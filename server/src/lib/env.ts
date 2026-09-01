@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import {
   readAuthRateLimitMax,
   readAuthRateLimitWindowMs,
+  readBindHost,
   readCorsCredentials,
   readCorsOrigins,
   readDatabaseUrl,
@@ -125,6 +126,7 @@ export const env = {
   nodeEnv,
   httpServerAdapter: readHttpServerAdapter(),
   port: readPort(),
+  bindHost: readBindHost(nodeEnv),
   corsOrigins,
   corsCredentials,
   databaseUrl: readDatabaseUrl(),

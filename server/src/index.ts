@@ -121,10 +121,11 @@ async function bootstrap(): Promise<void> {
 
   if (env.httpServerAdapter === "express") {
     const app = createApp();
-    const server = app.listen(env.port, () => {
+    const server = app.listen(env.port, env.bindHost, () => {
       appLogger.info(
         {
           adapter: env.httpServerAdapter,
+          bindHost: env.bindHost,
           port: env.port,
           version: buildInfo.appVersion,
           release: buildInfo.appRelease,
@@ -153,7 +154,7 @@ async function bootstrap(): Promise<void> {
   }
 
   const fastify = await createFastifyServer();
-  await fastify.listen({ port: env.port, host: "0.0.0.0" });
+  await fastify.listen({ port: env.port, host: env.bindHost });
 
   fastify.server.on("error", (error) => {
     appLogger.fatal({ err: error }, "Server error fatal.");
@@ -163,6 +164,7 @@ async function bootstrap(): Promise<void> {
   appLogger.info(
     {
       adapter: env.httpServerAdapter,
+      bindHost: env.bindHost,
       port: env.port,
       version: buildInfo.appVersion,
       release: buildInfo.appRelease,

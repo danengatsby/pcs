@@ -1,3 +1,4 @@
+import { isIP } from "node:net";
 import { readBooleanFlag, readPositiveInt } from "./shared.js";
 
 export type HttpServerAdapter = "express" | "fastify";
@@ -11,6 +12,17 @@ export function readPort(): number {
   }
 
   return parsed;
+}
+
+export function readBindHost(nodeEnv: string): string {
+  const defaultHost = nodeEnv === "production" ? "127.0.0.1" : "0.0.0.0";
+  const raw = process.env.BIND_HOST?.trim() || defaultHost;
+
+  if (isIP(raw) === 0) {
+    throw new Error(`BIND_HOST invalid: ${raw}. Configureaza o adresa IPv4 sau IPv6.`);
+  }
+
+  return raw;
 }
 
 export function readCorsOrigins(): string[] {
