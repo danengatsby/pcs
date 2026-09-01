@@ -8,7 +8,7 @@ services:
     env_file:
       - ./server/.env
     ports:
-      - "${POSTGRES_PORT:-5433}:5432"
+      - "127.0.0.1:${POSTGRES_PORT:-5433}:5432"
     volumes:
       - pcp_postgres_data:/var/lib/postgresql/data
 
@@ -20,7 +20,7 @@ services:
       - cache
       - testing
     ports:
-      - "${REDIS_PORT:-6381}:6379"
+      - "127.0.0.1:${REDIS_PORT:-6381}:6379"
 
   prometheus:
     image: prom/prometheus:v2.54.1
