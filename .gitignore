@@ -1,0 +1,16 @@
+node_modules
+dist
+.env
+.env.*
+!.env.example
+.DS_Store
+.pm2
+client/dist
+server/dist
+server/uploads
+coverage
+playwright-report
+test-results
+xx
+monitoring/prometheus/secrets/pcp_metrics_bearer_token
+monitoring/grafana/secrets/grafana_admin_password

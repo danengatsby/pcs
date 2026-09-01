@@ -1,0 +1,144 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: pcp-postgres
+    restart: unless-stopped
+    env_file:
+      - ./server/.env
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - pcp_postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: pcp-redis
+    restart: unless-stopped
+    profiles:
+      - cache
+      - testing
+    ports:
+      - "${REDIS_PORT:-6381}:6379"
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    container_name: pcp-prometheus
+    user: "0:0"
+    restart: unless-stopped
+    profiles:
+      - monitoring
+    ports:
+      - "9090:9090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-lifecycle"
+    volumes:
+      - ./monitoring/prometheus/prometheus.local.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/prometheus/alerts.pcp.yml:/etc/prometheus/rules/alerts.pcp.yml:ro
+      - ./monitoring/prometheus/secrets/pcp_metrics_bearer_token:/etc/prometheus/secrets/pcp_metrics_bearer_token:ro
+      - pcp_prometheus_data:/prometheus
+
+  grafana:
+    image: grafana/grafana:11.3.0
+    container_name: pcp-grafana
+    user: "0:0"
+    restart: unless-stopped
+    profiles:
+      - monitoring
+    ports:
+      - "${GRAFANA_PORT:-3300}:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD__FILE: /etc/grafana/secrets/grafana_admin_password
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    depends_on:
+      - prometheus
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - ./monitoring/grafana/secrets/grafana_admin_password:/etc/grafana/secrets/grafana_admin_password:ro
+      - pcp_grafana_data:/var/lib/grafana
+
+  news_media_cleanup:
+    image: node:20-alpine
+    container_name: pcp-news-media-cleanup
+    restart: unless-stopped
+    profiles:
+      - maintenance
+    working_dir: /app
+    env_file:
+      - ./server/.env
+    environment:
+      NODE_ENV: development
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      # Default: 7 days
+      NEWS_MEDIA_CLEANUP_MIN_AGE_HOURS: "${NEWS_MEDIA_CLEANUP_MIN_AGE_HOURS:-168}"
+      # How many assets to process per run
+      NEWS_MEDIA_CLEANUP_LIMIT: "${NEWS_MEDIA_CLEANUP_LIMIT:-2000}"
+      # Run interval (seconds). Default: 6 hours
+      NEWS_MEDIA_CLEANUP_INTERVAL_SECONDS: "${NEWS_MEDIA_CLEANUP_INTERVAL_SECONDS:-21600}"
+    volumes:
+      - ./package.json:/app/package.json:ro
+      - ./package-lock.json:/app/package-lock.json:ro
+      - ./tsconfig.base.json:/app/tsconfig.base.json:ro
+      - ./server:/app/server:ro
+      - ./client/package.json:/app/client/package.json:ro
+      - /app/server/dist
+      - /app/server/node_modules
+      - ./server/uploads:/app/server/uploads
+    command: >
+      sh -c "npm ci
+      && npm run build --workspace server
+      && while true; do
+          node server/dist/scripts/cleanupNewsMedia.js || true;
+          sleep $$NEWS_MEDIA_CLEANUP_INTERVAL_SECONDS;
+        done"
+    depends_on:
+      - postgres
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: pcp-jaeger
+    restart: unless-stopped
+    profiles:
+      - monitoring
+      - tracing
+    environment:
+      COLLECTOR_ZIPKIN_HOST_PORT: ":9411"
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"  # Jaeger UI
+      - "4317:4317"    # OTLP gRPC receiver
+      - "4318:4318"    # OTLP HTTP receiver
+      - "9411:9411"    # Zipkin compatible collector
+    depends_on:
+      - prometheus
+
+  clamav:
+    image: clamav/clamav:stable
+    container_name: pcp-clamav
+    restart: unless-stopped
+    profiles:
+      - security
+    ports:
+      - "${CLAMAV_PORT:-3310}:3310"
+    volumes:
+      - pcp_clamav_db:/var/lib/clamav
+    environment:
+      # The official image updates definitions automatically (freshclam).
+      # You can control update frequency via image envs if needed; defaults are usually sane.
+      CLAMD_CONF_StreamMaxLength: "${CLAMAV_STREAM_MAX_LENGTH:-26214400}"
+      CLAMD_CONF_MaxFileSize: "${CLAMAV_MAX_FILE_SIZE:-26214400}"
+      CLAMD_CONF_MaxScanSize: "${CLAMAV_MAX_SCAN_SIZE:-26214400}"
+
+volumes:
+  pcp_postgres_data:
+  pcp_prometheus_data:
+  pcp_grafana_data:
+  pcp_clamav_db:

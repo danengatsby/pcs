@@ -1,0 +1,200 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                     BigInt      @id @default(autoincrement()) @db.BigInt
+  fullName               String      @map("full_name") @db.VarChar(160)
+  email                  String      @db.VarChar(180)
+  passwordHash           String      @map("password_hash") @db.VarChar(255)
+  role                   String      @db.VarChar(20)
+  createdAt              DateTime    @map("created_at") @default(now()) @db.Timestamptz(6)
+  refreshTokens          AuthRefreshToken[]
+  adminAuditEntries      AdminAuditLog[] @relation("AdminAuditActor")
+  volunteersOwned        Volunteer[] @relation("VolunteerOwner")
+  volunteersStatusUpdate Volunteer[] @relation("VolunteerStatusUpdatedBy")
+  newsMediaAssetsCreated NewsMediaAsset[]
+
+  @@map("users")
+}
+
+model County {
+  id             Int         @id @default(autoincrement())
+  name           String      @unique @db.VarChar(120)
+  normalizedName String      @unique @map("normalized_name") @db.VarChar(120)
+  createdAt      DateTime    @map("created_at") @default(now()) @db.Timestamptz(6)
+  volunteers     Volunteer[]
+
+  @@map("counties")
+}
+
+model News {
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(180)
+  summary     String   @db.VarChar(320)
+  category    String   @default("Comunicat") @db.VarChar(80)
+  content     String   @default("") @db.Text
+  status      String   @default("published") @db.VarChar(20)
+  tags        Json
+  publishedAt DateTime @map("published_at") @default(now()) @db.Timestamptz(6)
+  createdAt   DateTime @map("created_at") @default(now()) @db.Timestamptz(6)
+  mediaLinks  NewsMediaLink[]
+
+  @@map("news")
+}
+
+model NewsMediaAsset {
+  id           BigInt         @id @default(autoincrement()) @db.BigInt
+  storagePath  String         @unique @map("storage_path") @db.VarChar(600)
+  publicUrl    String         @unique @map("public_url") @db.VarChar(600)
+  originalName String         @map("original_name") @db.VarChar(255)
+  mimeType     String         @map("mime_type") @db.VarChar(120)
+  sizeBytes    BigInt         @map("size_bytes") @db.BigInt
+  kind         String         @db.VarChar(20)
+  title        String         @default("") @db.VarChar(180)
+  alt          String         @default("") @db.VarChar(240)
+  createdBy    BigInt?        @map("created_by") @db.BigInt
+  createdByRef User?          @relation(fields: [createdBy], references: [id], onDelete: SetNull)
+  deletedAt    DateTime?      @map("deleted_at") @db.Timestamptz(6)
+  createdAt    DateTime       @map("created_at") @default(now()) @db.Timestamptz(6)
+  links        NewsMediaLink[]
+
+  @@map("news_media_assets")
+}
+
+model NewsMediaLink {
+  id        BigInt         @id @default(autoincrement()) @db.BigInt
+  newsId    Int            @map("news_id")
+  assetId   BigInt         @map("asset_id") @db.BigInt
+  kind      String         @db.VarChar(20)
+  title     String         @default("") @db.VarChar(180)
+  alt       String         @default("") @db.VarChar(240)
+  sortOrder Int            @default(0) @map("sort_order")
+  createdAt DateTime       @map("created_at") @default(now()) @db.Timestamptz(6)
+  news      News           @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  asset     NewsMediaAsset @relation(fields: [assetId], references: [id], onDelete: Restrict)
+
+  @@unique([newsId, assetId])
+  @@map("news_media_links")
+}
+
+model Volunteer {
+  id                 BigInt    @id @default(autoincrement()) @db.BigInt
+  fullName           String    @map("full_name") @db.VarChar(160)
+  email              String    @db.VarChar(180)
+  phone              String    @db.VarChar(40)
+  county             String    @db.VarChar(120)
+  countyId           Int?      @map("county_id")
+  countyRef          County?   @relation(fields: [countyId], references: [id], onDelete: Restrict)
+  locality           String    @db.VarChar(120)
+  skills             String    @db.VarChar(220)
+  motivation         String    @db.Text
+  workflowStatus     String    @map("workflow_status") @default("nou") @db.VarChar(20)
+  internalNotes      String    @map("internal_notes") @default("") @db.Text
+  statusUpdatedAt    DateTime? @map("status_updated_at") @db.Timestamptz(6)
+  statusUpdatedBy    BigInt?   @map("status_updated_by") @db.BigInt
+  statusUpdatedByRef User?     @relation("VolunteerStatusUpdatedBy", fields: [statusUpdatedBy], references: [id], onDelete: SetNull)
+  ownerUserId        BigInt?   @map("owner_user_id") @db.BigInt
+  ownerUserRef       User?     @relation("VolunteerOwner", fields: [ownerUserId], references: [id], onDelete: SetNull)
+  followUpAt         DateTime? @map("follow_up_at") @db.Timestamptz(6)
+  reminderAt         DateTime? @map("reminder_at") @db.Timestamptz(6)
+  lastContactAt      DateTime? @map("last_contact_at") @db.Timestamptz(6)
+  contactChannel     String?   @map("contact_channel") @db.VarChar(30)
+  crmPriority        String    @map("crm_priority") @default("medie") @db.VarChar(20)
+  rejectionReason    String    @map("rejection_reason") @default("") @db.Text
+  crmTags            Json      @map("crm_tags") @default("[]")
+  skillTags          Json      @map("skill_tags") @default("[]")
+  createdAt          DateTime  @map("created_at") @default(now()) @db.Timestamptz(6)
+
+  @@map("volunteers")
+}
+
+model RateLimitEntry {
+  scope       String   @db.VarChar(100)
+  keyHash     String   @map("key_hash") @db.Char(64)
+  windowStart DateTime @map("window_start") @db.Timestamptz(6)
+  hits        Int      @default(1)
+  updatedAt   DateTime @map("updated_at") @default(now()) @db.Timestamptz(6)
+
+  @@id([scope, keyHash])
+  @@map("rate_limit_entries")
+}
+
+model AuthRevokedToken {
+  jti       String   @id @db.VarChar(120)
+  expiresAt DateTime @map("expires_at") @db.Timestamptz(6)
+  revokedAt DateTime @map("revoked_at") @default(now()) @db.Timestamptz(6)
+
+  @@map("auth_revoked_tokens")
+}
+
+model AuthRefreshToken {
+  id            BigInt    @id @default(autoincrement()) @db.BigInt
+  tokenHash     String    @unique @map("token_hash") @db.Char(64)
+  csrfTokenHash String    @map("csrf_token_hash") @db.Char(64)
+  userId        BigInt    @map("user_id") @db.BigInt
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt     DateTime  @map("expires_at") @db.Timestamptz(6)
+  revokedAt     DateTime? @map("revoked_at") @db.Timestamptz(6)
+  rotatedFromId BigInt?   @map("rotated_from_id") @db.BigInt
+  rotatedToId   BigInt?   @map("rotated_to_id") @db.BigInt
+  userAgent     String    @map("user_agent") @db.VarChar(255)
+  ipAddress     String    @map("ip_address") @db.VarChar(120)
+  createdAt     DateTime  @map("created_at") @default(now()) @db.Timestamptz(6)
+
+  @@map("auth_refresh_tokens")
+}
+
+model AdminAuditLog {
+  id         BigInt    @id @default(autoincrement()) @db.BigInt
+  actorUserId BigInt?  @map("actor_user_id") @db.BigInt
+  actorUser   User?    @relation("AdminAuditActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  actorEmail String    @map("actor_email") @db.VarChar(180)
+  actorRole  String    @map("actor_role") @db.VarChar(20)
+  action     String    @db.VarChar(120)
+  targetType String    @map("target_type") @db.VarChar(80)
+  targetId   String    @map("target_id") @db.VarChar(120)
+  details    Json      @db.JsonB
+  createdAt  DateTime  @map("created_at") @default(now()) @db.Timestamptz(6)
+
+  @@map("admin_audit_log")
+}
+
+model NotificationEmailOutbox {
+  id           BigInt    @id @default(autoincrement()) @db.BigInt
+  action       String    @db.VarChar(120)
+  payload      Json      @db.JsonB
+  status       String    @default("pending") @db.VarChar(20)
+  attemptCount Int       @map("attempt_count") @default(0)
+  maxAttempts  Int       @map("max_attempts") @default(6)
+  nextAttemptAt DateTime @map("next_attempt_at") @default(now()) @db.Timestamptz(6)
+  lastError    String    @map("last_error") @default("") @db.Text
+  lockedAt     DateTime? @map("locked_at") @db.Timestamptz(6)
+  sentAt       DateTime? @map("sent_at") @db.Timestamptz(6)
+  createdAt    DateTime  @map("created_at") @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime  @map("updated_at") @default(now()) @db.Timestamptz(6)
+
+  @@map("notification_email_outbox")
+}
+
+model AdminAuditOutbox {
+  id            BigInt    @id @default(autoincrement()) @db.BigInt
+  action        String    @db.VarChar(120)
+  payload       Json      @db.JsonB
+  status        String    @default("pending") @db.VarChar(20)
+  attemptCount  Int       @map("attempt_count") @default(0)
+  maxAttempts   Int       @map("max_attempts") @default(6)
+  nextAttemptAt DateTime  @map("next_attempt_at") @default(now()) @db.Timestamptz(6)
+  lastError     String    @map("last_error") @default("") @db.Text
+  lockedAt      DateTime? @map("locked_at") @db.Timestamptz(6)
+  sentAt        DateTime? @map("sent_at") @db.Timestamptz(6)
+  createdAt     DateTime  @map("created_at") @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime  @map("updated_at") @default(now()) @db.Timestamptz(6)
+
+  @@map("admin_audit_outbox")
+}

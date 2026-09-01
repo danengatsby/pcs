@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Statut_PCP_v7</title>
+  <style>
+html {
+color: #1a1a1a;
+background-color: #fdfdfd;
+}
+body {
+margin: 0 auto;
+max-width: 36em;
+padding-left: 50px;
+padding-right: 50px;
+padding-top: 50px;
+padding-bottom: 50px;
+hyphens: auto;
+overflow-wrap: break-word;
+text-rendering: optimizeLegibility;
+font-kerning: normal;
+}
+@media (max-width: 600px) {
+body {
+font-size: 0.9em;
+padding: 12px;
+}
+h1 {
+font-size: 1.8em;
+}
+}
+@media print {
+html {
+background-color: white;
+}
+body {
+background-color: transparent;
+color: black;
+font-size: 12pt;
+}
+p, h2, h3 {
+orphans: 3;
+widows: 3;
+}
+h2, h3, h4 {
+page-break-after: avoid;
+}
+}
+p {
+margin: 1em 0;
+}
+a {
+color: #1a1a1a;
+}
+a:visited {
+color: #1a1a1a;
+}
+img {
+max-width: 100%;
+}
+h1, h2, h3, h4, h5, h6 {
+margin-top: 1.4em;
+}
+h5, h6 {
+font-size: 1em;
+font-style: italic;
+}
+h6 {
+font-weight: normal;
+}
+ol, ul {
+padding-left: 1.7em;
+margin-top: 1em;
+}
+li > ol, li > ul {
+margin-top: 0;
+}
+blockquote {
+margin: 1em 0 1em 1.7em;
+padding-left: 1em;
+border-left: 2px solid #e6e6e6;
+color: #606060;
+}
+code {
+font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+font-size: 85%;
+margin: 0;
+hyphens: manual;
+}
+pre {
+margin: 1em 0;
+overflow: auto;
+}
+pre code {
+padding: 0;
+overflow: visible;
+overflow-wrap: normal;
+}
+.sourceCode {
+background-color: transparent;
+overflow: visible;
+}
+hr {
+background-color: #1a1a1a;
+border: none;
+height: 1px;
+margin: 1em 0;
+}
+table {
+margin: 1em 0;
+border-collapse: collapse;
+width: 100%;
+overflow-x: auto;
+display: block;
+font-variant-numeric: lining-nums tabular-nums;
+}
+table caption {
+margin-bottom: 0.75em;
+}
+tbody {
+margin-top: 0.5em;
+border-top: 1px solid #1a1a1a;
+border-bottom: 1px solid #1a1a1a;
+}
+th {
+border-top: 1px solid #1a1a1a;
+padding: 0.25em 0.5em 0.25em 0.5em;
+}
+td {
+padding: 0.125em 0.5em 0.25em 0.5em;
+}
+header {
+margin-bottom: 4em;
+text-align: center;
+}
+#TOC li {
+list-style: none;
+}
+#TOC ul {
+padding-left: 1.3em;
+}
+#TOC > ul {
+padding-left: 0;
+}
+#TOC a:not(:hover) {
+text-decoration: none;
+}
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+</style>
+</head>
+<body>
+<p><strong>ROMANIA</strong></p>
+<p><img src="data:image/png;base64,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" style="width:1.25in;height:1.25in" /></p>
+<p><strong>PCP</strong></p>
+<p><strong>PARTIDUL CONSERVATOR AL PENSIONARILOR</strong></p>
+<p>Demnitate · Echitate · Traditie</p>
+<p><strong>STATUT</strong></p>
+<p>Document Constitutiv Oficial</p>
+<p>Adoptat in Congresul Fondator — Iasi, 2026</p>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 69%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>Denumire completa</strong></td>
+<td>Partidul Conservator al Pensionarilor</td>
+</tr>
+<tr class="even">
+<td><strong>Denumire prescurtata</strong></td>
+<td>P.C.P.</td>
+</tr>
+<tr class="odd">
+<td><strong>Sediu central</strong></td>
+<td>Iasi, Sos. Bucium nr. 23</td>
+</tr>
+<tr class="even">
+<td><strong>Baza legala</strong></td>
+<td>Legea nr. 14/2003 privind partidele politice, republicata</td>
+</tr>
+<tr class="odd">
+<td><strong>Finantare</strong></td>
+<td>Legea nr. 334/2006 privind finantarea partidelor politice</td>
+</tr>
+<tr class="even">
+<td><strong>Nr. dosar</strong></td>
+<td>Dosar nr. _________ / Tribunalul Iasi / 2026</td>
+</tr>
+<tr class="odd">
+<td><strong>Data adoptarii</strong></td>
+<td>Congresul Fondator P.C.P. — Iasi, _____________ 2026</td>
+</tr>
+</tbody>
+</table>
+<p>Conform Art. 10 din Legea nr. 14/2003 privind partidele politice</p>
+<p><strong>PREAMBUL</strong></p>
+<p>Partidul Conservator al Pensionarilor (P.C.P.) se intemeiaza pe
+convingerea ca generatia care a construit Romania moderna merita
+respectul, demnitatea si protectia deplina a statului. Fondat la
+initiativa a peste 25.000 de cetateni cu drept de vot, domiciliati in
+cel putin 18 judete ale tarii si in municipiul Iasi, P.C.P. isi propune
+sa reprezinte cu fermitate interesele pensionarilor si ale persoanelor
+varstnice din Romania.</p>
+<p>Prezentul Statut stabileste organizarea, functionarea, drepturile si
+obligatiile membrilor, sursele de finantare si toate celelalte elemente
+obligatorii prevazute de Art. 10 din Legea nr. 14/2003 privind partidele
+politice, republicata, cu modificarile si completarile ulterioare.</p>
+<p><strong>CAPITOLUL I DENUMIRE, SEMN PERMANENT SI SEDIU</strong></p>
+<p><strong>Sectiunea 1 — Denumire si Identitate</strong></p>
+<p><strong>Art. 1. Denumirea Partidului</strong></p>
+<blockquote>
+<p><strong>(1)</strong> Partidul se numeste PARTIDUL CONSERVATOR AL
+PENSIONARILOR, denumit in continuare P.C.P. sau Partidul.</p>
+<p><strong>(2)</strong> Denumirea prescurtata oficiala, utilizata in
+toate documentele, comunicatele, buletinele de vot si corespondenta
+oficiala, este: P.C.P.</p>
+<p><strong>(3)</strong> Partidul este persoana juridica de drept public,
+inregistrat la Tribunalul Iasi conform Legii nr. 14/2003, si isi
+desfasoara activitatea pe intreg teritoriul Romaniei.</p>
+</blockquote>
+<p><strong>Art. 2. Semnul permanent al Partidului</strong></p>
+<blockquote>
+<p><strong>(1)</strong> Semnul permanent al P.C.P. este compus din: o
+umbrela stilizata de culoare alba, inscriptionata intr-un scut
+verde-inchis (Pantone 357 C), simbol al protectiei si solidaritatii
+sociale, insotit de inscriptia P.C.P. in partea inferioara a scutului,
+font Arial Bold, culoare alba pe fond verde.</p>
+<p><strong>(2)</strong> Culorile oficiale ale Partidului sunt:
+verde-inchis (Pantone 357 C), alb (RAL 9016) si auriu (Pantone 871
+C).</p>
+<p><strong>(3)</strong> Semnul permanent este protejat conform
+legislatiei privind proprietatea intelectuala si nu poate fi utilizat
+fara acordul scris al Biroului Politic National.</p>
+<p><strong>(4)</strong> Semnul permanent va fi depus spre inregistrare
+la Biroul Electoral Central inaintea oricarei participari la
+alegeri.</p>
+</blockquote>
+<p><strong>Sectiunea 2 — Sediul Central</strong></p>
+<p><strong>Art. 3. Sediul central al Partidului</strong></p>
+<blockquote>
+<p><strong>(1)</strong> Sediul central al P.C.P. este in municipiul
+Iasi, Sos. Bucium nr. 23, judetul Iasi.</p>
+<p><strong>(2)</strong> Schimbarea sediului central se hotaraste de
+catre Biroul Politic National si se comunica de indata Tribunalului Iasi
+si Autoritatii Electorale Permanente, in termen de maximum 15 zile.</p>
+<p><strong>(3)</strong> Partidul poate infiinta sedii secundare in orice
+judet al tarii, prin hotararea organizatiei judetene respective, cu
+instiintarea Secretariatului General.</p>
+</blockquote>
+<p><strong>CAPITOLUL II SCOPURI, OBIECTIVE SI VALORI
+FUNDAMENTALE</strong></p>
+<p><strong>Art. 4. Respectarea ordinii constitutionale — Mentiune
+expresa</strong></p>
+<blockquote>
+<p><strong>(1)</strong> P.C.P. declara in mod expres ca respecta
+Constitutia Romaniei si legile tarii, ca promoveaza valorile democratiei
+pluraliste, statul de drept, drepturile si libertatile fundamentale ale
+omului, astfel cum sunt garantate de Constitutie si de tratatele
+internationale la care Romania este parte.</p>
+<p><strong>(2)</strong> Partidul condamna si se opune oricarei forme de
+discriminare, violenta, extremism, ura sau segregare pe criterii de
+varsta, sex, etnie, religie sau convingeri politice.</p>
+<p><strong>(3)</strong> P.C.P. recunoaste si respecta suveranitatea
+nationala si integritatea teritoriala a Romaniei, condamna separatismul
+teritorial, propaganda de ura nationala, rasiala sau religioasa.</p>
+</blockquote>
+<p><strong>Art. 5. Scopul si obiectivele Partidului</strong></p>
+<blockquote>
+<p><strong>(1)</strong> P.C.P. are ca scop reprezentarea si apararea
+intereselor pensionarilor si ale persoanelor varstnice din Romania in
+cadrul procesului democratic constitutional.</p>
+<p><strong>(2)</strong> Obiectivele principale ale Partidului sunt:</p>
+</blockquote>
+<ol type="a">
+<li><p>cresterea pensiilor si indexarea acestora la rata reala a
+inflatiei, garantata prin lege;</p></li>
+<li><p>asigurarea accesului universal si gratuit la servicii medicale de
+calitate pentru pensionari;</p></li>
+<li><p>combaterea saraciei in randul populatiei varstnice prin masuri
+sociale concrete;</p></li>
+<li><p>promovarea si adoptarea legislatiei privind protectia sociala a
+persoanelor varstnice;</p></li>
+<li><p>reprezentarea pensionarilor in Parlament, in Guvern si in
+administratia publica locala;</p></li>
+<li><p>combaterea abuzurilor si a exploatarii persoanelor
+varstnice.</p></li>
+</ol>
+<p><strong>CAPITOLUL III DREPTURILE SI INDATORIRILE
+MEMBRILOR</strong></p>
+<p><strong>Sectiunea 1 — Calitatea de Membru</strong></p>
+<p><strong>Art. 6. Conditii de aderare</strong></p>
+<blockquote>
+<p><strong>(1)</strong> Poate deveni membru al P.C.P. orice cetatean
+roman cu drept de vot, indiferent de sex, etnie, religie sau convingeri,
+care adera la valorile si programul politic al Partidului si nu face
+parte din alt partid politic.</p>
+<p><strong>(2)</strong> Nu pot fi membri ai P.C.P.: judecatorii Curtii
+Constitutionale, avocatii Poporului, magistratii, membrii activi ai
+armatei, politistii si alte categorii prevazute expres de lege.</p>
+<p><strong>(3)</strong> Un cetatean roman nu poate face parte, in
+acelasi timp, din doua sau mai multe partide politice. Inscrierea
+intr-un alt partid politic constituie de drept demisie din P.C.P.,
+conform Art. 7 din Legea nr. 14/2003.</p>
+<p><strong>(4)</strong> Cererea de inscriere se depune la organizatia
+teritoriala din raza domiciliului solicitantului si se aproba de
+conducerea acesteia in termen de 30 de zile calendaristice.</p>
+</blockquote>
+<p><strong>Sectiunea 2 — Drepturile Membrilor</strong></p>
+<p><strong>Art. 7. Drepturile membrilor P.C.P.</strong></p>
+<blockquote>
+<p><strong>(1)</strong> Membrii P.C.P. au urmatoarele drepturi:</p>
+</blockquote>
+<ol start="7" type="a">
+<li><p>dreptul de a participa la toate activitatile Partidului, la
+sedintele si adunarile organizatiei din care face parte;</p></li>
+<li><p>dreptul de a alege si de a fi ales in organele de conducere ale
+Partidului, la toate nivelurile organizatorice;</p></li>
+<li><p>dreptul de a fi propus si sustinut ca si candidat al Partidului
+in alegeri locale, parlamentare, europarlamentare sau
+prezidentiale;</p></li>
+<li><p>dreptul de a cunoaste situatia financiara a organizatiei din care
+face parte, prin consultarea rapoartelor anuale;</p></li>
+<li><p>dreptul de a formula petitii, sesizari si propuneri adresate
+organelor de conducere, cu obligatia primirii unui raspuns motivat in 30
+de zile;</p></li>
+<li><p>dreptul de a se retrage din Partid, prin cerere scrisa, fara a i
+se cere justificari;</p></li>
+<li><p>dreptul la aparare deplina in fata Comisiei de Arbitraj, in caz
+de procedura disciplinara.</p></li>
+</ol>
+<p><strong>Sectiunea 3 — Indatoririle Membrilor</strong></p>
+<p><strong>Art. 8. Indatoririle membrilor P.C.P.</strong></p>
+<blockquote>
+<p><strong>(1)</strong> Membrii P.C.P. au urmatoarele indatoriri:</p>
+</blockquote>
+<ol start="14" type="a">
+<li><p>sa respecte prezentul Statut, programul politic si hotararile
+organelor de conducere ale Partidului;</p></li>
+<li><p>sa plateasca cotizatia lunara in cuantumul stabilit de Biroul
+Politic National;</p></li>
+<li><p>sa participe activ la activitatile organizatiei si sa promoveze
+valorile si obiectivele Partidului;</p></li>
+<li><p>sa nu intreprinda actiuni care aduc prejudicii imaginii,
+intereselor sau patrimoniului Partidului;</p></li>
+<li><p>sa respecte deciziile adoptate prin vot democratic de organele
+Partidului;</p></li>
+<li><p>sa nu detina simultan calitatea de membru al altui partid
+politic.</p></li>
+</ol>
+<p><strong>CAPITOLUL IV SANCTIUNI DISCIPLINARE SI PROCEDURI</strong></p>
+<p><strong>Sectiunea 1 — Tipuri de Sanctiuni</strong></p>
+<p><strong>Art. 9. Sanctiunile disciplinare</strong></p>
+<blockquote>
+<p><strong>(1)</strong> Membrii P.C.P. care incalca prevederile
+prezentului Statut, ale programului politic sau hotararile organelor de
+conducere pot fi sanctionati disciplinar.</p>
+<p><strong>(2)</strong> Sanctiunile disciplinare, in ordinea crescatoare
+a gravitatii, sunt:</p>
+</blockquote>
+<ol start="20" type="a">
+<li><p>AVERTISMENT SCRIS — pentru abateri minore sau savarsita pentru
+prima data;</p></li>
+<li><p>MUSTRARE PUBLICA — pentru abateri repetate sau care au afectat
+imaginea Partidului;</p></li>
+<li><p>SUSPENDARE din calitatea de membru pe o perioada de 1 (una) pana
+la 12 (douasprezece) luni;</p></li>
+<li><p>EXCLUDERE din Partid — pentru abateri grave, incompatibilitate
+dovedita sau actiuni contrare intereselor fundamentale ale
+Partidului.</p></li>
+</ol>
+<p><strong>Sectiunea 2 — Procedura Disciplinara</strong></p>
+<p><strong>Art. 10. Procedura de aplicare a sanctiunilor</strong></p>
+<blockquote>
+<p><strong>(1)</strong> Nicio sanctiune nu poate fi aplicata fara
+respectarea dreptului la aparare al membrului in cauza, garantat prin
+prezentul Statut.</p>
+<p><strong>(2)</strong> Procedura disciplinara se declanseaza prin
+sesizare scrisa adresata Comisiei de Arbitraj de la nivelul organizatiei
+competente.</p>
+<p><strong>(3)</strong> Membrul sanctionat are dreptul sa fie audiat
+personal si sa prezinte probe si dovezi in apararea sa, in termen de 15
+zile calendaristice de la primirea notificarii.</p>
+<p><strong>(4)</strong> Decizia Comisiei de Arbitraj se adopta prin vot
+secret, cu majoritate simpla, si se comunica in scris celui vizat in
+termen de 5 zile lucratoare de la pronuntare.</p>
+<p><strong>(5)</strong> Decizia de excludere din Partid poate fi atacata
+cu contestatie la Comisia Centrala de Arbitraj in termen de 30 de zile
+calendaristice de la comunicare.</p>
+<p><strong>(6)</strong> Membrii organelor de conducere sanctionati cu
+excludere sunt suspendati din functie de drept pe toata durata
+procedurii disciplinare.</p>
+</blockquote>
+<p><strong>CAPITOLUL V ORGANIZARE SI FUNCTIONARE</strong></p>
+<p><strong>Sectiunea 1 — Structura Teritoriala</strong></p>
+<p><strong>Art. 11. Organizatiile teritoriale</strong></p>
+<blockquote>
+<p><strong>(1)</strong> P.C.P. este organizat pe principiul
+teritorialitatii, corespunzator organizarii administrativ-teritoriale a
+Romaniei, in conformitate cu Art. 8 din Legea nr. 14/2003.</p>
+<p><strong>(2)</strong> Subdiviziunile teritoriale ale Partidului sunt,
+in ordine ierarhica:</p>
+</blockquote>
+<ol start="24" type="a">
+<li><p>Organizatii comunale si orasenesti — nivel de baza, minim 7
+membri;</p></li>
+<li><p>Organizatii municipale — minim 50 de membri;</p></li>
+<li><p>Organizatii judetene — minim 700 de membri (obligatoriu in cel
+putin 18 judete);</p></li>
+<li><p>Organizatia Municipiului Iasi — sediu central la Sos. Bucium nr.
+23;</p></li>
+<li><p>Conducerea Nationala.</p></li>
+</ol>
+<blockquote>
+<p><strong>(3)</strong> Organele locale pot reprezenta Partidul fata de
+terti la nivelul local corespunzator, pot deschide conturi bancare si
+raspund de gestionarea acestora.</p>
+<p><strong>(4)</strong> Conducerile organizatiilor teritoriale se aleg
+pentru o perioada determinata de 4 (patru) ani, prin vot secret,
+potrivit prevederilor prezentului Statut.</p>
+</blockquote>
+<p><strong>Sectiunea 2 — Organele de Conducere Nationale</strong></p>
+<p><strong>Art. 12. Congresul National — Organul Suprem</strong></p>
+<blockquote>
+<p><strong>(1)</strong> Congresul National este organul suprem de
+decizie al P.C.P. la nivel national, conform Art. 11 din Legea nr.
+14/2003.</p>
+<p><strong>(2)</strong> Congresul National se intruneste in sesiune
+ordinara cel putin o data la 4 (patru) ani si in sesiune extraordinara
+ori de cate ori este necesar.</p>
+<p><strong>(3)</strong> Delegatii la Congresul National sunt alesi de
+organizatiile judetene prin vot secret, cu respectarea normei de
+reprezentare de 1 delegat la 50 de membri.</p>
+<p><strong>(4)</strong> Congresul National are urmatoarele atributii
+exclusive:</p>
+</blockquote>
+<ol start="29" type="a">
+<li><p>adoptarea si modificarea Statutului si Programului Politic al
+Partidului;</p></li>
+<li><p>alegerea si revocarea Presedintelui Partidului prin vot secret,
+direct;</p></li>
+<li><p>alegerea membrilor Consiliului National si ai Comisiei Centrale
+de Arbitraj;</p></li>
+<li><p>stabilirea directiilor strategice si a prioritatilor politice ale
+Partidului;</p></li>
+<li><p>dizolvarea voluntara a Partidului, cu majoritate calificata de
+2/3 din delegati.</p></li>
+</ol>
+<blockquote>
+<p><strong>(5)</strong> Congresul este legal constituit in prezenta a
+cel putin jumatate plus unu din delegatii alesi. Hotararile se adopta cu
+majoritate simpla, cu exceptia celor prevazute la alin. (4) lit. a) si
+e), care necesita majoritate calificata de 2/3.</p>
+</blockquote>
+<p><strong>Art. 13. Consiliul National</strong></p>
+<blockquote>
+<p><strong>(1)</strong> Consiliul National este organul de conducere al
+P.C.P. intre Congrese, format din: Presedintele Partidului, cei 4
+Vicepresedinti, Secretarul General, Trezorierul si presedintii
+organizatiilor judetene.</p>
+<p><strong>(2)</strong> Consiliul National se intruneste trimestrial in
+sesiune ordinara si ori de cate ori este convocat de Biroul Politic
+National, in sesiune extraordinara.</p>
+<p><strong>(3)</strong> Atributiile Consiliului National includ:
+coordonarea activitatii generale a Partidului, aprobarea bugetului
+anual, validarea candidaturilor la alegerile parlamentare si
+prezidentiale.</p>
+</blockquote>
+<p><strong>Art. 14. Biroul Politic National</strong></p>
+<blockquote>
+<p><strong>(1)</strong> Biroul Politic National (B.P.N.) este organul
+executiv permanent al P.C.P., cu activitate continua.</p>
+<p><strong>(2)</strong> B.P.N. este compus din: Presedintele Partidului
+— care il si conduce —, 4 Vicepresedinti, Secretarul General si
+Trezorierul National. Total: 7 membri.</p>
+<p><strong>(3)</strong> Membrii B.P.N. sunt alesi de Congresul National
+prin vot secret, pentru un mandat de 4 (patru) ani, cu posibilitatea
+reinnoirii mandatului o singura data.</p>
+<p><strong>(4)</strong> B.P.N. se intruneste bilunar in sedinta ordinara
+si ori de cate ori situatia o impune, la convocarea Presedintelui, cu un
+preaviz de minimum 48 de ore.</p>
+</blockquote>
+<p><strong>Art. 15. Presedintele Partidului</strong></p>
+<blockquote>
+<p><strong>(1)</strong> Presedintele P.C.P. este ales de Congresul
+National prin vot secret, direct si universal al delegatilor, cu
+majoritate simpla, pentru un mandat de 4 (patru) ani.</p>
+<p><strong>(2)</strong> Presedintele reprezinta Partidul in relatiile cu
+tertii, cu autoritatile publice, cu celelalte partide si cu
+organizatiile internationale.</p>
+<p><strong>(3)</strong> Functia de Presedinte este incompatibila cu
+orice functie publica aleasa sau numita la nivel central ori local, pe
+durata mandatului in Partid.</p>
+</blockquote>
+<p><strong>CAPITOLUL VI COMISIILE DE ARBITRAJ</strong></p>
+<p><strong>Art. 16. Organizarea Comisiilor de Arbitraj</strong></p>
+<blockquote>
+<p><strong>(1)</strong> In conformitate cu Art. 15 din Legea nr.
+14/2003, pentru solutionarea diferendelor dintre membrii P.C.P. sau
+dintre acestia si conducerile organizatiilor Partidului, se constituie
+Comisii de Arbitraj la toate nivelurile organizatorice.</p>
+<p><strong>(2)</strong> Se constituie Comisii de Arbitraj la nivel:
+local (3 membri), judetean (5 membri) si national — Comisia Centrala de
+Arbitraj (7 membri).</p>
+<p><strong>(3)</strong> Membrii comisiilor de arbitraj sunt alesi prin
+vot secret de catre adunarile generale ale organizatiilor respective,
+pentru o durata de cel mult 4 (patru) ani.</p>
+<p><strong>(4)</strong> Nu pot fi membri ai Comisiei de Arbitraj
+persoanele care detin functii de conducere in Partid la nivelul
+respectiv sau care au interese directe in cauzele supuse
+arbitrajului.</p>
+</blockquote>
+<p><strong>Art. 17. Atributiile Comisiei de Arbitraj</strong></p>
+<blockquote>
+<p><strong>(1)</strong> Comisiile de Arbitraj solutioneaza: litigiile
+dintre membri, contestatiile la deciziile disciplinare, conflictele de
+competenta intre organizatiile teritoriale si orice alte diferende
+interne.</p>
+<p><strong>(2)</strong> Comisia Centrala de Arbitraj judeca in ultima
+instanta interna; deciziile sale privind excluderea din Partid pot fi
+atacate numai in instanta judecatoreasca competenta, potrivit legii.</p>
+<p><strong>(3)</strong> Procedura in fata Comisiei de Arbitraj se
+desfasoara cu respectarea principiilor contradictorialitatii, egalitatii
+de arme si dreptului la aparare.</p>
+</blockquote>
+<p><strong>CAPITOLUL VII SURSELE DE FINANTARE ADMISE</strong></p>
+<p><strong>Art. 18. Sursele legale de finantare</strong></p>
+<blockquote>
+<p><strong>(1)</strong> Finantarea P.C.P. se realizeaza exclusiv din
+surse legale, in conformitate cu Legea nr. 334/2006 privind finantarea
+activitatii partidelor politice si a campaniilor electorale.</p>
+<p><strong>(2)</strong> Sursele de finantare admise ale P.C.P. sunt:</p>
+</blockquote>
+<ol start="34" type="a">
+<li><p>COTIZATII ale membrilor — cuantumul anual se stabileste de Biroul
+Politic National;</p></li>
+<li><p>DONATII SI LEGATE — de la persoane fizice, in limita plafonului
+legal de 200 de salarii minime brute pe economie pe an si per
+donator;</p></li>
+<li><p>SUBVENTII DE LA BUGETUL DE STAT — in conditiile si limitele
+stabilite de lege;</p></li>
+<li><p>VENITURI DIN ACTIVITATI PROPRII — edituri, evenimente
+cultural-politice, formare politica;</p></li>
+<li><p>IMPRUMUTURI DE LA INSTITUTII FINANCIAR-BANCARE — exclusiv banci
+autorizate din Romania sau din Uniunea Europeana.</p></li>
+</ol>
+<p><strong>Art. 19. Interdictii de finantare si raspundere</strong></p>
+<blockquote>
+<p><strong>(1)</strong> Este interzisa finantarea P.C.P. din surse
+anonime, din resurse publice (altele decat subventiile legale), din
+surse externe sau de la persoane juridice.</p>
+<p><strong>(2)</strong> Orice donatie care depaseste plafonul legal este
+refuzata si returnata donatorului in termen de 30 de zile
+calendaristice.</p>
+<p><strong>(3)</strong> Trezorierul National raspunde personal pentru
+respectarea normelor de finantare si pentru raportarea anuala la
+Autoritatea Electorala Permanenta si la Curtea de Conturi a
+Romaniei.</p>
+</blockquote>
+<p><strong>CAPITOLUL VIII MODIFICAREA STATUTULUI SI DIZOLVAREA
+PARTIDULUI</strong></p>
+<p><strong>Art. 20. Modificarea Statutului</strong></p>
+<blockquote>
+<p><strong>(1)</strong> Prezentul Statut poate fi modificat numai de
+Congresul National, cu votul a cel putin 2/3 (doua treimi) din delegatii
+prezenti si legal constituiti.</p>
+<p><strong>(2)</strong> Propunerile de modificare a Statutului se depun
+in scris la Secretariatul General cu cel putin 30 de zile calendaristice
+inainte de data Congresului.</p>
+<p><strong>(3)</strong> Modificarile intra in vigoare dupa inregistrarea
+lor la Tribunalul Iasi, in conformitate cu procedura prevazuta de Legea
+nr. 14/2003.</p>
+</blockquote>
+<p><strong>Art. 21. Dizolvarea Partidului</strong></p>
+<blockquote>
+<p><strong>(1)</strong> P.C.P. se poate dizolva voluntar prin hotararea
+Congresului National, adoptata cu votul a cel putin 2/3 (doua treimi)
+din totalul delegatilor alesi.</p>
+<p><strong>(2)</strong> Dizolvarea judiciara poate fi pronuntata de
+Curtea Constitutionala a Romaniei, in conditiile prevazute de Legea nr.
+14/2003.</p>
+<p><strong>(3)</strong> In caz de dizolvare voluntara, patrimoniul ramas
+dupa achitarea datoriilor va fi donat unor organizatii neguvernamentale
+cu activitate in domeniul protectiei sociale a persoanelor
+varstnice.</p>
+</blockquote>
+<p><strong>Art. 22. Dispozitii finale</strong></p>
+<blockquote>
+<p><strong>(1)</strong> Prezentul Statut a fost adoptat de Congresul
+Fondator al P.C.P., la Iasi, Sos. Bucium nr. 23, in anul 2026, si intra
+in vigoare de la data inregistrarii la Tribunalul Iasi.</p>
+<p><strong>(2)</strong> Prevederile prezentului Statut se completeaza cu
+dispozitiile Legii nr. 14/2003, ale Legii nr. 334/2006 si ale celorlalte
+acte normative aplicabile.</p>
+<p><strong>(3)</strong> Regulamentele interne ale P.C.P. se adopta de
+Biroul Politic National si nu pot contraveni prevederilor prezentului
+Statut.</p>
+</blockquote>
+<p><img src="data:image/png;base64,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" style="width:0.52083in;height:0.52083in" /> <strong>ADOPTARE SI
+SEMNATURI OFICIALE</strong></p>
+<p>Congresul Fondator al P.C.P. — Iasi, Sos. Bucium nr. 23</p>
+<p>Subsemnatii, delegati ai Congresului Fondator al Partidului
+Conservator al Pensionarilor (P.C.P.), intrunit la Iasi, Sos. Bucium nr.
+23, in data de _______________ 2026, adoptam in mod liber si democratic
+prezentul Statut, ca act constitutiv si de organizare a partidului, in
+conformitate cu prevederile Legii nr. 14/2003.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><p><strong>PRESEDINTE FONDATOR</strong></p>
+<p>___________________________</p>
+<p>Nume si prenume</p>
+<p>Semnatura: ___________________</p>
+<p>CNP: _________________________</p></td>
+<td><p><strong>SECRETAR GENERAL FONDATOR</strong></p>
+<p>___________________________</p>
+<p>Nume si prenume</p>
+<p>Semnatura: ___________________</p>
+<p>CNP: _________________________</p></td>
+</tr>
+<tr class="even">
+<td><p><strong>TREZORIER NATIONAL</strong></p>
+<p>___________________________</p>
+<p>Nume si prenume</p>
+<p>Semnatura: ___________________</p>
+<p>CNP: _________________________</p></td>
+<td><strong>STAMPILA OFFICIALA P.C.P.</strong></td>
+</tr>
+</tbody>
+</table>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 66%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>INREGISTRAT LA:</strong></td>
+<td>Tribunalul Iasi — Nr. _________ / Data: _____________ 2026</td>
+</tr>
+<tr class="even">
+<td><strong>JUDECATOR DELEGAT:</strong></td>
+<td>Nume si prenume: _________________________________</td>
+</tr>
+<tr class="odd">
+<td><strong>SEMNATURA / STAMPILA:</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Conf. Legii nr. 14/2003 privind partidele politice | Conf. Legii nr.
+334/2006 | GDPR (UE) 2016/679</p>
+</body>
+</html>

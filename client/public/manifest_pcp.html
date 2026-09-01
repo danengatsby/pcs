@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manifestul PCP — Program Clar pentru Pensionari</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Cinzel:wght@400;600;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:    #081a2f;
+    --navy-deep:#04111f;
+    --navy-soft:#102844;
+    --navy-lt:  #163555;
+    --gold:    #c9963a;
+    --gold-lt: #e8c06a;
+    --cream:   #f5f7fb;
+    --warm:    #14304d;
+    --red:     #8b1a1a;
+    --text:    #f7fbff;
+    --mid:     #d7e4f2;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background:
+      radial-gradient(circle at top, rgba(201,150,58,0.08), transparent 32%),
+      linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 100%);
+    color: var(--text);
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: clamp(19px, 1.1vw + 15px, 21px);
+    line-height: 1.9;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE TEXTURE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.5;
+  }
+
+  /* ── HERO HEADER ── */
+  .hero {
+    background: var(--navy);
+    color: var(--cream);
+    text-align: center;
+    padding: 80px 40px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(201,150,58,0.07) 39px, rgba(201,150,58,0.07) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(201,150,58,0.05) 39px, rgba(201,150,58,0.05) 40px);
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, var(--gold), var(--gold-lt), var(--gold), transparent);
+  }
+
+  .emblem {
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 28px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .emblem svg { width: 100%; height: 100%; }
+
+  .hero-eyebrow {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    letter-spacing: 6px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 2;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  .hero h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(34px, 5.6vw, 72px);
+    font-weight: 900;
+    letter-spacing: 2px;
+    line-height: 1.15;
+    color: #fff;
+    position: relative;
+    z-index: 2;
+    animation: fadeUp 0.9s ease 0.1s both;
+  }
+
+  .hero h1 span {
+    color: var(--gold-lt);
+    display: block;
+  }
+
+  .hero-sub {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: clamp(22px, 2.4vw, 28px);
+    color: rgba(245,240,232,0.7);
+    margin-top: 18px;
+    position: relative;
+    z-index: 2;
+    animation: fadeUp 1s ease 0.2s both;
+  }
+
+  .gold-rule {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 28px auto;
+    max-width: 320px;
+    position: relative;
+    z-index: 2;
+    animation: fadeUp 1s ease 0.3s both;
+  }
+  .gold-rule::before, .gold-rule::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold));
+  }
+  .gold-rule::after {
+    background: linear-gradient(90deg, var(--gold), transparent);
+  }
+  .gold-rule span {
+    color: var(--gold);
+    font-size: 20px;
+  }
+
+  /* ── PREAMBUL ── */
+  .preambul {
+    background: var(--navy);
+    color: var(--cream);
+    padding: 60px 40px;
+    text-align: center;
+    border-bottom: 3px solid var(--gold);
+  }
+
+  .preambul p {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(19px, 2.9vw, 28px);
+    line-height: 2;
+    max-width: 760px;
+    margin: 0 auto;
+    color: rgba(245,240,232,0.88);
+  }
+
+  .preambul p em {
+    color: var(--gold-lt);
+    font-style: normal;
+    font-weight: 700;
+  }
+
+  .preambul .final-line {
+    margin-top: 32px;
+    font-family: 'Cinzel', serif;
+    font-style: normal;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: var(--gold);
+  }
+
+  /* ── MAIN CONTENT ── */
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ── CHAPTER ── */
+  .chapter {
+    padding: 64px 0 48px;
+    border-bottom: 1px solid rgba(201,150,58,0.24);
+    animation: fadeUp 0.7s ease both;
+  }
+
+  .chapter:last-of-type { border-bottom: none; }
+
+  .chapter-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 40px;
+  }
+
+  .chapter-num {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .chapter-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--gold), transparent);
+  }
+
+  .chapter h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 32px;
+    padding-left: 20px;
+    border-left: 4px solid var(--gold);
+  }
+
+  /* ── ARTICLE ── */
+  .article {
+    margin-bottom: 32px;
+    padding: 32px 36px;
+    background: linear-gradient(180deg, var(--navy-soft) 0%, var(--navy-lt) 100%);
+    border: 1px solid rgba(201,150,58,0.22);
+    border-left: 4px solid var(--gold);
+    box-shadow: 0 10px 28px rgba(0,0,0,0.22);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+  }
+
+  .article:hover {
+    transform: translateX(4px);
+    box-shadow: 0 16px 34px rgba(0,0,0,0.28);
+    border-left-color: var(--gold-lt);
+  }
+
+  .article-num {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .article p {
+    font-family: 'EB Garamond', serif;
+    font-size: 20px;
+    line-height: 2;
+    color: rgba(247,251,255,0.92);
+  }
+
+  .article p + p { margin-top: 12px; }
+
+  .article strong {
+    color: var(--gold-lt);
+    font-weight: 500;
+  }
+
+  .article em {
+    color: rgba(247,251,255,0.78);
+    font-style: italic;
+  }
+
+  /* ── SPECIAL: VALORI ── */
+  .valori-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+    margin-top: 16px;
+  }
+
+  .valoare {
+    padding: 28px 24px;
+    background: linear-gradient(180deg, var(--navy-soft) 0%, var(--navy) 100%);
+    color: var(--cream);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(201,150,58,0.18);
+  }
+
+  .valoare::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--gold);
+  }
+
+  .valoare-icon {
+    font-size: 32px;
+    display: block;
+    margin-bottom: 14px;
+  }
+
+  .valoare h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .valoare p {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: rgba(245,240,232,0.75);
+    line-height: 1.7;
+  }
+
+  /* ── ANGAJAMENT FINAL ── */
+  .angajament {
+    background: linear-gradient(135deg, var(--navy) 0%, #1a2f45 100%);
+    color: var(--cream);
+    padding: 80px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    margin-top: 0;
+  }
+
+  .angajament::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(201,150,58,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 50%, rgba(201,150,58,0.06) 0%, transparent 60%);
+  }
+
+  .angajament::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, var(--gold), var(--gold-lt), var(--gold), transparent);
+  }
+
+  .angajament-inner {
+    position: relative;
+    z-index: 2;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .angajament h2 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(19px, 2.8vw, 28px);
+    font-weight: 600;
+    letter-spacing: 5px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 40px;
+  }
+
+  .angajament p {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(20px, 3vw, 28px);
+    line-height: 2;
+    color: rgba(245,240,232,0.88);
+    margin-bottom: 20px;
+  }
+
+  .angajament .promise {
+    margin: 48px 0;
+    padding: 36px 40px;
+    border: 1px solid rgba(201,150,58,0.3);
+    border-top: 3px solid var(--gold);
+  }
+
+  .angajament .promise p {
+    font-style: italic;
+    color: var(--cream);
+    font-size: clamp(19px, 2.5vw, 24px);
+  }
+
+  /* ── FOOTER STAMP ── */
+  .footer {
+    background: var(--navy);
+    color: var(--cream);
+    text-align: center;
+    padding: 48px 24px 40px;
+    border-top: 3px solid var(--gold);
+  }
+
+  .footer .party-name {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(17px, 2.8vw, 26px);
+    font-weight: 900;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .footer .motto {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 20px;
+    color: rgba(245,240,232,0.6);
+    margin-bottom: 28px;
+  }
+
+  .footer .stamp {
+    display: inline-block;
+    border: 2px solid var(--gold);
+    padding: 16px 40px;
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    position: relative;
+  }
+
+  .footer .stamp::before, .footer .stamp::after {
+    content: '✦';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gold);
+    font-size: 10px;
+  }
+  .footer .stamp::before { left: 12px; }
+  .footer .stamp::after  { right: 12px; }
+
+  /* ── TABLE OF CONTENTS ── */
+  .toc {
+    background: linear-gradient(180deg, rgba(16,40,68,0.95) 0%, rgba(8,26,47,0.98) 100%);
+    border: 1px solid rgba(201,150,58,0.3);
+    border-left: 4px solid var(--gold);
+    padding: 36px 40px;
+    margin: 48px 0;
+    box-shadow: 0 10px 26px rgba(0,0,0,0.2);
+  }
+
+  .toc h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    letter-spacing: 5px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .toc ol {
+    list-style: none;
+    counter-reset: toc;
+  }
+
+  .toc ol li {
+    counter-increment: toc;
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px dotted rgba(245,247,251,0.14);
+    font-family: 'EB Garamond', serif;
+    font-size: 19px;
+  }
+
+  .toc ol li::before {
+    content: counter(toc, upper-roman);
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    color: var(--gold);
+    letter-spacing: 1px;
+    flex-shrink: 0;
+    min-width: 30px;
+  }
+
+  .toc ol li a {
+    color: rgba(247,251,255,0.94);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .toc ol li a:hover { color: var(--gold); }
+
+  /* ── PULL QUOTE ── */
+  .pull-quote {
+    margin: 40px 0;
+    padding: 18px 22px 18px 28px;
+    border-left: 4px solid var(--gold);
+    background: rgba(16,40,68,0.68);
+  }
+
+  .pull-quote p {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(21px, 2.9vw, 30px);
+    line-height: 1.6;
+    color: rgba(247,251,255,0.94);
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .chapter { opacity: 0; animation: fadeUp 0.6s ease forwards; }
+  .chapter:nth-child(1) { animation-delay: 0.1s; }
+  .chapter:nth-child(2) { animation-delay: 0.15s; }
+  .chapter:nth-child(3) { animation-delay: 0.2s; }
+  .chapter:nth-child(4) { animation-delay: 0.25s; }
+  .chapter:nth-child(5) { animation-delay: 0.3s; }
+  .chapter:nth-child(6) { animation-delay: 0.35s; }
+  .chapter:nth-child(7) { animation-delay: 0.4s; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .hero { padding: 56px 24px 44px; }
+    .preambul { padding: 44px 24px; }
+    .chapter { padding: 48px 0 36px; }
+    .article { padding: 24px 22px; }
+    .angajament { padding: 56px 24px; }
+    .toc { padding: 24px 24px; }
+    .chapter-header { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ HERO ══ -->
+<header class="hero">
+  <div class="emblem">
+    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="46" stroke="#c9963a" stroke-width="1.5"/>
+      <circle cx="50" cy="50" r="40" stroke="#c9963a" stroke-width="0.5" stroke-dasharray="3 5"/>
+      <!-- Oak leaves -->
+      <path d="M50 15 C44 22 38 28 40 36 C42 30 48 25 50 15Z" fill="#c9963a" opacity="0.8"/>
+      <path d="M50 15 C56 22 62 28 60 36 C58 30 52 25 50 15Z" fill="#c9963a" opacity="0.8"/>
+      <path d="M35 22 C32 30 30 38 36 44 C35 37 38 30 35 22Z" fill="#c9963a" opacity="0.65"/>
+      <path d="M65 22 C68 30 70 38 64 44 C65 37 62 30 65 22Z" fill="#c9963a" opacity="0.65"/>
+      <!-- Torch -->
+      <rect x="47" y="42" width="6" height="26" rx="1" fill="#c9963a" opacity="0.9"/>
+      <path d="M50 38 C46 42 44 46 50 42 C56 46 54 42 50 38Z" fill="#e8c06a"/>
+      <path d="M50 35 C47 39 50 40 50 35Z" fill="#fff" opacity="0.8"/>
+      <!-- Stars -->
+      <text x="26" y="70" fill="#c9963a" font-size="8" text-anchor="middle">★</text>
+      <text x="74" y="70" fill="#c9963a" font-size="8" text-anchor="middle">★</text>
+      <text x="50" y="80" fill="#c9963a" font-size="8" text-anchor="middle">★</text>
+      <!-- Base text -->
+      <text x="50" y="94" fill="#c9963a" font-size="5.5" text-anchor="middle" letter-spacing="1" font-family="serif">PCP · ROMÂNIA</text>
+    </svg>
+  </div>
+
+  <p class="hero-eyebrow">Partidul Conservator al Pensionarilor · Program Public</p>
+
+  <h1>
+    MANIFESTUL
+    <span>P.C.P.</span>
+  </h1>
+
+  <div class="gold-rule"><span>✦</span></div>
+
+  <p class="hero-sub">Un program mai clar, mai predictibil și mai demn pentru seniorii României</p>
+</header>
+
+<!-- ══ PREAMBUL ══ -->
+<section class="preambul">
+  <p>
+    Partidul Conservator al Pensionarilor susține că politicile publice dedicate seniorilor
+    trebuie tratate ca o <em>prioritate de stat</em>, nu ca o temă secundară sau ocazională.<br><br>
+    Persoanele care au contribuit zeci de ani la dezvoltarea economică și socială a României
+    au dreptul la venituri previzibile, servicii medicale accesibile, locuire sigură,
+    mobilitate reală și respect instituțional.
+  </p>
+  <p class="final-line" style="margin-top:32px; font-style:italic; color: rgba(245,240,232,0.7); font-family:'EB Garamond',serif; font-size:24px; letter-spacing:1px;">
+    Acest manifest prezintă angajamente clare, aplicabile și orientate spre rezultate.
+  </p>
+</section>
+
+<!-- ══ CONTENT ══ -->
+<main class="container">
+
+  <!-- TABLE OF CONTENTS -->
+  <div class="toc">
+    <h3>Cuprins</h3>
+    <ol>
+      <li><a href="#pensii">Pensiile</a></li>
+      <li><a href="#sanatate">Sănătatea</a></li>
+      <li><a href="#transport">Transportul</a></li>
+      <li><a href="#locuinta">Locuința și Utilitățile</a></li>
+      <li><a href="#demnitate">Demnitatea Socială</a></li>
+      <li><a href="#tehnologie">Tehnologia</a></li>
+      <li><a href="#valori">Valorile Noastre</a></li>
+    </ol>
+  </div>
+
+  <!-- ── CAP I: PENSII ── -->
+  <section class="chapter" id="pensii">
+    <div class="chapter-header">
+      <span class="chapter-num">Capitolul I</span>
+      <div class="chapter-line"></div>
+    </div>
+    <h2>Pensiile</h2>
+
+    <div class="article">
+      <span class="article-num">Articolul 1</span>
+      <p>Pensia este un <strong>drept contributiv</strong> și trebuie administrată prin reguli stabile, transparente și ușor de verificat public. Statul are obligația de a explica limpede cum se calculează fiecare componentă și de a elimina formulele care produc confuzie, neîncredere și tratament inegal.</p>
+      <p>Susținem publicarea periodică a indicatorilor esențiali privind sistemul de pensii, astfel încât fiecare pensionar să poată înțelege nu doar valoarea primită, ci și logica administrativă din spatele ei. Fără claritate și fără predictibilitate, dreptul contributiv rămâne vulnerabil la arbitrar.</p>
+    </div>
+
+    <div class="article">
+      <span class="article-num">Articolul 2</span>
+      <p>Indexarea pensiilor trebuie corelată cu <strong>costul real al vieții</strong> și aplicată prin mecanisme automate, previzibile și corecte. Nu este suficientă o ajustare simbolică atunci când cheltuielile cu hrana, energia, medicamentele și întreținerea cresc într-un ritm mai rapid decât veniturile seniorilor.</p>
+      <p>Propunem o formulă de actualizare anunțată din timp, cu calendar public și criterii ușor de urmărit, pentru ca fiecare beneficiar să știe când și de ce se modifică pensia. Respectul instituțional începe atunci când oamenii nu mai sunt obligați să aștepte decizii improvizate de la o lună la alta.</p>
+    </div>
+
+    <div class="article">
+      <span class="article-num">Articolul 3</span>
+      <p>Obiectivul nostru este reducerea diferenței dintre pensia medie și <strong>coșul minim de consum</strong> necesar pentru un trai decent. O societate serioasă nu poate considera normal ca după o viață de muncă o persoană să fie obligată să aleagă între căldură, hrană și tratamente medicale.</p>
+      <p>Vom susține politici care urmăresc în mod real puterea de cumpărare a pensionarilor și care tratează decalajul dintre venit și costurile de trai ca pe o problemă publică majoră, nu ca pe o statistică abstractă. Demnitatea economică la vârsta pensionării trebuie apărată prin măsuri măsurabile și constante.</p>
+    </div>
+  </section>
+
+  <!-- ── CAP II: SĂNĂTATE ── -->
+  <section class="chapter" id="sanatate">
+    <div class="chapter-header">
+      <span class="chapter-num">Capitolul II</span>
+      <div class="chapter-line"></div>
+    </div>
+    <h2>Sănătatea</h2>
+
+    <div class="article">
+      <span class="article-num">Articolul 4</span>
+      <p>Accesul la medicamente compensate trebuie simplificat astfel încât beneficiul legal să fie resimțit <strong>efectiv</strong> de pacient la farmacie. Seniorii nu trebuie plimbați între cabinete, ghișee și interpretări administrative diferite pentru a obține un tratament deja prevăzut de lege.</p>
+      <p>Susținem proceduri mai simple, interoperabilitate între sistemele medicale și o comunicare clară către pacient, pentru ca timpul și energia persoanelor vârstnice să nu fie irosite în birocrație. O compensație există cu adevărat doar atunci când este accesibilă rapid, clar și fără umilință administrativă.</p>
+    </div>
+
+    <div class="article">
+      <span class="article-num">Articolul 5</span>
+      <p>Serviciile de medicină de familie și ambulatoriu trebuie organizate astfel încât timpii de așteptare să rămână <em>rezonabili și predictibili</em>. Pentru pacienții vârstnici, întârzierile repetate înseamnă agravarea bolilor cronice, costuri suplimentare și o dependență mai mare de intervenții de urgență.</p>
+      <p>Avem nevoie de programări mai bine distribuite, de extinderea capacității acolo unde presiunea este mare și de criterii de prioritizare adaptate vulnerabilității medicale. Un sistem eficient nu înseamnă doar mai multe servicii, ci servicii oferite la timp, cu răspuns realist la nevoile seniorilor.</p>
+    </div>
+
+    <div class="article">
+      <span class="article-num">Articolul 6</span>
+      <p>Sănătatea orală trebuie inclusă mai consistent în pachetul de servicii de bază, pentru că <strong>prevenția costă mai puțin decât neglijența</strong>. Problemele dentare netratate afectează alimentația, mobilitatea, încrederea socială și starea generală de sănătate a persoanelor vârstnice.</p>
+      <p>Considerăm necesară extinderea accesului la consultații, tratamente și proteze prin mecanisme suportabile financiar, în special pentru pensionarii cu venituri mici. Medicina orală nu trebuie tratată ca un lux, ci ca parte firească a îngrijirii de bază.</p>
+    </div>
+
+    <div class="article">
+      <span class="article-num">Articolul 7</span>
+      <p>Infrastructura medicală trebuie să respecte standarde minime de <em>accesibilitate, siguranță și tratament demn</em> pentru persoanele vârstnice. O rampă lipsă, o sală de așteptare improprie sau un traseu administrativ confuz devin bariere reale pentru un pacient cu mobilitate redusă.</p>
+      <p>Vom susține investiții și controale care să privească experiența concretă a pacientului, de la intrarea în unitate până la ieșire, inclusiv orientarea, igiena, confortul și respectul personalului față de seniori. Demnitatea medicală se construiește atât prin tratament, cât și prin condițiile în care acesta este oferit.</p>
+    </div>
+  </section>
+
+  <!-- ── CAP III: TRANSPORT ── -->
+  <section class="chapter" id="transport">
+    <div class="chapter-header">
+      <span class="chapter-num">Capitolul III</span>
+      <div class="chapter-line"></div>
+    </div>
+    <h2>Transportul</h2>
+
+    <div class="article">
+      <span class="article-num">Articolul 8</span>
+      <p>Transportul public pentru pensionari trebuie să fie accesibil, ușor de utilizat și administrat prin proceduri <strong>simple, fără birocrație excesivă</strong>. Facilitățile acordate seniorilor trebuie să poată fi obținute și folosite fără drumuri inutile, cozi lungi și reguli schimbate frecvent.</p>
+      <p>Susținem sisteme clare de validare, informații vizibile și condiții de călătorie adaptate persoanelor cu mobilitate redusă, astfel încât deplasarea să rămână un drept practic, nu doar o prevedere formală. Transportul decent înseamnă independență, acces la servicii și viață socială activă.</p>
+    </div>
+
+    <div class="article">
+      <span class="article-num">Articolul 9</span>
+      <p>Infrastructura pietonală și semaforizarea trebuie proiectate pentru mobilitate redusă, cu accent pe <em>siguranță reală, nu pe formalități administrative</em>. Timpul de traversare, calitatea trotuarelor, iluminatul și accesul la bănci de odihnă influențează direct capacitatea seniorilor de a se deplasa în siguranță.</p>
+      <p>Orașele și comunele trebuie evaluate și finanțate și după felul în care protejează pietonii vârstnici, nu doar după volumul investițiilor anunțate. Mobilitatea urbană corectă începe cu infrastructură gândită pentru cei mai vulnerabili utilizatori ai spațiului public.</p>
+    </div>
+
+    <div class="article">
+      <span class="article-num">Articolul 10</span>
+      <p>Trotuarele, stațiile și punctele de acces public trebuie întreținute prin termene clare și <strong>responsabilitate administrativă</strong>. Degradarea spațiului public îi afectează disproporționat pe seniori, care suportă mai greu obstacolele, denivelările și lipsa de protecție în zonele de așteptare.</p>
+      <p>Solicităm standarde de intervenție publice, termene verificabile și răspundere instituțională atunci când problemele persistă. O administrație serioasă nu trebuie evaluată doar după proiectele noi, ci și după felul în care întreține infrastructura de bază folosită zilnic de cetățeni.</p>
+    </div>
+  </section>
+
+  <!-- ── CAP IV: LOCUINȚĂ ── -->
+  <section class="chapter" id="locuinta">
+    <div class="chapter-header">
+      <span class="chapter-num">Capitolul IV</span>
+      <div class="chapter-line"></div>
+    </div>
+    <h2>Locuința și Utilitățile</h2>
+
+    <div class="article">
+      <span class="article-num">Articolul 11</span>
+      <p>Nicio persoană vârstnică nu trebuie împinsă în <strong>sărăcie energetică</strong> de costurile utilităților esențiale. Cheltuielile cu încălzirea, electricitatea și apa nu pot deveni o povară care anulează efectiv sensul unei pensii obținute prin contribuție.</p>
+      <p>Politicile de protecție trebuie să țină cont de venitul real, de starea locuinței și de vulnerabilitatea medicală a persoanelor în vârstă, mai ales în perioadele de iarnă sau de caniculă. Nimeni nu ar trebui să trăiască ultimii ani ai vieții în frig, întuneric sau nesiguranță domestică.</p>
+    </div>
+
+    <div class="article">
+      <span class="article-num">Articolul 12</span>
+      <p>Programele de eficiență energetică și reabilitare trebuie să prioritizeze comunitățile cu populație vârstnică numeroasă și venituri reduse. Investițiile publice au sens social real atunci când reduc costurile lunare ale celor care resimt cel mai puternic presiunea întreținerii.</p>
+      <p>Vom susține intervenții care combină izolarea termică, siguranța locuinței și accesibilizarea spațiului pentru vârsta a treia, astfel încât modernizarea să producă economii concrete și condiții mai bune de viață. Locuința trebuie să rămână un spațiu al stabilității, nu o sursă continuă de anxietate financiară.</p>
+    </div>
+
+    <div class="pull-quote">
+      <p>„Demnitatea la vârsta pensionării începe cu o locuință sigură, încălzită și accesibilă."</p>
+    </div>
+  </section>
+
+  <!-- ── CAP V: DEMNITATE ── -->
+  <section class="chapter" id="demnitate">
+    <div class="chapter-header">
+      <span class="chapter-num">Capitolul V</span>
+      <div class="chapter-line"></div>
+    </div>
+    <h2>Demnitatea Socială</h2>
+
+    <div class="article">
+      <span class="article-num">Articolul 13</span>
+      <p><strong>Respectul față de persoanele vârstnice</strong> trebuie consolidat prin reguli clare, educație publică și sancționarea discriminării de vârstă. O comunitate sănătoasă nu își tratează seniorii ca pe o categorie marginală, ci ca pe o parte esențială a memoriei, echilibrului și continuității sociale.</p>
+      <p>Susținem campanii publice, norme instituționale și mecanisme de sesizare care descurajează umilirea, neglijarea și excluderea persoanelor în vârstă din viața publică. Demnitatea socială trebuie apărată nu doar în discurs, ci și în comportamentul concret al instituțiilor și al comunităților.</p>
+    </div>
+
+    <div class="article">
+      <span class="article-num">Articolul 14</span>
+      <p>Fiecare comunitate are nevoie de centre funcționale pentru socializare, consiliere și activități dedicate seniorilor, <em>cu servicii reale și personal suficient</em>. Izolarea socială nu este doar o problemă afectivă, ci și una de sănătate publică, de siguranță și de participare civică.</p>
+      <p>Aceste spații trebuie să ofere activități utile, sprijin administrativ, consiliere și oportunități de apartenență, nu doar existență formală în rapoarte. Seniorii trebuie să găsească în comunitatea locală un loc în care sunt primiți, ascultați și sprijiniți constant.</p>
+    </div>
+
+    <div class="article">
+      <span class="article-num">Articolul 15</span>
+      <p>Protecția împotriva fraudelor și abuzurilor comerciale trebuie întărită prin prevenție, intervenție rapidă și <strong>sancțiuni ferme</strong>. Persoanele vârstnice sunt adesea ținta unor practici agresive sau înșelătoare care exploatează încrederea, vulnerabilitatea și lipsa de asistență imediată.</p>
+      <p>Este necesară o cooperare mai eficientă între autorități, servicii sociale și comunități locale pentru identificarea rapidă a cazurilor de abuz și pentru recuperarea prejudiciilor atunci când este posibil. Statul trebuie să fie prezent înainte ca frauda să se producă, nu doar după ce paguba a devenit ireversibilă.</p>
+    </div>
+  </section>
+
+  <!-- ── CAP VI: TEHNOLOGIE ── -->
+  <section class="chapter" id="tehnologie">
+    <div class="chapter-header">
+      <span class="chapter-num">Capitolul VI</span>
+      <div class="chapter-line"></div>
+    </div>
+    <h2>Tehnologia</h2>
+
+    <div class="article">
+      <span class="article-num">Articolul 16</span>
+      <p>Digitalizarea serviciilor publice trebuie însoțită permanent de alternative fizice și de <em>asistență umană accesibilă</em>. Modernizarea nu poate fi folosită ca pretext pentru a închide uși administrative în fața celor care nu au echipamente, competențe digitale sau sprijin familial.</p>
+      <p>Orice platformă online importantă trebuie dublată de puncte clare de ajutor, explicații simple și opțiuni offline funcționale, pentru ca seniorii să nu fie excluși exact de la serviciile pe care statul pretinde că le simplifică. Tehnologia este utilă doar atunci când crește accesul, nu când îl restrânge.</p>
+    </div>
+
+    <div class="article">
+      <span class="article-num">Articolul 17</span>
+      <p>Alfabetizarea digitală pentru seniori trebuie susținută prin cursuri practice, răbdare pedagogică și infrastructură locală adecvată. Într-o administrație tot mai digitalizată, competențele minime de utilizare a telefonului, a platformelor publice și a comunicării online devin o formă de autonomie civică.</p>
+      <p>Susținem programe locale simple, repetitive și prietenoase, care pun accent pe exercițiu și încredere, nu pe limbaj tehnic. Seniorii nu au nevoie de promisiuni despre viitorul digital, ci de ajutor concret pentru a-l folosi fără teamă și fără dependență permanentă de alții.</p>
+    </div>
+  </section>
+
+  <!-- ── CAP VII: VALORI ── -->
+  <section class="chapter" id="valori">
+    <div class="chapter-header">
+      <span class="chapter-num">Capitolul VII</span>
+      <div class="chapter-line"></div>
+    </div>
+    <h2>Valorile Noastre</h2>
+
+    <div class="valori-grid">
+      <div class="valoare">
+        <span class="valoare-icon">🏠</span>
+        <h3>Familie</h3>
+        <p>Sprijin intergenerațional, responsabilitate și continuitate socială.</p>
+      </div>
+      <div class="valoare">
+        <span class="valoare-icon">⚒️</span>
+        <h3>Muncă</h3>
+        <p>Respect pentru contribuția acumulată de-a lungul unei vieți active.</p>
+      </div>
+      <div class="valoare">
+        <span class="valoare-icon">🌿</span>
+        <h3>Tradiție</h3>
+        <p>Continuitate instituțională și atașament față de comunitate și identitate.</p>
+      </div>
+      <div class="valoare">
+        <span class="valoare-icon">🤝</span>
+        <h3>Respect</h3>
+        <p>O relație corectă între stat, comunitate și cetățean.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ══ ANGAJAMENT FINAL ══ -->
+<section class="angajament">
+  <div class="angajament-inner">
+    <h2>Angajamentul Nostru Final</h2>
+
+    <p>Ne asumăm un program public bazat pe claritate, predictibilitate și responsabilitate instituțională.<br>
+    <em>Seniorii României au nevoie de politici coerente, nu de promisiuni improvizate.</em></p>
+
+    <div class="promise">
+      <p>
+        „Vom susține măsuri publice aplicabile, verificabile și finanțabile,<br>
+        astfel încât pensionarii să beneficieze de siguranță materială,<br>
+        acces la servicii și recunoașterea contribuției lor sociale."
+      </p>
+    </div>
+
+    <p style="font-size:clamp(16px,2.3vw,20px); color:rgba(245,240,232,0.55); font-style:normal; font-family:'Cinzel',serif; letter-spacing:2px;">
+      PRIORITĂȚI CLARE.<br>
+      MĂSURI REALISTE.<br>
+      RESPECT PENTRU CONTRIBUȚIA UNEI VIEȚI ÎNTREGI.
+    </p>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div class="party-name">Partidul Conservator al Pensionarilor</div>
+  <div class="motto">„Respect pentru contribuție. Siguranță pentru viitor."</div>
+  <div class="stamp">P · C · P · România</div>
+  <p style="margin-top:28px; font-size:15px; color:rgba(245,240,232,0.3); font-family:'EB Garamond',serif; letter-spacing:1px;">
+    Manifest politic · Ediție de prezentare · România
+  </p>
+</footer>
+
+<script>
+  // Intersection Observer for scroll animations
+  const chapters = document.querySelectorAll('.chapter');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.08 });
+
+  chapters.forEach(ch => {
+    ch.style.opacity = '0';
+    ch.style.transform = 'translateY(30px)';
+    ch.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
+    observer.observe(ch);
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,55 @@
+<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path
+    d="M80 6L145 21V108L80 156L15 108V21L80 6Z"
+    fill="#B88A00"
+  />
+  <path
+    d="M80 11L140 24.5V105.5L80 150L20 105.5V24.5L80 11Z"
+    fill="#0D5720"
+  />
+  <path
+    d="M80 35C95.5 35 108 47.5 108 63H52C52 47.5 64.5 35 80 35Z"
+    fill="#F7F1DE"
+  />
+  <path
+    d="M80 35L87 63H73L80 35Z"
+    fill="#B88A00"
+  />
+  <path
+    d="M65 40.5L74.5 63H60L65 40.5Z"
+    fill="#B88A00"
+  />
+  <path
+    d="M95 40.5L100 63H85.5L95 40.5Z"
+    fill="#B88A00"
+  />
+  <path
+    d="M55 49L67.5 63H49L55 49Z"
+    fill="#B88A00"
+  />
+  <path
+    d="M105 49L111 63H92.5L105 49Z"
+    fill="#B88A00"
+  />
+  <path
+    d="M79 61H81.5V101H79V61Z"
+    fill="#F7F1DE"
+  />
+  <path
+    d="M52 63H108"
+    stroke="#F7F1DE"
+    stroke-width="2.5"
+    stroke-linecap="round"
+  />
+  <text
+    x="80"
+    y="126"
+    text-anchor="middle"
+    font-family="Verdana, Arial, sans-serif"
+    font-size="28"
+    font-weight="700"
+    fill="#D9A11A"
+  >
+    PCP
+  </text>
+</svg>

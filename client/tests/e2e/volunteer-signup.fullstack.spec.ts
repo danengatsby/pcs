@@ -1,0 +1,80 @@
+import { randomUUID } from "node:crypto";
+import { expect, test } from "@playwright/test";
+import { fillVolunteerSignupForm } from "./helpers/contact";
+import {
+  buildTestEmail,
+  deleteUserByEmail,
+  deleteVolunteerByEmail,
+  query,
+} from "./helpers/testDb";
+
+test("visitor can submit the volunteer signup form and create account records", async ({ page }) => {
+  const token = randomUUID().replaceAll("-", "").slice(0, 12);
+  const email = buildTestEmail(`playwright.join.${token}`);
+  const fullName = `Aderent Public ${token}`;
+  const password = "ParolaFoarteBuna#2026";
+  const phone = "0712345678";
+  const locality = "Cluj-Napoca";
+  const skills = "organizare comunitara";
+  const motivation = "Vreau sa ma implic activ in proiectele locale.";
+
+  try {
+    await page.goto("/contact");
+
+    await fillVolunteerSignupForm(page, {
+      fullName,
+      email,
+      password,
+      phone,
+      county: "Cluj",
+      locality,
+      skills,
+      motivation,
+    });
+
+    const submitResponse = page.waitForResponse((response) => (
+      response.request().method() === "POST"
+      && response.url().endsWith("/api/volunteers")
+      && response.status() === 201
+    ));
+
+    await page.getByRole("button", { name: "Trimite cererea" }).click();
+    await submitResponse;
+
+    await expect(page.getByText("Cererea de înscriere a fost trimisă. Mulțumim!")).toBeVisible();
+    await expect(page.getByLabel("Nume complet")).toHaveValue("");
+    await expect(page.getByLabel("Email")).toHaveValue("");
+
+    await expect.poll(async () => {
+      const result = await query<{
+        volunteer_id: number;
+        volunteer_status: string;
+        volunteer_county: string;
+        volunteer_locality: string;
+        user_role: string;
+      }>(
+        `
+          SELECT
+            v.id AS volunteer_id,
+            v.workflow_status::text AS volunteer_status,
+            v.county AS volunteer_county,
+            v.locality AS volunteer_locality,
+            u.role::text AS user_role
+          FROM volunteers v
+          INNER JOIN users u
+            ON LOWER(u.email) = LOWER(v.email)
+          WHERE LOWER(v.email) = LOWER($1)
+        `,
+        [email],
+      );
+
+      const row = result.rows[0];
+      return row
+        ? `${row.volunteer_status}|${row.volunteer_county}|${row.volunteer_locality}|${row.user_role}`
+        : null;
+    }).toBe(`nou|Cluj|${locality}|ADERENT`);
+  } finally {
+    await deleteVolunteerByEmail(email);
+    await deleteUserByEmail(email);
+  }
+});

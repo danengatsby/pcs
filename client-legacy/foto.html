@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ro">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Foto | PCP</title>
+    <meta
+      name="description"
+      content="Galerie foto PCP, cu selectie rapida din meniu lateral."
+    />
+  </head>
+  <body>
+    <div id="app">
+      <header id="site-header" class="site-header"></header>
+
+      <main>
+        <section class="section-dark">
+          <div class="container">
+            <article class="page-intro-card page-intro-card-dark">
+              <p class="eyebrow">Galerie Foto</p>
+              <h2>Imagini PCP</h2>
+              <p class="hero-text">
+                In stanga ai listele de imagini, iar in dreapta se afiseaza fotografia selectata cu titlu.
+              </p>
+              <div class="hero-actions">
+                <a
+                  class="btn-secondary"
+                  href="docs/Foto_Galerie.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Afisare
+                </a>
+                <a class="btn-primary" href="index.html">Inapoi</a>
+              </div>
+            </article>
+
+            <article class="doc-viewer-card">
+              <iframe
+                class="doc-viewer-frame"
+                src="docs/Foto_Galerie.html?embedded=1"
+                title="Galerie foto"
+                loading="lazy"
+              ></iframe>
+            </article>
+          </div>
+        </section>
+      </main>
+
+      <footer id="site-footer" class="site-footer"></footer>
+    </div>
+
+    <script type="module" src="./src/main.tsx"></script>
+  </body>
+</html>

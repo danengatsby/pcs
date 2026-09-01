@@ -1,0 +1,53 @@
+{
+  "name": "pcp-platform",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Aplicatie full-stack pentru Partidul Politic PCP",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev": "concurrently -n server,client -c blue,green \"npm run dev --workspace server\" \"npm run dev --workspace client\"",
+    "lint": "npm run lint:server && npm run lint:client && npm run lint:repo",
+    "lint:server": "eslint \"server/src/**/*.{ts,tsx}\" --max-warnings=0",
+    "lint:client": "npm run lint --workspace client",
+    "lint:repo": "eslint eslint.config.mjs playwright.config.ts playwright.fullstack.config.ts --max-warnings=0",
+    "lint:fix": "eslint . --fix",
+    "build": "npm run build --workspace server && npm run build --workspace client",
+    "verify": "npm run lint && npm run build",
+    "start": "npm run build && npm run start --workspace server",
+    "db:init": "npm run db:init --workspace server",
+    "db:migrate": "npm run db:migrate --workspace server",
+    "db:seed": "npm run db:seed --workspace server",
+    "auth:cleanup-tokens": "npm run auth:cleanup-tokens --workspace server",
+    "auth:promote-admin": "npm run auth:promote-admin --workspace server --",
+    "auth:demote-admin": "npm run auth:demote-admin --workspace server --",
+    "test": "npm run test --workspace server",
+    "test:smoke": "npm run build && npm run test:smoke:compiled",
+    "test:smoke:compiled": "npm run test:smoke:compiled --workspace server",
+    "test:client": "npm run test --workspace client",
+    "test:unit": "npm run test:unit --workspace server",
+    "test:integration": "npm run test:integration --workspace server",
+    "test:integration:redis": "npm run test:integration:redis --workspace server",
+    "test:e2e": "npm run test:e2e --workspace server",
+    "test:e2e:browser": "npm run test:e2e:browser:fullstack",
+    "test:e2e:browser:fullstack": "NODE_ENV=test AUTH_REFRESH_ENABLED=1 AUTH_RATE_LIMIT_MAX=1000 VOLUNTEER_RATE_LIMIT_MAX=1000 CAPTCHA_MODE=disabled EMAIL_NOTIFICATIONS_ENABLED=false CORS_ORIGIN=http://127.0.0.1:4010 CORS_CREDENTIALS=true PORT=4010 npm run build && NODE_ENV=test AUTH_REFRESH_ENABLED=1 AUTH_RATE_LIMIT_MAX=1000 VOLUNTEER_RATE_LIMIT_MAX=1000 CAPTCHA_MODE=disabled EMAIL_NOTIFICATIONS_ENABLED=false CORS_ORIGIN=http://127.0.0.1:4010 CORS_CREDENTIALS=true PORT=4010 node server/dist/scripts/migrateDb.js && playwright test --config=playwright.fullstack.config.ts",
+    "email:outbox-worker": "npm run email:outbox-worker --workspace server"
+  },
+  "overrides": {
+    "@opentelemetry/api": "1.8.0",
+    "rollup": "^4.59.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.58.2",
+    "concurrently": "^9.2.1",
+    "eslint": "^10.0.2",
+    "globals": "^17.4.0",
+    "typescript-eslint": "^8.56.1",
+    "vitest": "^4.1.11"
+  }
+}

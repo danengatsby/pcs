@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Regulament privind Protecția Datelor cu Caracter Personal (GDPR)</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,300;0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+    :root {
+      --primary: #1B3A5C;
+      --primary-light: #2a5080;
+      --accent: #0077B6;
+      --accent2: #00B4D8;
+      --gold: #F4A836;
+      --danger: #D62828;
+      --success: #2D6A4F;
+      --bg: #F4F6F9;
+      --surface: #FFFFFF;
+      --border: #D8E0EB;
+      --text: #1a2535;
+      --muted: #6B7A94;
+      --sidebar: 300px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 13pt;
+      line-height: 1.8;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    /* ===== HEADER ===== */
+    header {
+      background: var(--primary);
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .header-top {
+      background: var(--accent);
+      height: 4px;
+      background: linear-gradient(90deg, #0077B6, #00B4D8, #0077B6);
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 18px 36px;
+    }
+
+    .gdpr-badge {
+      background: var(--accent2);
+      color: white;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      font-size: 11pt;
+      padding: 6px 14px;
+      border-radius: 4px;
+      letter-spacing: 1px;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
+    .header-text h1 {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      font-size: 17pt;
+      color: white;
+      line-height: 1.2;
+    }
+    .header-text p {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 9.5pt;
+      color: rgba(255,255,255,0.6);
+      margin-top: 3px;
+    }
+
+    /* ===== LAYOUT ===== */
+    .layout {
+      display: flex;
+      min-height: calc(100vh - 80px);
+    }
+
+    /* ===== SIDEBAR ===== */
+    nav {
+      width: var(--sidebar);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      position: sticky;
+      top: 80px;
+      height: calc(100vh - 80px);
+      overflow-y: auto;
+      flex-shrink: 0;
+      padding: 24px 0 24px;
+    }
+
+    nav h2 {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 8pt;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      padding: 0 20px 10px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 10px;
+    }
+
+    nav a {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 7px 20px;
+      text-decoration: none;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 9.5pt;
+      border-left: 3px solid transparent;
+      transition: all 0.15s;
+      line-height: 1.4;
+    }
+    nav a .nav-num {
+      font-size: 8pt;
+      color: var(--accent);
+      font-weight: 600;
+      min-width: 28px;
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+    nav a:hover {
+      background: #EEF4FB;
+      color: var(--accent);
+      border-left-color: var(--accent);
+    }
+    nav a.cap {
+      font-weight: 600;
+      color: var(--primary);
+      font-size: 9.5pt;
+    }
+    nav a.sub {
+      padding-left: 36px;
+      color: var(--muted);
+      font-size: 9pt;
+    }
+
+    /* ===== MAIN ===== */
+    main {
+      flex: 1;
+      padding: 40px 56px 80px;
+      max-width: 940px;
+    }
+
+    /* ===== INTRO BOX ===== */
+    .intro-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 5px solid var(--accent);
+      border-radius: 0 6px 6px 0;
+      padding: 20px 26px;
+      margin-bottom: 40px;
+    }
+    .intro-box .doc-meta {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 9pt;
+      color: var(--muted);
+      margin-bottom: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .intro-box .doc-meta span { display: flex; align-items: center; gap: 5px; }
+    .intro-box p {
+      font-size: 11pt;
+      line-height: 1.7;
+      color: #334;
+    }
+    .intro-box strong { color: var(--primary); }
+
+    /* ===== CHAPTER ===== */
+    .chapter {
+      margin-top: 48px;
+      margin-bottom: 4px;
+    }
+
+    .chapter-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 22px;
+      background: var(--primary);
+      border-radius: 6px 6px 0 0;
+      color: white;
+    }
+    .chapter-num {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 9pt;
+      font-weight: 600;
+      background: rgba(255,255,255,0.15);
+      padding: 3px 9px;
+      border-radius: 3px;
+      white-space: nowrap;
+    }
+    .chapter-title {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12pt;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    /* ===== SECTION ===== */
+    .section-title {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 10.5pt;
+      font-weight: 600;
+      color: var(--accent);
+      margin: 24px 0 6px;
+      padding: 8px 16px;
+      background: #EEF4FB;
+      border-left: 3px solid var(--accent2);
+      border-radius: 0 4px 4px 0;
+    }
+
+    /* ===== ARTICLES ===== */
+    .article {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: none;
+      padding: 18px 22px;
+      transition: box-shadow 0.15s;
+    }
+    .article:last-of-type, .article + .chapter, .article + .section-title {
+      border-radius: 0 0 6px 6px;
+    }
+    .article + .article {
+      border-top: 1px solid var(--border);
+    }
+    .chapter + .article {
+      border-top: none;
+    }
+    .section-title + .article {
+      border-top: 1px solid var(--border);
+    }
+    .article:hover {
+      box-shadow: 0 2px 14px rgba(0,119,182,0.09);
+      z-index: 1;
+      position: relative;
+    }
+    .article:target {
+      border-left: 4px solid var(--gold);
+      background: #FFFCF4;
+    }
+
+    .art-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .art-num {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 9pt;
+      font-weight: 700;
+      color: white;
+      background: var(--accent);
+      padding: 3px 9px;
+      border-radius: 3px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .art-title {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      font-size: 11pt;
+      color: var(--primary);
+      line-height: 1.4;
+    }
+
+    .alin {
+      margin: 6px 0 6px 18px;
+      text-align: justify;
+      font-size: 12pt;
+    }
+    .alin > em {
+      font-style: normal;
+      font-weight: 700;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 10pt;
+      color: var(--accent);
+      margin-right: 4px;
+    }
+
+    .lit {
+      margin: 5px 0 5px 38px;
+      text-align: justify;
+      font-size: 12pt;
+    }
+    .lit > em {
+      font-style: normal;
+      font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 10pt;
+      color: var(--muted);
+    }
+
+    p.art-text {
+      text-align: justify;
+      font-size: 12pt;
+      margin: 4px 0;
+    }
+
+    /* ===== SPECIAL BOXES ===== */
+    .info-box {
+      background: #EEF8FF;
+      border: 1px solid #BDE0F5;
+      border-left: 4px solid var(--accent2);
+      border-radius: 0 4px 4px 0;
+      padding: 12px 16px;
+      margin: 10px 0;
+      font-size: 11pt;
+      color: #1a3a55;
+    }
+    .warn-box {
+      background: #FFF8EC;
+      border: 1px solid #F5D99B;
+      border-left: 4px solid var(--gold);
+      border-radius: 0 4px 4px 0;
+      padding: 12px 16px;
+      margin: 10px 0;
+      font-size: 11pt;
+      color: #4a3100;
+    }
+    .danger-box {
+      background: #FEF2F2;
+      border: 1px solid #FECACA;
+      border-left: 4px solid var(--danger);
+      border-radius: 0 4px 4px 0;
+      padding: 12px 16px;
+      margin: 10px 0;
+      font-size: 11pt;
+      color: #5a1a1a;
+    }
+
+    /* definition term highlight */
+    .term {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      color: var(--primary);
+      font-style: normal;
+    }
+
+    /* ===== TABLE ===== */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 11pt;
+      font-family: 'DM Sans', sans-serif;
+    }
+    th {
+      background: var(--primary);
+      color: white;
+      padding: 9px 14px;
+      text-align: left;
+      font-size: 10pt;
+      font-weight: 600;
+    }
+    td {
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    tr:nth-child(even) td { background: #F8FAFC; }
+
+    /* ===== FOOTER ===== */
+    footer {
+      background: var(--primary);
+      color: rgba(255,255,255,0.65);
+      text-align: center;
+      padding: 22px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 9.5pt;
+      margin-top: 60px;
+    }
+    footer strong { color: white; }
+
+    #top-btn {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0,119,182,0.4);
+      z-index: 300;
+      transition: background 0.15s;
+    }
+    #top-btn:hover { background: var(--primary); }
+
+    @media(max-width: 900px) {
+      nav { display: none; }
+      main { padding: 24px 20px 50px; }
+      header .header-inner { padding: 14px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header>
+  <div class="header-top"></div>
+  <div class="header-inner">
+    <div class="gdpr-badge">GDPR</div>
+    <div class="header-text">
+      <h1>Regulament privind Protecția Datelor cu Caracter Personal</h1>
+      <p>Conform Regulamentului UE 2016/679 (GDPR) · Adoptat în baza Legii nr. 190/2018</p>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+<!-- ===== SIDEBAR ===== -->
+<nav>
+  <h2>Cuprins</h2>
+  <a href="#cap1" class="cap"><span class="nav-num">I</span>Dispoziții generale</a>
+  <a href="#art1" class="sub"><span class="nav-num">1</span>Scop și obiective</a>
+  <a href="#art2" class="sub"><span class="nav-num">2</span>Domeniu de aplicare</a>
+  <a href="#art3" class="sub"><span class="nav-num">3</span>Temei juridic</a>
+
+  <a href="#cap2" class="cap"><span class="nav-num">II</span>Definiții</a>
+  <a href="#art4" class="sub"><span class="nav-num">4</span>Termeni și definiții</a>
+
+  <a href="#cap3" class="cap"><span class="nav-num">III</span>Principii de prelucrare</a>
+  <a href="#art5" class="sub"><span class="nav-num">5</span>Principii fundamentale</a>
+  <a href="#art6" class="sub"><span class="nav-num">6</span>Temeiuri de prelucrare</a>
+  <a href="#art7" class="sub"><span class="nav-num">7</span>Condiții consimțământ</a>
+  <a href="#art8" class="sub"><span class="nav-num">8</span>Categorii speciale</a>
+
+  <a href="#cap4" class="cap"><span class="nav-num">IV</span>Drepturile persoanelor vizate</a>
+  <a href="#art9" class="sub"><span class="nav-num">9</span>Dreptul la informare</a>
+  <a href="#art10" class="sub"><span class="nav-num">10</span>Dreptul de acces</a>
+  <a href="#art11" class="sub"><span class="nav-num">11</span>Dreptul la rectificare</a>
+  <a href="#art12" class="sub"><span class="nav-num">12</span>Dreptul la ștergere</a>
+  <a href="#art13" class="sub"><span class="nav-num">13</span>Dreptul la restricție</a>
+  <a href="#art14" class="sub"><span class="nav-num">14</span>Dreptul la portabilitate</a>
+  <a href="#art15" class="sub"><span class="nav-num">15</span>Dreptul la opoziție</a>
+  <a href="#art16" class="sub"><span class="nav-num">16</span>Decizia automată</a>
+  <a href="#art17" class="sub"><span class="nav-num">17</span>Exercitarea drepturilor</a>
+
+  <a href="#cap5" class="cap"><span class="nav-num">V</span>Obligațiile Operatorului</a>
+  <a href="#art18" class="sub"><span class="nav-num">18</span>Obligații generale</a>
+  <a href="#art19" class="sub"><span class="nav-num">19</span>Privacy by design</a>
+  <a href="#art20" class="sub"><span class="nav-num">20</span>Registrul activităților</a>
+  <a href="#art21" class="sub"><span class="nav-num">21</span>Evaluarea de impact</a>
+  <a href="#art22" class="sub"><span class="nav-num">22</span>Persoane împuternicite</a>
+
+  <a href="#cap6" class="cap"><span class="nav-num">VI</span>Responsabilul cu Protecția Datelor</a>
+  <a href="#art23" class="sub"><span class="nav-num">23</span>Desemnare și statut</a>
+  <a href="#art24" class="sub"><span class="nav-num">24</span>Atribuții DPO</a>
+
+  <a href="#cap7" class="cap"><span class="nav-num">VII</span>Securitatea datelor</a>
+  <a href="#art25" class="sub"><span class="nav-num">25</span>Măsuri tehnice</a>
+  <a href="#art26" class="sub"><span class="nav-num">26</span>Obligații personal</a>
+  <a href="#art27" class="sub"><span class="nav-num">27</span>Incidente de securitate</a>
+
+  <a href="#cap8" class="cap"><span class="nav-num">VIII</span>Transfer internațional</a>
+  <a href="#art28" class="sub"><span class="nav-num">28</span>Condiții transfer</a>
+
+  <a href="#cap9" class="cap"><span class="nav-num">IX</span>Sancțiuni</a>
+  <a href="#art29" class="sub"><span class="nav-num">29</span>Răspundere și sancțiuni</a>
+
+  <a href="#cap10" class="cap"><span class="nav-num">X</span>Dispoziții finale</a>
+  <a href="#art30" class="sub"><span class="nav-num">30</span>Intrarea în vigoare</a>
+</nav>
+
+<!-- ===== MAIN ===== -->
+<main>
+
+<!-- INTRO -->
+<div class="intro-box">
+  <div class="doc-meta">
+    <span>📋 Regulament intern de protecție a datelor</span>
+    <span>🇪🇺 Bazat pe Regulamentul UE 2016/679</span>
+    <span>⚖️ Lege nr. 190/2018 · ANSPDCP</span>
+  </div>
+  <p>
+    Prezentul regulament stabilește cadrul intern de protecție a datelor cu caracter personal prelucrate de <strong>[Denumirea Organizației]</strong>, în calitate de operator de date, în conformitate cu <strong>Regulamentul (UE) 2016/679 al Parlamentului European și al Consiliului</strong> din 27 aprilie 2016 (GDPR) și cu <strong>Legea nr. 190/2018</strong> privind măsuri de punere în aplicare a Regulamentului (UE) 2016/679.
+    Documentul este obligatoriu pentru toți membrii, angajații, colaboratorii și persoanele împuternicite care prelucrează date cu caracter personal în numele organizației.
+  </p>
+</div>
+
+<!-- ==================== CAPITOLUL I ==================== -->
+<div id="cap1" class="chapter">
+  <div class="chapter-header">
+    <span class="chapter-num">CAPITOLUL I</span>
+    <span class="chapter-title">Dispoziții generale</span>
+  </div>
+
+  <div id="art1" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 1</span>
+      <span class="art-title">Scop și obiective</span>
+    </div>
+    <p class="alin"><em>(1)</em> Prezentul regulament are drept scop asigurarea protecției drepturilor și libertăților fundamentale ale persoanelor fizice, în special a dreptului la protecția datelor cu caracter personal, în cadrul activității desfășurate de <strong>[Denumirea Organizației]</strong>.</p>
+    <p class="alin"><em>(2)</em> Obiectivele prezentului regulament sunt:</p>
+    <p class="lit"><em>a)</em> stabilirea principiilor și regulilor privind prelucrarea datelor cu caracter personal;</p>
+    <p class="lit"><em>b)</em> definirea drepturilor persoanelor vizate și a procedurilor de exercitare a acestora;</p>
+    <p class="lit"><em>c)</em> stabilirea obligațiilor organizației în calitate de operator de date;</p>
+    <p class="lit"><em>d)</em> desemnarea responsabilului cu protecția datelor (DPO) și definirea atribuțiilor acestuia;</p>
+    <p class="lit"><em>e)</em> stabilirea măsurilor tehnice și organizatorice de securitate a datelor;</p>
+    <p class="lit"><em>f)</em> definirea procedurii de notificare și gestionare a incidentelor de securitate;</p>
+    <p class="lit"><em>g)</em> prevenirea și sancționarea încălcărilor dispozițiilor privind protecția datelor.</p>
+  </div>
+
+  <div id="art2" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 2</span>
+      <span class="art-title">Domeniu de aplicare</span>
+    </div>
+    <p class="alin"><em>(1)</em> Prezentul regulament se aplică prelucrării datelor cu caracter personal, efectuate total sau parțial prin mijloace automatizate, precum și prelucrării prin alte mijloace decât cele automatizate a datelor cu caracter personal care fac parte dintr-un sistem de evidență a datelor sau care sunt destinate să facă parte dintr-un sistem de evidență a datelor.</p>
+    <p class="alin"><em>(2)</em> Regulamentul se aplică tuturor:</p>
+    <p class="lit"><em>a)</em> angajaților și colaboratorilor organizației;</p>
+    <p class="lit"><em>b)</em> membrilor și voluntarilor organizației;</p>
+    <p class="lit"><em>c)</em> persoanelor împuternicite care prelucrează date în numele organizației;</p>
+    <p class="lit"><em>d)</em> terților care acționează în baza unui contract cu organizația și care prelucrează date cu caracter personal.</p>
+    <p class="alin"><em>(3)</em> Categoriile de persoane vizate ale căror date sunt prelucrate de organizație includ, fără a se limita la: membri, simpatizanți, angajați, colaboratori, voluntari, donatori, petiționari și persoane care intră în contact cu organizația.</p>
+  </div>
+
+  <div id="art3" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 3</span>
+      <span class="art-title">Temeiul juridic al regulamentului</span>
+    </div>
+    <p class="alin"><em>(1)</em> Prezentul regulament este emis în temeiul:</p>
+    <p class="lit"><em>a)</em> <strong>Regulamentul (UE) 2016/679</strong> al Parlamentului European și al Consiliului din 27 aprilie 2016 privind protecția persoanelor fizice în ceea ce privește prelucrarea datelor cu caracter personal și privind libera circulație a acestor date și de abrogare a Directivei 95/46/CE (Regulamentul general privind protecția datelor — GDPR);</p>
+    <p class="lit"><em>b)</em> <strong>Legea nr. 190/2018</strong> privind măsuri de punere în aplicare a Regulamentului (UE) 2016/679 al Parlamentului European și al Consiliului din 27 aprilie 2016;</p>
+    <p class="lit"><em>c)</em> <strong>Legea nr. 506/2004</strong> privind prelucrarea datelor cu caracter personal și protecția vieții private în sectorul comunicațiilor electronice;</p>
+    <p class="lit"><em>d)</em> Ghidurile și recomandările emise de <strong>Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal (ANSPDCP)</strong> și de Comitetul European pentru Protecția Datelor (CEPD/EDPB).</p>
+    <div class="info-box">ℹ️ Organizația notifică/înregistrează activitățile de prelucrare la ANSPDCP în cazurile prevăzute de lege și cooperează cu autoritatea de supraveghere în exercițiul atribuțiilor acesteia.</div>
+  </div>
+</div>
+
+<!-- ==================== CAPITOLUL II ==================== -->
+<div id="cap2" class="chapter">
+  <div class="chapter-header">
+    <span class="chapter-num">CAPITOLUL II</span>
+    <span class="chapter-title">Definiții</span>
+  </div>
+
+  <div id="art4" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 4</span>
+      <span class="art-title">Termeni și definiții</span>
+    </div>
+    <p class="art-text">În sensul prezentului regulament, termenii de mai jos au următoarele semnificații:</p>
+
+    <p class="alin"><em>(1)</em> <span class="term">„Date cu caracter personal"</span> — orice informații privind o persoană fizică identificată sau identificabilă (<em>persoana vizată</em>); o persoană fizică identificabilă este o persoană care poate fi identificată, direct sau indirect, în special prin referire la un element de identificare, cum ar fi un nume, un număr de identificare, date de localizare, un identificator online, sau la unul sau mai multe elemente specifice, proprii identității sale fizice, fiziologice, genetice, psihice, economice, culturale sau sociale.</p>
+
+    <p class="alin"><em>(2)</em> <span class="term">„Prelucrare"</span> — orice operațiune sau set de operațiuni efectuate asupra datelor cu caracter personal sau asupra seturilor de date cu caracter personal, cu sau fără utilizarea de mijloace automatizate, cum ar fi colectarea, înregistrarea, organizarea, structurarea, stocarea, adaptarea sau modificarea, extragerea, consultarea, utilizarea, divulgarea prin transmitere, diseminarea sau punerea la dispoziție în orice alt mod, alinierea sau combinarea, restricționarea, ștergerea sau distrugerea.</p>
+
+    <p class="alin"><em>(3)</em> <span class="term">„Operator"</span> — persoana fizică sau juridică, autoritatea publică, agenția sau alt organism care, singur sau împreună cu altele, stabilește scopurile și mijloacele de prelucrare a datelor cu caracter personal. În prezentul regulament, operatorul este <strong>[Denumirea Organizației]</strong>.</p>
+
+    <p class="alin"><em>(4)</em> <span class="term">„Persoana împuternicită de operator"</span> — persoana fizică sau juridică, autoritatea publică, agenția sau alt organism care prelucrează datele cu caracter personal în numele operatorului.</p>
+
+    <p class="alin"><em>(5)</em> <span class="term">„Persoana vizată"</span> — persoana fizică ale cărei date cu caracter personal sunt prelucrate de operator.</p>
+
+    <p class="alin"><em>(6)</em> <span class="term">„Consimțământ"</span> — orice manifestare de voință liberă, specifică, informată și lipsită de ambiguitate a persoanei vizate prin care aceasta acceptă, printr-o declarație sau printr-o acțiune fără echivoc, ca datele cu caracter personal care o privesc să fie prelucrate.</p>
+
+    <p class="alin"><em>(7)</em> <span class="term">„Încălcarea securității datelor cu caracter personal"</span> — o încălcare a securității care duce, în mod accidental sau ilegal, la distrugerea, pierderea, modificarea, sau divulgarea neautorizată a datelor cu caracter personal transmise, stocate sau prelucrate într-un alt mod, sau la accesul neautorizat la acestea.</p>
+
+    <p class="alin"><em>(8)</em> <span class="term">„Date biometrice"</span> — date cu caracter personal care rezultă în urma unor tehnici de prelucrare specifice referitoare la caracteristicile fizice, fiziologice sau comportamentale ale unei persoane fizice, care permit sau confirmă identificarea unică a respectivei persoane, cum ar fi imaginile faciale sau datele dactiloscopice.</p>
+
+    <p class="alin"><em>(9)</em> <span class="term">„Pseudonimizare"</span> — prelucrarea datelor cu caracter personal într-un asemenea mod încât acestea să nu mai poată fi atribuite unei anume persoane vizate fără a se utiliza informații suplimentare, cu condiția că aceste informații suplimentare sunt stocate separat și sunt supuse unor măsuri de natură tehnică și organizatorică care să asigure neatribuirea respectivelor date cu caracter personal unei persoane fizice identificate sau identificabile.</p>
+
+    <p class="alin"><em>(10)</em> <span class="term">„Responsabilul cu protecția datelor / DPO"</span> (<em>Data Protection Officer</em>) — persoana desemnată de operator să se ocupe de toate aspectele legate de protecția datelor cu caracter personal în cadrul organizației.</p>
+
+    <p class="alin"><em>(11)</em> <span class="term">„ANSPDCP"</span> — Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal, autoritatea de supraveghere competentă din România.</p>
+
+    <p class="alin"><em>(12)</em> <span class="term">„Evaluarea impactului asupra protecției datelor (DPIA)"</span> — un proces menit să descrie prelucrarea, să evalueze necesitatea și proporționalitatea acesteia și să contribuie la gestionarea riscurilor pentru drepturile și libertățile persoanelor fizice, prin evaluarea acestor riscuri și determinarea măsurilor necesare pentru a le aborda.</p>
+  </div>
+</div>
+
+<!-- ==================== CAPITOLUL III ==================== -->
+<div id="cap3" class="chapter">
+  <div class="chapter-header">
+    <span class="chapter-num">CAPITOLUL III</span>
+    <span class="chapter-title">Principiile de prelucrare a datelor cu caracter personal</span>
+  </div>
+
+  <div id="art5" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 5</span>
+      <span class="art-title">Principii fundamentale privind prelucrarea datelor</span>
+    </div>
+    <p class="alin"><em>(1)</em> Organizația prelucrează datele cu caracter personal cu respectarea strictă a următoarelor principii:</p>
+    <p class="lit"><em>a)</em> <span class="term">Legalitate, echitate și transparență</span> — datele sunt prelucrate în mod legal, echitabil și transparent față de persoana vizată;</p>
+    <p class="lit"><em>b)</em> <span class="term">Limitări legate de scop</span> — datele sunt colectate în scopuri determinate, explicite și legitime și nu sunt prelucrate ulterior într-un mod incompatibil cu aceste scopuri; prelucrarea ulterioară în scopuri de arhivare în interes public, în scopuri de cercetare științifică sau istorică ori în scopuri statistice nu este considerată incompatibilă cu scopurile inițiale;</p>
+    <p class="lit"><em>c)</em> <span class="term">Reducerea la minimum a datelor</span> — datele prelucrate sunt adecvate, relevante și limitate la ceea ce este necesar în raport cu scopurile în care sunt prelucrate;</p>
+    <p class="lit"><em>d)</em> <span class="term">Exactitate</span> — datele sunt exacte și, în cazul în care este necesar, actualizate; se iau toate măsurile rezonabile pentru a se asigura că datele inexacte sunt șterse sau rectificate fără întârziere;</p>
+    <p class="lit"><em>e)</em> <span class="term">Limitări legate de stocare</span> — datele sunt păstrate într-o formă care permite identificarea persoanelor vizate pe o perioadă care nu depășește perioada necesară îndeplinirii scopurilor în care sunt prelucrate;</p>
+    <p class="lit"><em>f)</em> <span class="term">Integritate și confidențialitate</span> — datele sunt prelucrate într-un mod care asigură securitatea adecvată, inclusiv protecția împotriva prelucrării neautorizate sau ilegale și împotriva pierderii, a distrugerii sau a deteriorării accidentale, prin luarea de măsuri tehnice sau organizatorice corespunzătoare;</p>
+    <p class="lit"><em>g)</em> <span class="term">Responsabilitate</span> — operatorul este responsabil de respectarea principiilor enumerate și poate demonstra această respectare (<em>„accountability"</em>).</p>
+    <p class="alin"><em>(2)</em> Organizația implementează politici și proceduri interne care să garanteze respectarea acestor principii și poate demonstra, la cerere, conformitatea cu acestea.</p>
+  </div>
+
+  <div id="art6" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 6</span>
+      <span class="art-title">Temeiurile legale ale prelucrării</span>
+    </div>
+    <p class="alin"><em>(1)</em> Organizația prelucrează date cu caracter personal numai în cazul în care se aplică cel puțin unul din următoarele temeiuri:</p>
+    <p class="lit"><em>a)</em> <strong>Consimțământul</strong> — persoana vizată și-a dat consimțământul pentru prelucrarea datelor sale cu caracter personal pentru unul sau mai multe scopuri specifice;</p>
+    <p class="lit"><em>b)</em> <strong>Contractul</strong> — prelucrarea este necesară pentru executarea unui contract la care persoana vizată este parte sau pentru a face demersuri la cererea persoanei vizate înainte de încheierea unui contract;</p>
+    <p class="lit"><em>c)</em> <strong>Obligația legală</strong> — prelucrarea este necesară în vederea îndeplinirii unei obligații legale care îi revine operatorului;</p>
+    <p class="lit"><em>d)</em> <strong>Interesele vitale</strong> — prelucrarea este necesară pentru a proteja interesele vitale ale persoanei vizate sau ale altei persoane fizice;</p>
+    <p class="lit"><em>e)</em> <strong>Interesul public</strong> — prelucrarea este necesară pentru îndeplinirea unei sarcini care servește un interes public sau care rezultă din exercitarea autorității publice cu care este învestit operatorul;</p>
+    <p class="lit"><em>f)</em> <strong>Interesul legitim</strong> — prelucrarea este necesară în scopul intereselor legitime urmărite de operator sau de o parte terță, cu excepția cazului în care prevalează interesele sau drepturile și libertățile fundamentale ale persoanei vizate, care necesită protejarea datelor cu caracter personal, în special atunci când persoana vizată este un copil.</p>
+    <p class="alin"><em>(2)</em> Pentru fiecare activitate de prelucrare, organizația identifică și documentează temeiul juridic aplicabil în Registrul activităților de prelucrare.</p>
+  </div>
+
+  <div id="art7" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 7</span>
+      <span class="art-title">Condițiile privind consimțământul</span>
+    </div>
+    <p class="alin"><em>(1)</em> Atunci când prelucrarea se bazează pe consimțământ, organizația este în măsură să demonstreze că persoana vizată și-a dat consimțământul pentru prelucrarea datelor sale.</p>
+    <p class="alin"><em>(2)</em> Dacă consimțământul persoanei vizate este dat în contextul unei declarații scrise care se referă și la alte aspecte, cererea privind consimțământul este prezentată într-o formă care o diferențiază în mod clar de celelalte aspecte, într-o formă inteligibilă și ușor accesibilă, utilizând un limbaj clar și simplu.</p>
+    <p class="alin"><em>(3)</em> Persoana vizată are dreptul să își retragă consimțământul <strong>în orice moment</strong>. Retragerea consimțământului nu afectează legalitatea prelucrării efectuate pe baza consimțământului înainte de retragerea acestuia. Înainte de acordarea consimțământului, persoana vizată este informată cu privire la acest aspect.</p>
+    <p class="alin"><em>(4)</em> Retragerea consimțământului trebuie să fie la fel de facilă ca și acordarea acestuia.</p>
+    <p class="alin"><em>(5)</em> Consimțământul nu constituie un temei juridic valabil pentru prelucrare în cazul în care există un dezechilibru semnificativ între persoana vizată și operator (raport de subordonare), în special dacă operatorul este o autoritate publică.</p>
+    <div class="warn-box">⚠️ Consimțământul dat de un copil cu vârsta sub 16 ani nu este valabil. Pentru copiii cu vârsta sub 16 ani, prelucrarea datelor este legală numai dacă și în măsura în care consimțământul respectiv este acordat sau autorizat de titularul răspunderii părintești asupra copilului.</div>
+  </div>
+
+  <div id="art8" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 8</span>
+      <span class="art-title">Categorii speciale de date cu caracter personal</span>
+    </div>
+    <p class="alin"><em>(1)</em> Se interzice prelucrarea de date cu caracter personal care dezvăluie originea rasială sau etnică, opiniile politice, confesiunea religioasă sau convingerile filozofice sau apartenența la sindicate și prelucrarea de date genetice, de date biometrice pentru identificarea unică a unei persoane fizice, de date privind sănătatea sau de date privind viața sexuală sau orientarea sexuală ale unei persoane fizice.</p>
+    <p class="alin"><em>(2)</em> Prin excepție de la alineatul (1), prelucrarea acestor categorii de date este permisă numai dacă:</p>
+    <p class="lit"><em>a)</em> persoana vizată și-a dat consimțământul explicit pentru prelucrarea acestor date, în unul sau mai multe scopuri specifice;</p>
+    <p class="lit"><em>b)</em> prelucrarea este necesară în scopul îndeplinirii obligațiilor și al exercitării unor drepturi specifice ale operatorului sau ale persoanei vizate în domeniul ocupării forței de muncă și al securității sociale și protecției sociale;</p>
+    <p class="lit"><em>c)</em> prelucrarea este necesară pentru protejarea intereselor vitale ale persoanei vizate sau ale altei persoane fizice, atunci când persoana vizată se află în incapacitate fizică sau juridică de a-și da consimțământul;</p>
+    <p class="lit"><em>d)</em> prelucrarea este efectuată în cadrul activităților legitime și cu garanții adecvate de către o fundație, o asociație sau orice alt organism fără scop lucrativ și cu specific politic, filozofic, religios sau sindical.</p>
+    <p class="alin"><em>(3)</em> În cazul în care organizația prelucrează categorii speciale de date, se implementează măsuri suplimentare de securitate și se realizează o evaluare a impactului asupra protecției datelor (DPIA) conform Art. 21 din prezentul regulament.</p>
+    <div class="danger-box">🔴 Prelucrarea datelor de sănătate, biometrice sau genetice fără temei legal explicit constituie o încălcare gravă a GDPR și poate atrage sancțiuni administrative de până la <strong>20.000.000 EUR sau 4% din cifra de afaceri anuală globală</strong>.</div>
+  </div>
+</div>
+
+<!-- ==================== CAPITOLUL IV ==================== -->
+<div id="cap4" class="chapter">
+  <div class="chapter-header">
+    <span class="chapter-num">CAPITOLUL IV</span>
+    <span class="chapter-title">Drepturile persoanelor vizate</span>
+  </div>
+
+  <div id="art9" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 9</span>
+      <span class="art-title">Dreptul la informare</span>
+    </div>
+    <p class="alin"><em>(1)</em> Organizația informează persoanele vizate cu privire la prelucrarea datelor lor, la momentul colectării acestora, prin intermediul notelor de informare (note de informare privind prelucrarea datelor cu caracter personal — <em>privacy notice</em>).</p>
+    <p class="alin"><em>(2)</em> Informațiile furnizate persoanelor vizate includ obligatoriu:</p>
+    <p class="lit"><em>a)</em> identitatea și datele de contact ale operatorului;</p>
+    <p class="lit"><em>b)</em> datele de contact ale responsabilului cu protecția datelor (DPO), dacă este cazul;</p>
+    <p class="lit"><em>c)</em> scopurile și temeiul juridic al prelucrării;</p>
+    <p class="lit"><em>d)</em> interesele legitime urmărite de operator, dacă prelucrarea se bazează pe interesul legitim;</p>
+    <p class="lit"><em>e)</em> destinatarii sau categoriile de destinatari ai datelor;</p>
+    <p class="lit"><em>f)</em> informații privind transferurile internaționale de date, dacă este cazul;</p>
+    <p class="lit"><em>g)</em> perioada de stocare a datelor sau criteriile utilizate pentru a stabili această perioadă;</p>
+    <p class="lit"><em>h)</em> drepturile persoanei vizate: acces, rectificare, ștergere, restricționare, portabilitate, opoziție;</p>
+    <p class="lit"><em>i)</em> dreptul de a retrage consimțământul, dacă prelucrarea se bazează pe consimțământ;</p>
+    <p class="lit"><em>j)</em> dreptul de a depune o plângere la ANSPDCP;</p>
+    <p class="lit"><em>k)</em> dacă furnizarea datelor este o obligație contractuală sau legală și consecințele nefurnizării;</p>
+    <p class="lit"><em>l)</em> existența unui proces decizional automatizat, inclusiv crearea de profiluri.</p>
+  </div>
+
+  <div id="art10" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 10</span>
+      <span class="art-title">Dreptul de acces al persoanei vizate</span>
+    </div>
+    <p class="alin"><em>(1)</em> Persoana vizată are dreptul de a obține din partea operatorului o confirmare că se prelucrează sau nu date cu caracter personal care o privesc și, în caz afirmativ, acces la datele respective și la informațiile prevăzute la Art. 9 alin. (2).</p>
+    <p class="alin"><em>(2)</em> Organizația furnizează o copie a datelor cu caracter personal care fac obiectul prelucrării. Pentru orice alte copii solicitate de persoana vizată, operatorul poate percepe o taxă rezonabilă bazată pe costurile administrative.</p>
+    <p class="alin"><em>(3)</em> Organizația răspunde solicitărilor de acces în termen de <strong>maxim o lună</strong> de la primirea cererii, cu posibilitatea prelungirii cu două luni suplimentare în cazuri complexe.</p>
+  </div>
+
+  <div id="art11" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 11</span>
+      <span class="art-title">Dreptul la rectificare</span>
+    </div>
+    <p class="alin"><em>(1)</em> Persoana vizată are dreptul de a obține de la operator, fără întârzieri nejustificate, <strong>rectificarea datelor inexacte</strong> care o privesc. Ținând seama de scopurile în care au fost prelucrate datele, persoana vizată are dreptul de a obține completarea datelor incomplete, inclusiv prin furnizarea unei declarații suplimentare.</p>
+    <p class="alin"><em>(2)</em> Organizația informează fiecare destinatar căruia i-au fost divulgate datele cu privire la orice rectificare, cu excepția cazului în care acest lucru se dovedește imposibil sau presupune eforturi disproporționate.</p>
+  </div>
+
+  <div id="art12" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 12</span>
+      <span class="art-title">Dreptul la ștergerea datelor („dreptul de a fi uitat")</span>
+    </div>
+    <p class="alin"><em>(1)</em> Persoana vizată are dreptul de a obține din partea operatorului ștergerea datelor cu caracter personal care o privesc, fără întârzieri nejustificate, în cazul în care se aplică unul din motivele:</p>
+    <p class="lit"><em>a)</em> datele nu mai sunt necesare pentru scopurile în care au fost colectate sau prelucrate;</p>
+    <p class="lit"><em>b)</em> persoana vizată își retrage consimțământul și nu există alt temei juridic pentru prelucrare;</p>
+    <p class="lit"><em>c)</em> persoana vizată se opune prelucrării și nu există motive legitime care să prevaleze;</p>
+    <p class="lit"><em>d)</em> datele au fost prelucrate ilegal;</p>
+    <p class="lit"><em>e)</em> datele trebuie șterse pentru respectarea unei obligații legale;</p>
+    <p class="lit"><em>f)</em> datele au fost colectate în legătură cu oferirea de servicii ale societății informaționale copiilor.</p>
+    <p class="alin"><em>(2)</em> Dreptul la ștergere <strong>nu se aplică</strong> în măsura în care prelucrarea este necesară: pentru exercitarea dreptului la liberă exprimare și la informare; pentru respectarea unei obligații legale; din motive de interes public; în scopuri arhivistice, de cercetare sau statistice; sau pentru constatarea, exercitarea sau apărarea unui drept în instanță.</p>
+  </div>
+
+  <div id="art13" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 13</span>
+      <span class="art-title">Dreptul la restricționarea prelucrării</span>
+    </div>
+    <p class="alin"><em>(1)</em> Persoana vizată are dreptul de a obține din partea operatorului restricționarea prelucrării în cazul în care:</p>
+    <p class="lit"><em>a)</em> contestă exactitatea datelor — pe o perioadă care îi permite operatorului să verifice exactitatea datelor;</p>
+    <p class="lit"><em>b)</em> prelucrarea este ilegală, iar persoana vizată se opune ștergerii datelor, solicitând în schimb restricționarea utilizării lor;</p>
+    <p class="lit"><em>c)</em> operatorul nu mai are nevoie de datele cu caracter personal, dar persoana vizată i le solicită pentru constatarea, exercitarea sau apărarea unui drept în instanță;</p>
+    <p class="lit"><em>d)</em> persoana vizată s-a opus prelucrării, pentru intervalul de timp în care se verifică dacă drepturile legitime ale operatorului prevalează asupra celor ale persoanei vizate.</p>
+    <p class="alin"><em>(2)</em> Atunci când prelucrarea a fost restricționată, datele pot fi în continuare stocate, dar vor fi prelucrate exclusiv cu consimțământul persoanei vizate, cu excepțiile prevăzute de lege.</p>
+  </div>
+
+  <div id="art14" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 14</span>
+      <span class="art-title">Dreptul la portabilitatea datelor</span>
+    </div>
+    <p class="alin"><em>(1)</em> Persoana vizată are dreptul de a primi datele cu caracter personal care o privesc și pe care le-a furnizat operatorului, <strong>într-un format structurat, utilizat în mod curent și care poate fi citit automat</strong>, și are dreptul de a transmite aceste date altui operator, fără obstacole din partea operatorului căruia i-au fost furnizate datele, în cazul în care:</p>
+    <p class="lit"><em>a)</em> prelucrarea se bazează pe consimțământ sau pe un contract; și</p>
+    <p class="lit"><em>b)</em> prelucrarea este efectuată prin mijloace automatizate.</p>
+    <p class="alin"><em>(2)</em> La cererea persoanei vizate, datele pot fi transmise direct altui operator, dacă acest lucru este tehnic fezabil.</p>
+    <div class="info-box">ℹ️ Formatele acceptate pentru portabilitatea datelor includ: CSV, JSON, XML sau alte formate standard. Organizația va furniza datele în termen de o lună de la solicitare.</div>
+  </div>
+
+  <div id="art15" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 15</span>
+      <span class="art-title">Dreptul la opoziție</span>
+    </div>
+    <p class="alin"><em>(1)</em> Persoana vizată are dreptul de a se opune în orice moment, din motive legate de situația particulară în care se află, prelucrării datelor care o privesc, inclusiv creării de profiluri pe baza respectivelor dispoziții. Operatorul nu mai prelucrează datele cu caracter personal, cu excepția cazului în care operatorul demonstrează că are motive legitime și imperioase care justifică prelucrarea și care prevalează asupra intereselor, drepturilor și libertăților persoanei vizate sau că scopul este constatarea, exercitarea sau apărarea unui drept în instanță.</p>
+    <p class="alin"><em>(2)</em> În cazul în care datele cu caracter personal sunt prelucrate pentru marketing direct, persoana vizată are dreptul de a se opune în orice moment prelucrării, inclusiv creării de profiluri, în măsura în care este legată de marketingul direct respectiv. <strong>Această opoziție este absolută și nu poate fi înlăturată.</strong></p>
+    <p class="alin"><em>(3)</em> Cel târziu în momentul primului comunicat cu persoana vizată, dreptul de opoziție la marketing direct este adus la cunoștința persoanei vizate în mod explicit și este prezentat în mod clar și separat de orice alte informații.</p>
+  </div>
+
+  <div id="art16" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 16</span>
+      <span class="art-title">Dreptul de a nu face obiectul unei decizii bazate exclusiv pe prelucrare automatizată</span>
+    </div>
+    <p class="alin"><em>(1)</em> Persoana vizată are dreptul de a nu face obiectul unei decizii bazate exclusiv pe prelucrarea automatizată, inclusiv crearea de profiluri, care produce efecte juridice care privesc persoana vizată sau o afectează în mod similar într-o măsură semnificativă.</p>
+    <p class="alin"><em>(2)</em> Organizația nu utilizează sisteme de decizie exclusiv automatizată care să producă efecte juridice sau similare asupra persoanelor vizate, fără intervenție umană, cu excepția cazurilor expres permise de lege.</p>
+    <p class="alin"><em>(3)</em> Dacă organizația utilizează astfel de procese în baza temeiului legal aplicabil, ea garantează cel puțin dreptul persoanei vizate de a obține intervenție umană din partea operatorului, de a-și exprima punctul de vedere și de a contesta decizia.</p>
+  </div>
+
+  <div id="art17" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 17</span>
+      <span class="art-title">Procedura de exercitare a drepturilor</span>
+    </div>
+    <p class="alin"><em>(1)</em> Cererile privind exercitarea drepturilor prevăzute la Art. 10–16 se transmit:</p>
+    <p class="lit"><em>a)</em> în scris, la sediul organizației;</p>
+    <p class="lit"><em>b)</em> prin e-mail, la adresa dedicată: <strong>[dpo@organizatie.ro]</strong>;</p>
+    <p class="lit"><em>c)</em> prin orice altă modalitate care permite identificarea solicitantului.</p>
+    <p class="alin"><em>(2)</em> Organizația răspunde solicitărilor <strong>în termen de o lună</strong> de la primire. Termenul poate fi prelungit cu cel mult două luni suplimentare, dacă este necesar, ținând seama de complexitatea și numărul cererilor. Organizația informează persoana vizată cu privire la orice astfel de prelungire, în termen de o lună de la primirea cererii, precizând motivele întârzierii.</p>
+    <p class="alin"><em>(3)</em> Organizația furnizează informații privind acțiunile întreprinse în urma unei cereri <strong>gratuit</strong>. În cazul în care cererile din partea unei persoane vizate sunt în mod vădit nefondate sau excesive, în special din cauza caracterului lor repetitiv, operatorul poate fie să perceapă o taxă rezonabilă, fie să refuze să dea curs cererii.</p>
+    <p class="alin"><em>(4)</em> Dacă organizația are îndoieli rezonabile cu privire la identitatea persoanei fizice care înaintează cererea, poate solicita informații suplimentare necesare pentru confirmarea identității persoanei vizate.</p>
+    <p class="alin"><em>(5)</em> Persoana vizată are dreptul de a depune o plângere la <strong>ANSPDCP</strong> (www.dataprotection.ro) dacă consideră că drepturile sale au fost încălcate.</p>
+
+    <table>
+      <tr>
+        <th>Drept</th>
+        <th>Termen de răspuns</th>
+        <th>Excepții</th>
+      </tr>
+      <tr>
+        <td>Acces (Art. 10)</td>
+        <td>1 lună (+2 luni)</td>
+        <td>Securitate națională, drepturi ale terților</td>
+      </tr>
+      <tr>
+        <td>Rectificare (Art. 11)</td>
+        <td>Fără întârzieri nejustificate</td>
+        <td>Datele exacte nu pot fi modificate</td>
+      </tr>
+      <tr>
+        <td>Ștergere (Art. 12)</td>
+        <td>Fără întârzieri nejustificate</td>
+        <td>Obligație legală, interes public, litigii</td>
+      </tr>
+      <tr>
+        <td>Restricționare (Art. 13)</td>
+        <td>Fără întârzieri nejustificate</td>
+        <td>Litigii, interes public major</td>
+      </tr>
+      <tr>
+        <td>Portabilitate (Art. 14)</td>
+        <td>1 lună</td>
+        <td>Doar prelucrare automatizată</td>
+      </tr>
+      <tr>
+        <td>Opoziție (Art. 15)</td>
+        <td>Imediat (marketing direct)</td>
+        <td>Interese legitime imperative</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ==================== CAPITOLUL V ==================== -->
+<div id="cap5" class="chapter">
+  <div class="chapter-header">
+    <span class="chapter-num">CAPITOLUL V</span>
+    <span class="chapter-title">Obligațiile Operatorului</span>
+  </div>
+
+  <div id="art18" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 18</span>
+      <span class="art-title">Obligații generale ale operatorului</span>
+    </div>
+    <p class="alin"><em>(1)</em> Organizația, în calitate de operator, are obligația de a pune în aplicare măsuri tehnice și organizatorice adecvate pentru a garanta și a fi în măsură să demonstreze că prelucrarea se efectuează în conformitate cu GDPR și cu prezentul regulament.</p>
+    <p class="alin"><em>(2)</em> Organizația are obligația de a elabora și a menține actualizate:</p>
+    <p class="lit"><em>a)</em> Politica de Protecție a Datelor cu Caracter Personal;</p>
+    <p class="lit"><em>b)</em> Registrul activităților de prelucrare;</p>
+    <p class="lit"><em>c)</em> Proceduri interne privind exercitarea drepturilor persoanelor vizate;</p>
+    <p class="lit"><em>d)</em> Proceduri privind gestionarea incidentelor de securitate;</p>
+    <p class="lit"><em>e)</em> Contracte cu persoanele împuternicite (DPA — <em>Data Processing Agreement</em>);</p>
+    <p class="lit"><em>f)</em> Note de informare privind prelucrarea datelor (<em>privacy notices</em>);</p>
+    <p class="lit"><em>g)</em> Evaluări ale impactului asupra protecției datelor (DPIA), acolo unde este necesar.</p>
+    <p class="alin"><em>(3)</em> Organizația revizuiește și actualizează aceste documente cel puțin <strong>o dată pe an</strong> sau ori de câte ori intervin modificări semnificative în activitățile de prelucrare.</p>
+  </div>
+
+  <div id="art19" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 19</span>
+      <span class="art-title">Protecția datelor începând cu momentul conceperii și în mod implicit (Privacy by Design și by Default)</span>
+    </div>
+    <p class="alin"><em>(1)</em> Organizația implementează principiile <strong>privacy by design</strong> și <strong>privacy by default</strong>, ceea ce implică:</p>
+    <p class="lit"><em>a)</em> luarea în considerare a cerințelor privind protecția datelor încă din faza de proiectare a oricărui sistem, aplicație, produs sau serviciu care implică prelucrarea datelor cu caracter personal;</p>
+    <p class="lit"><em>b)</em> implementarea setărilor implicite care asigură că, în mod prestabilit, sunt prelucrate numai datele cu caracter personal care sunt necesare pentru fiecare scop specific al prelucrării;</p>
+    <p class="lit"><em>c)</em> reducerea la minimum a cantității de date colectate, a gradului de prelucrare, a perioadei de stocare și a accesibilității datelor.</p>
+    <p class="alin"><em>(2)</em> Organizația aplică tehnici de <strong>pseudonimizare</strong> și <strong>criptare</strong> a datelor cu caracter personal acolo unde este adecvat și posibil din punct de vedere tehnic.</p>
+  </div>
+
+  <div id="art20" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 20</span>
+      <span class="art-title">Registrul activităților de prelucrare</span>
+    </div>
+    <p class="alin"><em>(1)</em> Organizația menține un <strong>registru al activităților de prelucrare</strong> desfășurate sub responsabilitatea sa, care conține cel puțin:</p>
+    <p class="lit"><em>a)</em> numele și datele de contact ale operatorului și, după caz, ale reprezentantului operatorului și ale responsabilului cu protecția datelor;</p>
+    <p class="lit"><em>b)</em> scopurile prelucrării;</p>
+    <p class="lit"><em>c)</em> o descriere a categoriilor de persoane vizate și a categoriilor de date cu caracter personal;</p>
+    <p class="lit"><em>d)</em> categoriile de destinatari cărora le-au fost sau le vor fi divulgate datele, inclusiv destinatari din țări terțe sau organizații internaționale;</p>
+    <p class="lit"><em>e)</em> după caz, transferurile de date cu caracter personal către o țară terță sau o organizație internațională;</p>
+    <p class="lit"><em>f)</em> termenele-limită preconizate pentru ștergerea diferitelor categorii de date;</p>
+    <p class="lit"><em>g)</em> o descriere generală a măsurilor tehnice și organizatorice de securitate prevăzute.</p>
+    <p class="alin"><em>(2)</em> Registrul este menținut în formă scrisă, inclusiv în format electronic, și este pus la dispoziția autorității de supraveghere la cerere.</p>
+  </div>
+
+  <div id="art21" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 21</span>
+      <span class="art-title">Evaluarea impactului asupra protecției datelor (DPIA)</span>
+    </div>
+    <p class="alin"><em>(1)</em> Atunci când un tip de prelucrare, în special cea care utilizează noi tehnologii, este susceptibil să genereze un <strong>risc ridicat</strong> pentru drepturile și libertățile persoanelor fizice, organizația efectuează, înaintea prelucrării, o evaluare a impactului operațiunilor de prelucrare prevăzute asupra protecției datelor cu caracter personal.</p>
+    <p class="alin"><em>(2)</em> DPIA este obligatorie în special în cazul:</p>
+    <p class="lit"><em>a)</em> evaluării sistematice și cuprinzătoare a aspectelor personale referitoare la persoanele fizice, care se bazează pe prelucrarea automată, inclusiv crearea de profiluri;</p>
+    <p class="lit"><em>b)</em> prelucrării pe scară largă a categoriilor speciale de date sau a datelor cu caracter personal referitoare la condamnări penale și infracțiuni;</p>
+    <p class="lit"><em>c)</em> monitorizării sistematice pe scară largă a unei zone accesibile publicului.</p>
+    <p class="alin"><em>(3)</em> DPIA conține cel puțin: o descriere sistematică a operațiunilor de prelucrare; o evaluare a necesității și proporționalității; o evaluare a riscurilor pentru drepturile și libertățile persoanelor vizate; măsurile preconizate pentru abordarea riscurilor.</p>
+    <p class="alin"><em>(4)</em> Dacă DPIA indică un risc rezidual ridicat, organizația consultă ANSPDCP înainte de începerea prelucrării.</p>
+  </div>
+
+  <div id="art22" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 22</span>
+      <span class="art-title">Persoanele împuternicite de operator</span>
+    </div>
+    <p class="alin"><em>(1)</em> Organizația recurge numai la persoane împuternicite care prezintă garanții suficiente pentru punerea în aplicare a unor măsuri tehnice și organizatorice adecvate, astfel încât prelucrarea să respecte cerințele GDPR.</p>
+    <p class="alin"><em>(2)</em> Prelucrarea de către o persoană împuternicită de operator este reglementată printr-un <strong>contract sau alt act juridic</strong> (DPA — <em>Data Processing Agreement</em>), care prevede cel puțin:</p>
+    <p class="lit"><em>a)</em> obiectul și durata prelucrării;</p>
+    <p class="lit"><em>b)</em> natura și scopul prelucrării;</p>
+    <p class="lit"><em>c)</em> tipul de date cu caracter personal și categoriile de persoane vizate;</p>
+    <p class="lit"><em>d)</em> obligațiile și drepturile operatorului;</p>
+    <p class="lit"><em>e)</em> că persoana împuternicită prelucrează datele numai pe baza instrucțiunilor documentate din partea operatorului;</p>
+    <p class="lit"><em>f)</em> că persoanele autorizate să prelucreze datele s-au angajat să respecte confidențialitatea;</p>
+    <p class="lit"><em>g)</em> că persoana împuternicită acordă asistență operatorului pentru asigurarea respectării obligațiilor privind securitatea, notificarea încălcărilor și drepturile persoanelor vizate;</p>
+    <p class="lit"><em>h)</em> că la finalizarea activității de prelucrare, persoana împuternicită șterge sau returnează toate datele.</p>
+    <p class="alin"><em>(3)</em> Persoana împuternicită nu angajează o altă persoană împuternicită fără autorizarea prealabilă scrisă a operatorului.</p>
+  </div>
+</div>
+
+<!-- ==================== CAPITOLUL VI ==================== -->
+<div id="cap6" class="chapter">
+  <div class="chapter-header">
+    <span class="chapter-num">CAPITOLUL VI</span>
+    <span class="chapter-title">Responsabilul cu Protecția Datelor (DPO)</span>
+  </div>
+
+  <div id="art23" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 23</span>
+      <span class="art-title">Desemnarea și statutul DPO</span>
+    </div>
+    <p class="alin"><em>(1)</em> Organizația desemnează un <strong>Responsabil cu Protecția Datelor (DPO)</strong> în cazurile prevăzute de art. 37 din GDPR sau, în mod voluntar, ori de câte ori consideră oportun.</p>
+    <p class="alin"><em>(2)</em> DPO este desemnat pe baza calităților profesionale, în special a cunoștințelor de specialitate în dreptul și practica din domeniul protecției datelor, și a capacității de a îndeplini sarcinile prevăzute de GDPR și de prezentul regulament.</p>
+    <p class="alin"><em>(3)</em> DPO poate fi un angajat al organizației sau poate îndeplini sarcinile în baza unui contract de servicii.</p>
+    <p class="alin"><em>(4)</em> Organizația publică datele de contact ale DPO și le comunică autorității de supraveghere.</p>
+    <p class="alin"><em>(5)</em> DPO beneficiază de independență deplină în exercitarea atribuțiilor sale:</p>
+    <p class="lit"><em>a)</em> nu primește instrucțiuni cu privire la îndeplinirea atribuțiilor sale;</p>
+    <p class="lit"><em>b)</em> raportează direct celui mai înalt nivel al conducerii organizației;</p>
+    <p class="lit"><em>c)</em> nu este demis sau sancționat de operator sau de persoana împuternicită de operator pentru îndeplinirea atribuțiilor sale;</p>
+    <p class="lit"><em>d)</em> persoanele vizate pot contacta DPO cu privire la orice aspecte legate de prelucrarea datelor lor și de exercitarea drepturilor.</p>
+  </div>
+
+  <div id="art24" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 24</span>
+      <span class="art-title">Atribuțiile DPO</span>
+    </div>
+    <p class="alin"><em>(1)</em> DPO are cel puțin următoarele atribuții:</p>
+    <p class="lit"><em>a)</em> <strong>Informare și consiliere</strong> — informează și consiliază operatorul, persoanele împuternicite și angajații care se ocupă de prelucrare cu privire la obligațiile ce le revin în temeiul GDPR și al altor dispoziții de drept al UE sau drept intern referitoare la protecția datelor;</p>
+    <p class="lit"><em>b)</em> <strong>Monitorizare</strong> — monitorizează respectarea GDPR, a altor dispoziții de drept al UE sau de drept intern referitoare la protecția datelor și a politicilor operatorului sau ale persoanei împuternicite, inclusiv repartizarea responsabilităților, acțiunile de sensibilizare și formare a personalului, precum și auditurile aferente;</p>
+    <p class="lit"><em>c)</em> <strong>Consiliere DPIA</strong> — furnizează consiliere, la cerere, în ceea ce privește evaluarea impactului asupra protecției datelor și monitorizează efectuarea acesteia;</p>
+    <p class="lit"><em>d)</em> <strong>Cooperare cu ANSPDCP</strong> — cooperează cu ANSPDCP și reprezintă punctul de contact pentru ANSPDCP privind aspectele legate de prelucrare;</p>
+    <p class="lit"><em>e)</em> <strong>Punct de contact pentru persoanele vizate</strong> — acționează ca punct de contact pentru persoanele vizate în legătură cu toate problemele legate de prelucrarea datelor lor și de exercitarea drepturilor.</p>
+    <p class="alin"><em>(2)</em> DPO ține seama, în mod corespunzător, de riscul asociat operațiunilor de prelucrare, ținând cont de natura, domeniul de aplicare, contextul și scopurile prelucrării.</p>
+  </div>
+</div>
+
+<!-- ==================== CAPITOLUL VII ==================== -->
+<div id="cap7" class="chapter">
+  <div class="chapter-header">
+    <span class="chapter-num">CAPITOLUL VII</span>
+    <span class="chapter-title">Securitatea datelor cu caracter personal</span>
+  </div>
+
+  <div id="art25" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 25</span>
+      <span class="art-title">Măsuri tehnice și organizatorice de securitate</span>
+    </div>
+    <p class="alin"><em>(1)</em> Organizația implementează măsuri tehnice și organizatorice adecvate pentru asigurarea unui nivel de securitate corespunzător riscului, inclusiv:</p>
+    <p class="lit"><em>a)</em> <strong>Pseudonimizarea și criptarea</strong> datelor cu caracter personal;</p>
+    <p class="lit"><em>b)</em> capacitatea de a asigura <strong>confidențialitatea, integritatea, disponibilitatea și rezistența</strong> continue ale sistemelor și serviciilor de prelucrare;</p>
+    <p class="lit"><em>c)</em> capacitatea de a restabili disponibilitatea datelor și accesul la acestea în timp util în cazul unui incident fizic sau tehnic;</p>
+    <p class="lit"><em>d)</em> un proces pentru <strong>testarea, evaluarea și aprecierea periodică</strong> a eficacității măsurilor tehnice și organizatorice pentru garantarea securității prelucrării.</p>
+    <p class="alin"><em>(2)</em> Măsurile tehnice minime obligatorii includ:</p>
+    <p class="lit"><em>a)</em> autentificare prin parolă complexă sau autentificare multi-factor pentru sistemele ce conțin date cu caracter personal;</p>
+    <p class="lit"><em>b)</em> criptarea datelor în tranzit (TLS/SSL) și, acolo unde este adecvat, a datelor stocate;</p>
+    <p class="lit"><em>c)</em> controlul accesului bazat pe principiul necesității de a cunoaște (<em>need-to-know</em>);</p>
+    <p class="lit"><em>d)</em> backup periodic al datelor și testarea procedurii de recuperare;</p>
+    <p class="lit"><em>e)</em> instalarea și actualizarea periodică a software-ului antivirus/antimalware;</p>
+    <p class="lit"><em>f)</em> actualizarea regulată a sistemelor de operare și aplicațiilor (patch management);</p>
+    <p class="lit"><em>g)</em> jurnalizarea (logging) accesului la sistemele ce conțin date cu caracter personal;</p>
+    <p class="lit"><em>h)</em> distrugerea securizată a documentelor și mediilor de stocare ce conțin date cu caracter personal.</p>
+  </div>
+
+  <div id="art26" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 26</span>
+      <span class="art-title">Obligațiile personalului privind protecția datelor</span>
+    </div>
+    <p class="alin"><em>(1)</em> Toți angajații și colaboratorii organizației care prelucrează date cu caracter personal au următoarele obligații:</p>
+    <p class="lit"><em>a)</em> să cunoască și să respecte prevederile prezentului regulament și ale politicii de protecție a datelor;</p>
+    <p class="lit"><em>b)</em> să prelucreze datele numai în scopurile autorizate și pe baza instrucțiunilor primite;</p>
+    <p class="lit"><em>c)</em> să mențină confidențialitatea datelor cu caracter personal la care au acces, inclusiv după încetarea raportului de muncă/colaborare;</p>
+    <p class="lit"><em>d)</em> să nu divulge date cu caracter personal unor terți neautorizați;</p>
+    <p class="lit"><em>e)</em> să raporteze imediat orice incident de securitate sau potențial incident DPO-ului și/sau responsabilului IT;</p>
+    <p class="lit"><em>f)</em> să utilizeze parole complexe și să nu le partajeze cu alte persoane;</p>
+    <p class="lit"><em>g)</em> să asigure securizarea fizică a documentelor ce conțin date cu caracter personal;</p>
+    <p class="lit"><em>h)</em> să participe la programele de formare și conștientizare privind protecția datelor organizate de organizație.</p>
+    <p class="alin"><em>(2)</em> Obligația de confidențialitate este asumată prin semnarea unui <strong>Acord de confidențialitate privind datele cu caracter personal</strong> anterior accesului la datele cu caracter personal și subzistă și după încetarea raportului contractual.</p>
+  </div>
+
+  <div id="art27" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 27</span>
+      <span class="art-title">Notificarea și gestionarea incidentelor de securitate</span>
+    </div>
+    <p class="alin"><em>(1)</em> În cazul producerii unui incident de securitate care implică date cu caracter personal, organizația aplică procedura de mai jos:</p>
+    <p class="alin"><em>(2)</em> <strong>Detectare și raportare internă</strong> — orice angajat sau colaborator care constată sau suspectează un incident de securitate raportează imediat (în maxim 4 ore) DPO-ului sau responsabilului IT.</p>
+    <p class="alin"><em>(3)</em> <strong>Evaluarea incidentului</strong> — DPO evaluează severitatea incidentului și determină dacă este probabilă producerea unui risc pentru drepturile și libertățile persoanelor fizice.</p>
+    <p class="alin"><em>(4)</em> <strong>Notificarea ANSPDCP</strong> — dacă incidentul este susceptibil să genereze un risc pentru drepturile și libertățile persoanelor fizice, organizația notifică ANSPDCP <strong>în termen de 72 de ore</strong> de la data luării la cunoștință. Notificarea include:</p>
+    <p class="lit"><em>a)</em> descrierea naturii încălcării, inclusiv categoriile și numărul aproximativ de persoane vizate, categoriile și numărul aproximativ de înregistrări de date vizate;</p>
+    <p class="lit"><em>b)</em> datele de contact ale DPO sau ale unui alt punct de contact;</p>
+    <p class="lit"><em>c)</em> descrierea consecințelor probabile ale încălcării;</p>
+    <p class="lit"><em>d)</em> descrierea măsurilor luate sau propuse.</p>
+    <p class="alin"><em>(5)</em> <strong>Notificarea persoanelor vizate</strong> — dacă incidentul este susceptibil să genereze un risc ridicat pentru drepturile și libertățile persoanelor fizice, organizația informează <strong>fără întârzieri nejustificate</strong> persoanele vizate afectate.</p>
+    <p class="alin"><em>(6)</em> Toate incidentele de securitate sunt documentate în <strong>Registrul Incidentelor de Securitate</strong>, indiferent dacă notificarea autorității de supraveghere este sau nu necesară.</p>
+    <div class="danger-box">🔴 Netransmiterea notificării către ANSPDCP în termenul de 72 de ore constituie o încălcare a GDPR și poate atrage sancțiuni administrative. Documentați motivele întârzierii dacă notificarea nu poate fi trimisă la timp.</div>
+  </div>
+</div>
+
+<!-- ==================== CAPITOLUL VIII ==================== -->
+<div id="cap8" class="chapter">
+  <div class="chapter-header">
+    <span class="chapter-num">CAPITOLUL VIII</span>
+    <span class="chapter-title">Transferul internațional de date</span>
+  </div>
+
+  <div id="art28" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 28</span>
+      <span class="art-title">Condițiile pentru transferul datelor în afara SEE</span>
+    </div>
+    <p class="alin"><em>(1)</em> Orice transfer de date cu caracter personal care face obiectul unei prelucrări sau care este destinat să facă obiectul unei prelucrări după transfer către o <strong>țară terță</strong> sau o organizație internațională poate fi efectuat numai cu respectarea condițiilor stabilite de GDPR.</p>
+    <p class="alin"><em>(2)</em> Transferul este permis dacă:</p>
+    <p class="lit"><em>a)</em> Comisia Europeană a adoptat o <strong>decizie de adecvare</strong> pentru țara terță sau teritoriul respectiv (ex.: Regatul Unit, Japonia, Canada, Elveția, Israel);</p>
+    <p class="lit"><em>b)</em> sunt prevăzute <strong>garanții adecvate</strong>, în special prin clauze contractuale standard adoptate de Comisie sau de o autoritate de supraveghere (<em>Standard Contractual Clauses — SCC</em>);</p>
+    <p class="lit"><em>c)</em> au fost adoptate <strong>reguli corporatiste obligatorii</strong> (<em>Binding Corporate Rules — BCR</em>) în cazul grupurilor de întreprinderi;</p>
+    <p class="lit"><em>d)</em> se aplică una din <strong>derogările</strong> prevăzute de Art. 49 GDPR: consimțământul explicit al persoanei vizate, executarea unui contract, motive de interes public, apărarea în instanță sau interese vitale.</p>
+    <p class="alin"><em>(3)</em> Organizația documentează toate transferurile internaționale de date în Registrul activităților de prelucrare și se asigură că garanțiile adecvate sunt la locul lor înainte de inițierea transferului.</p>
+    <div class="warn-box">⚠️ Utilizarea serviciilor cloud (Google Workspace, Microsoft 365, AWS, etc.) poate implica transferuri internaționale de date. Verificați clauzele contractuale ale furnizorilor și asigurați-vă că sunt în vigoare SCC sau un alt mecanism de transfer valabil.</div>
+  </div>
+</div>
+
+<!-- ==================== CAPITOLUL IX ==================== -->
+<div id="cap9" class="chapter">
+  <div class="chapter-header">
+    <span class="chapter-num">CAPITOLUL IX</span>
+    <span class="chapter-title">Răspundere și sancțiuni</span>
+  </div>
+
+  <div id="art29" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 29</span>
+      <span class="art-title">Răspundere și sancțiuni aplicabile</span>
+    </div>
+    <p class="alin"><em>(1)</em> Organizația răspunde pentru orice prejudiciu material sau moral cauzat de prelucrarea datelor cu caracter personal cu încălcarea dispozițiilor GDPR sau a prezentului regulament.</p>
+    <p class="alin"><em>(2)</em> <strong>Sancțiunile administrative</strong> aplicabile de ANSPDCP operatorilor pentru încălcările GDPR sunt:</p>
+
+    <table>
+      <tr>
+        <th>Tipul de încălcare</th>
+        <th>Sancțiunea maximă</th>
+      </tr>
+      <tr>
+        <td>Încălcări mai puțin grave (principii de bază, drepturi ale persoanelor vizate, notificarea ANSPDCP)</td>
+        <td><strong>10.000.000 EUR</strong> sau 2% din cifra de afaceri anuală globală</td>
+      </tr>
+      <tr>
+        <td>Încălcări grave (principii de prelucrare, categorii speciale, transferuri internaționale, nerespectarea ordinelor ANSPDCP)</td>
+        <td><strong>20.000.000 EUR</strong> sau 4% din cifra de afaceri anuală globală</td>
+      </tr>
+    </table>
+
+    <p class="alin"><em>(3)</em> <strong>Sancțiunile disciplinare interne</strong> aplicate personalului organizației pentru încălcarea prezentului regulament sunt:</p>
+    <p class="lit"><em>a)</em> avertisment scris — pentru prima abatere minoră;</p>
+    <p class="lit"><em>b)</em> retragerea temporară a dreptului de acces la datele cu caracter personal;</p>
+    <p class="lit"><em>c)</em> suspendarea din funcție;</p>
+    <p class="lit"><em>d)</em> desfacerea contractului de muncă/colaborare — pentru abateri grave sau repetate.</p>
+    <p class="alin"><em>(4)</em> Răspunderea disciplinară nu exclude răspunderea civilă, contravențională sau penală.</p>
+    <p class="alin"><em>(5)</em> Persoanele fizice care au suferit un prejudiciu material sau moral în urma unei prelucrări ilegale au dreptul de a obține de la operator despăgubiri pentru prejudiciul suferit.</p>
+    <p class="alin"><em>(6)</em> Operatorul este exonerat de răspundere dacă dovedește că nu îi este imputabilă în niciun fel fapta care a provocat prejudiciul.</p>
+    <div class="danger-box">🔴 Conform GDPR, sarcina probei aparține operatorului. Organizația trebuie să demonstreze că a respectat prevederile GDPR, nu că aceasta din urmă trebuie să demonstreze contrariul.</div>
+  </div>
+</div>
+
+<!-- ==================== CAPITOLUL X ==================== -->
+<div id="cap10" class="chapter">
+  <div class="chapter-header">
+    <span class="chapter-num">CAPITOLUL X</span>
+    <span class="chapter-title">Dispoziții finale</span>
+  </div>
+
+  <div id="art30" class="article">
+    <div class="art-header">
+      <span class="art-num">Art. 30</span>
+      <span class="art-title">Intrarea în vigoare, revizuire și dispoziții finale</span>
+    </div>
+    <p class="alin"><em>(1)</em> Prezentul regulament intră în vigoare la data adoptării sale de către organul de conducere al organizației și se publică pe site-ul oficial al organizației, acolo unde este cazul.</p>
+    <p class="alin"><em>(2)</em> Prezentul regulament se revizuiește și se actualizează:</p>
+    <p class="lit"><em>a)</em> cel puțin <strong>o dată pe an</strong>, de regulă în luna ianuarie;</p>
+    <p class="lit"><em>b)</em> ori de câte ori intervin modificări legislative relevante la nivel european sau național;</p>
+    <p class="lit"><em>c)</em> ori de câte ori se introduc activități de prelucrare noi sau se modifică substanțial cele existente;</p>
+    <p class="lit"><em>d)</em> ca urmare a recomandărilor formulate de DPO sau de ANSPDCP.</p>
+    <p class="alin"><em>(3)</em> Toți membrii, angajații și colaboratorii organizației sunt informați cu privire la conținutul prezentului regulament și la orice modificări ulterioare ale acestuia prin mijloace adecvate (e-mail, publicare intranet, sesiuni de informare).</p>
+    <p class="alin"><em>(4)</em> Prezentul regulament completează și se coroborează cu:</p>
+    <p class="lit"><em>a)</em> Politica de Protecție a Datelor cu Caracter Personal a organizației;</p>
+    <p class="lit"><em>b)</em> Procedura privind drepturile persoanelor vizate;</p>
+    <p class="lit"><em>c)</em> Procedura privind notificarea incidentelor de securitate;</p>
+    <p class="lit"><em>d)</em> Politica de retenție și ștergere a datelor;</p>
+    <p class="lit"><em>e)</em> Acordul de confidențialitate privind datele cu caracter personal;</p>
+    <p class="lit"><em>f)</em> Contractele cu persoanele împuternicite (DPA).</p>
+    <p class="alin"><em>(5)</em> Prezentul regulament a fost adoptat în ședința din data de <strong>__________</strong>, prin decizia nr. <strong>__________</strong>.</p>
+    <p class="alin"><em>(6)</em> Responsabilitatea implementării și monitorizării aplicării prezentului regulament revine <strong>Responsabilului cu Protecția Datelor (DPO)</strong>, cu sprijinul conducerii organizației.</p>
+
+    <div style="margin-top: 28px; display: flex; justify-content: space-between; font-family: 'DM Sans', sans-serif; font-size: 10.5pt; gap: 40px;">
+      <div style="flex:1; border-top: 1px solid #ccc; padding-top: 12px; text-align: center;">
+        <strong>[Reprezentant Legal]</strong><br>
+        <span style="color: #666; font-size: 9.5pt;">Semnătura și ștampila</span>
+      </div>
+      <div style="flex:1; border-top: 1px solid #ccc; padding-top: 12px; text-align: center;">
+        <strong>[Responsabil cu Protecția Datelor]</strong><br>
+        <span style="color: #666; font-size: 9.5pt;">Semnătura DPO</span>
+      </div>
+      <div style="flex:1; border-top: 1px solid #ccc; padding-top: 12px; text-align: center;">
+        <strong>Data adoptării: ___________</strong><br>
+        <span style="color: #666; font-size: 9.5pt;">Data intrării în vigoare</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<footer>
+  <strong>Regulament privind Protecția Datelor cu Caracter Personal</strong><br>
+  Conform Regulamentului (UE) 2016/679 (GDPR) · Legea nr. 190/2018 · ANSPDCP<br>
+  <span style="font-size: 8.5pt; margin-top: 6px; display: block;">
+    Autoritatea Națională de Supraveghere: <strong>www.dataprotection.ro</strong> ·
+    Comitetul European pentru Protecția Datelor: <strong>www.edpb.europa.eu</strong>
+  </span>
+</footer>
+
+<button id="top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Sus">↑</button>
+
+</body>
+</html>
