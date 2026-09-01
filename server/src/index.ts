@@ -130,7 +130,7 @@ async function bootstrap(): Promise<void> {
           version: buildInfo.appVersion,
           release: buildInfo.appRelease,
         },
-        `PCP API ruleaza pe http://localhost:${env.port}`
+        `PCS API ruleaza pe http://localhost:${env.port}`
       );
     });
 
@@ -169,7 +169,7 @@ async function bootstrap(): Promise<void> {
       version: buildInfo.appVersion,
       release: buildInfo.appRelease,
     },
-    `PCP API ruleaza pe http://localhost:${env.port}`
+    `PCS API ruleaza pe http://localhost:${env.port}`
   );
 
   closeHttpServer = async () => {

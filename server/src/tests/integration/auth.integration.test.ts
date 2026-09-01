@@ -175,14 +175,14 @@ test("refresh flow should use HttpOnly cookie + CSRF token", async () => {
       .expect(200);
 
     const setCookie = signinResponse.headers["set-cookie"] as string[] | string | undefined;
-    const refreshCookiePair = readCookiePair(setCookie, "pcp_refresh_token");
-    const csrfCookiePair = readCookiePair(setCookie, "pcp_refresh_csrf");
+    const refreshCookiePair = readCookiePair(setCookie, "pcs_refresh_token");
+    const csrfCookiePair = readCookiePair(setCookie, "pcs_refresh_csrf");
     assert.ok(refreshCookiePair);
     assert.ok(csrfCookiePair);
 
     const setCookieList = Array.isArray(setCookie) ? setCookie : setCookie ? [setCookie] : [];
-    const refreshCookieHeader = setCookieList.find((item) => item.startsWith("pcp_refresh_token=")) ?? "";
-    const csrfCookieHeader = setCookieList.find((item) => item.startsWith("pcp_refresh_csrf=")) ?? "";
+    const refreshCookieHeader = setCookieList.find((item) => item.startsWith("pcs_refresh_token=")) ?? "";
+    const csrfCookieHeader = setCookieList.find((item) => item.startsWith("pcs_refresh_csrf=")) ?? "";
     assert.match(refreshCookieHeader, /HttpOnly/i);
     assert.doesNotMatch(csrfCookieHeader, /HttpOnly/i);
 
@@ -266,8 +266,8 @@ test("signout should clear refresh session even when access token is missing", a
       .expect(200);
 
     const setCookie = signinResponse.headers["set-cookie"] as string[] | string | undefined;
-    const refreshCookiePair = readCookiePair(setCookie, "pcp_refresh_token");
-    const csrfCookiePair = readCookiePair(setCookie, "pcp_refresh_csrf");
+    const refreshCookiePair = readCookiePair(setCookie, "pcs_refresh_token");
+    const csrfCookiePair = readCookiePair(setCookie, "pcs_refresh_csrf");
     const csrfToken = signinResponse.body?.data?.csrfToken as string | undefined;
     assert.ok(refreshCookiePair);
     assert.ok(csrfCookiePair);
@@ -286,8 +286,8 @@ test("signout should clear refresh session even when access token is missing", a
         ? [signoutCookies]
         : [];
 
-    const hasRefreshClearCookie = signoutCookieList.some((item) => item.startsWith("pcp_refresh_token="));
-    const hasCsrfClearCookie = signoutCookieList.some((item) => item.startsWith("pcp_refresh_csrf="));
+    const hasRefreshClearCookie = signoutCookieList.some((item) => item.startsWith("pcs_refresh_token="));
+    const hasCsrfClearCookie = signoutCookieList.some((item) => item.startsWith("pcs_refresh_csrf="));
     assert.equal(hasRefreshClearCookie, true);
     assert.equal(hasCsrfClearCookie, true);
   } finally {

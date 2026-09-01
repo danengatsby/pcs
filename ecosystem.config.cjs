@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: "pcp-server",
+      name: "pcs-server",
       cwd: __dirname,
       script: "server/dist/index.js",
       interpreter: "node",

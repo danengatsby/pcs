@@ -29,7 +29,7 @@ export function UserProfilePage() {
           <div className="stack-12">
             <h1 className="profile-page__title">Bun venit, {displayName}</h1>
             <p className="lead">
-              Aceasta este pagina ta personală din platforma PCP. Datele afișate mai jos sunt preluate direct din
+              Aceasta este pagina ta personală din platforma PCS. Datele afișate mai jos sunt preluate direct din
               contul cu care ești autentificat.
             </p>
           </div>

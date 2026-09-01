@@ -6,7 +6,7 @@ test("test database safety is a no-op outside the test environment", () => {
   assert.doesNotThrow(() => {
     assertSafeTestDatabase({
       nodeEnv: "production",
-      databaseUrl: "postgresql://app:secret@db:5432/pcp",
+      databaseUrl: "postgresql://app:secret@db:5432/pcs",
       testDatabaseUrl: "",
     });
   });
@@ -17,7 +17,7 @@ test("test database safety requires an explicit TEST_DATABASE_URL", () => {
     () => {
       assertSafeTestDatabase({
         nodeEnv: "test",
-        databaseUrl: "postgresql://app:secret@db:5432/pcp",
+        databaseUrl: "postgresql://app:secret@db:5432/pcs",
         testDatabaseUrl: "",
       });
     },
@@ -26,7 +26,7 @@ test("test database safety requires an explicit TEST_DATABASE_URL", () => {
 });
 
 test("test database safety rejects a database without a test marker", () => {
-  const databaseUrl = "postgresql://app:secret@db:5432/pcp";
+  const databaseUrl = "postgresql://app:secret@db:5432/pcs";
   assert.throws(
     () => {
       assertSafeTestDatabase({
@@ -40,7 +40,7 @@ test("test database safety rejects a database without a test marker", () => {
 });
 
 test("test database safety accepts an explicitly configured test database", () => {
-  const databaseUrl = "postgresql://app:secret@db:5432/pcp_test";
+  const databaseUrl = "postgresql://app:secret@db:5432/pcs_test";
   assert.doesNotThrow(() => {
     assertSafeTestDatabase({
       nodeEnv: "test",

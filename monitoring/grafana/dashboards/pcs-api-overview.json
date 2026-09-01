@@ -62,7 +62,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "pcp:api_latency_seconds:p95_5m",
+          "expr": "pcs:api_latency_seconds:p95_5m",
           "legendFormat": "p95",
           "range": true,
           "refId": "A"
@@ -111,7 +111,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "pcp:auth_failures:rate5m",
+          "expr": "pcs:auth_failures:rate5m",
           "legendFormat": "auth failures/s",
           "range": true,
           "refId": "A"
@@ -160,7 +160,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "pcp:refresh_failures:rate5m",
+          "expr": "pcs:refresh_failures:rate5m",
           "legendFormat": "refresh failures/s",
           "range": true,
           "refId": "A"
@@ -209,7 +209,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "pcp:email_failures:increase15m",
+          "expr": "pcs:email_failures:increase15m",
           "legendFormat": "email failures/15m",
           "range": true,
           "refId": "A"
@@ -258,7 +258,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(pcp_http_request_duration_seconds_count{status_class=\"5xx\",route!=\"/api/metrics\",route!=\"/api/health\"}[5m]))",
+          "expr": "sum(rate(pcs_http_request_duration_seconds_count{status_class=\"5xx\",route!=\"/api/metrics\",route!=\"/api/health\"}[5m]))",
           "legendFormat": "5xx/s",
           "range": true,
           "refId": "A"
@@ -272,7 +272,7 @@
   "schemaVersion": 39,
   "style": "dark",
   "tags": [
-    "pcp",
+    "pcs",
     "observability"
   ],
   "templating": {
@@ -284,8 +284,8 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "PCP API Overview",
-  "uid": "pcp-api-overview",
+  "title": "PCS API Overview",
+  "uid": "pcs-api-overview",
   "version": 1,
   "weekStart": ""
 }

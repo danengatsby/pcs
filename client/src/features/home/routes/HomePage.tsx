@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import pcpLogo from '../../../assets/pcp-logo.svg'
+import pcsLogo from '../../../assets/pcs-logo.svg'
 
 export function HomePage() {
   return (
@@ -9,7 +9,7 @@ export function HomePage() {
           <div className="hero-copy">
             <div className="hero-kicker">Platforma Partidului Conservator al Seniorilor</div>
             <h1 className="home__headline">
-              <span className="home__headline-prefix">PCP —</span>
+              <span className="home__headline-prefix">PCS —</span>
               <span className="home__headline-main">PARTIDUL</span>
               <span className="home__headline-subtitle">CONSERVATOR AL</span>
               <span className="home__headline-tail">SENIORILOR</span>
@@ -29,8 +29,8 @@ export function HomePage() {
             </div>
           </div>
 
-          <aside className="hero-logo" aria-label="Sigla PCP">
-            <img src={pcpLogo} alt="Sigla PCP" />
+          <aside className="hero-logo" aria-label="Sigla PCS">
+            <img src={pcsLogo} alt="Sigla PCS" />
           </aside>
         </div>
       </section>

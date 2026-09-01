@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Program_Politic_PCS_PRO</title>
+  <style>
+html {
+color: #1a1a1a;
+background-color: #fdfdfd;
+}
+body {
+margin: 0 auto;
+max-width: 36em;
+padding-left: 50px;
+padding-right: 50px;
+padding-top: 50px;
+padding-bottom: 50px;
+hyphens: auto;
+overflow-wrap: break-word;
+text-rendering: optimizeLegibility;
+font-kerning: normal;
+}
+@media (max-width: 600px) {
+body {
+font-size: 0.9em;
+padding: 12px;
+}
+h1 {
+font-size: 1.8em;
+}
+}
+@media print {
+html {
+background-color: white;
+}
+body {
+background-color: transparent;
+color: black;
+font-size: 12pt;
+}
+p, h2, h3 {
+orphans: 3;
+widows: 3;
+}
+h2, h3, h4 {
+page-break-after: avoid;
+}
+}
+p {
+margin: 1em 0;
+}
+a {
+color: #1a1a1a;
+}
+a:visited {
+color: #1a1a1a;
+}
+img {
+max-width: 100%;
+}
+h1, h2, h3, h4, h5, h6 {
+margin-top: 1.4em;
+}
+h5, h6 {
+font-size: 1em;
+font-style: italic;
+}
+h6 {
+font-weight: normal;
+}
+ol, ul {
+padding-left: 1.7em;
+margin-top: 1em;
+}
+li > ol, li > ul {
+margin-top: 0;
+}
+blockquote {
+margin: 1em 0 1em 1.7em;
+padding-left: 1em;
+border-left: 2px solid #e6e6e6;
+color: #606060;
+}
+code {
+font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+font-size: 85%;
+margin: 0;
+hyphens: manual;
+}
+pre {
+margin: 1em 0;
+overflow: auto;
+}
+pre code {
+padding: 0;
+overflow: visible;
+overflow-wrap: normal;
+}
+.sourceCode {
+background-color: transparent;
+overflow: visible;
+}
+hr {
+background-color: #1a1a1a;
+border: none;
+height: 1px;
+margin: 1em 0;
+}
+table {
+margin: 1em 0;
+border-collapse: collapse;
+width: 100%;
+overflow-x: auto;
+display: block;
+font-variant-numeric: lining-nums tabular-nums;
+}
+table caption {
+margin-bottom: 0.75em;
+}
+tbody {
+margin-top: 0.5em;
+border-top: 1px solid #1a1a1a;
+border-bottom: 1px solid #1a1a1a;
+}
+th {
+border-top: 1px solid #1a1a1a;
+padding: 0.25em 0.5em 0.25em 0.5em;
+}
+td {
+padding: 0.125em 0.5em 0.25em 0.5em;
+}
+header {
+margin-bottom: 4em;
+text-align: center;
+}
+#TOC li {
+list-style: none;
+}
+#TOC ul {
+padding-left: 1.3em;
+}
+#TOC > ul {
+padding-left: 0;
+}
+#TOC a:not(:hover) {
+text-decoration: none;
+}
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+</style>
+</head>
+<body>
+<p><strong>ROMANIA — PARTIDUL CONSERVATOR AL SENIORILOR — IASI
+2026</strong></p>
+<p><img src="data:image/png;base64,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" style="width:1.45833in;height:1.45833in" /></p>
+<p><strong>PCS</strong></p>
+<p><strong>PARTIDUL CONSERVATOR AL SENIORILOR</strong></p>
+<p>Demnitate · Echitate · Traditie · Solidaritate</p>
+<p><strong>PROGRAM POLITIC</strong></p>
+<p><strong>SI DOCTRINA POLITICA</strong></p>
+<p>Document programatic fundamental adoptat de Congresul Fondator al
+P.C.S.</p>
+<p>Iasi, Sos. Bucium nr. 23 — Editia 2026</p>
+<table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 72%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>PARTID</strong></td>
+<td>Partidul Conservator al Seniorilor (P.C.S.)</td>
+</tr>
+<tr class="even">
+<td><strong>SEDIU CENTRAL</strong></td>
+<td>Iasi, Sos. Bucium nr. 23, Judetul Iasi</td>
+</tr>
+<tr class="odd">
+<td><strong>DOCTRINA</strong></td>
+<td>Conservatorism Social | Justitie Distributiva | Stat Social
+Activ</td>
+</tr>
+<tr class="even">
+<td><strong>ORIENTARE</strong></td>
+<td>Centru-stanga social | Pro-european | Traditie si modernitate</td>
+</tr>
+<tr class="odd">
+<td><strong>ADOPTAT DE</strong></td>
+<td>Congresul Fondator P.C.S. — Iasi, _____________ 2026</td>
+</tr>
+</tbody>
+</table>
+<p>Adoptat in conformitate cu Art. 10 alin. (1) lit. b) din Legea nr.
+14/2003 privind partidele politice, republicata</p>
+<p>Conf. Legii nr. 14/2003 | Legii nr. 334/2006 | Constitutiei Romaniei
+| Tratatelor UE</p>
+<p><strong>DECLARATIE DE PRINCIPII</strong></p>
+<blockquote>
+<p>Noi, membrii fondatori ai Partidului Conservator al Seniorilor, ne
+angajam solemn sa aparăm cu toate mijloacele legale demnitatea,
+drepturile si interesele seniorilor romani. Aceasta tara a fost
+construita pe munca lor. Este datoria noastra morala si politica sa le
+oferim in schimb securitate, respect si o batranete demna.</p>
+</blockquote>
+<p>Romania numara astazi peste 5,2 milioane de seniori — mai mult de
+un sfert din electoratul national. Cu toate acestea, vocea lor in
+Parlament este aproape inexistenta, drepturile lor sunt frecvent
+ignorate, iar pensiile nu acopera in mod real costul vietii. Partidul
+Conservator al Seniorilor ia nastere tocmai din aceasta fractura
+sociala profunda si isi asuma responsabilitatea de a o remedia.</p>
+<p>Suntem un partid al seniorilor, condus de seniori, pentru
+seniori. Nu suntem anti-sistem. Suntem pro-dreptate. Recunoastem
+economia de piata, democratia constitutionala si integrarea europeana.
+Insa sustinem ca aceste institutii trebuie sa serveasca cetateanul —
+inclusiv pe cel care a iesit deja din campul muncii.</p>
+<p>Prezentul Program Politic si Doctrina reprezinta contractul nostru cu
+societatea romaneasca. Fiecare capitol este un angajament asumat public,
+cu termene si indicatori masurabili.</p>
+<blockquote>
+<p><strong>Cuprins Tematic</strong></p>
+</blockquote>
+<table>
+<colgroup>
+<col style="width: 6%" />
+<col style="width: 71%" />
+<col style="width: 22%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>CAP.</strong></td>
+<td><strong>TITLU</strong></td>
+<td><strong>TEMATICA</strong></td>
+</tr>
+<tr class="even">
+<td><strong>I</strong></td>
+<td>Doctrina Politica a Partidului</td>
+<td>Ideologie &amp; Valori</td>
+</tr>
+<tr class="odd">
+<td><strong>II</strong></td>
+<td>Viziunea Strategica 2026—2034</td>
+<td>Obiective strategice</td>
+</tr>
+<tr class="even">
+<td><strong>III</strong></td>
+<td>Politici Sociale</td>
+<td>Pensii &amp; Ingrijire</td>
+</tr>
+<tr class="odd">
+<td><strong>IV</strong></td>
+<td>Politici Economice si Fiscale</td>
+<td>Fiscalitate &amp; Economie</td>
+</tr>
+<tr class="even">
+<td><strong>V</strong></td>
+<td>Politici de Sanatate</td>
+<td>Acces &amp; Calitate</td>
+</tr>
+<tr class="odd">
+<td><strong>VI</strong></td>
+<td>Educatie, Cultura si Viata Activa</td>
+<td>Incluziune sociala</td>
+</tr>
+<tr class="even">
+<td><strong>VII</strong></td>
+<td>Drepturile Fundamentale ale Seniorilor</td>
+<td>Carta Drepturilor</td>
+</tr>
+<tr class="odd">
+<td><strong>VIII</strong></td>
+<td>Reprezentare Politica si Institutionala</td>
+<td>Vocea seniorilor</td>
+</tr>
+<tr class="even">
+<td><strong>IX</strong></td>
+<td>Politica Externa si Dimensiunea Europeana</td>
+<td>UE &amp; Diaspora</td>
+</tr>
+<tr class="odd">
+<td><strong>X</strong></td>
+<td>Contractul cu Alegatorii — 10 Angajamente</td>
+<td>Promisiuni ferme</td>
+</tr>
+</tbody>
+</table>
+<p><strong>CAP. I</strong></p>
+<p><strong>DOCTRINA POLITICA A PARTIDULUI</strong></p>
+<table>
+<colgroup>
+<col style="width: 24%" />
+<col style="width: 24%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><p><strong>5,2M</strong></p>
+<p>seniori in Romania</p></td>
+<td><p><strong>27%</strong></p>
+<p>din electorat</p></td>
+<td><p><strong>1 din 3</strong></p>
+<p>traieste la limita saraciei</p></td>
+<td><p><strong>&lt; 10%</strong></p>
+<p>reprezentati politic</p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>1.1 Conservatorismul Social — Fundamentul
+Ideologic</strong></p>
+</blockquote>
+<p>Doctrina fundamentala a P.C.S. este conservatorismul social — o
+traditie ideologica europeana cu radacini in gandirea politica a
+secolului XX, care imbina valorile conservatoare (continuitate,
+stabilitate, responsabilitate, familie, comunitate) cu angajamentul
+nenegociabil pentru justitia sociala si protectia celor vulnerabili.</p>
+<blockquote>
+<p>Conservatorismul social al P.C.S. nu este ideologia elitelor sau a
+celor privilegiati. Este ideologia muncii cinstite rasplatite, a
+contractului intergenerational onorat si a statului care isi protejeaza
+cetatenii in toate etapele vietii lor.</p>
+</blockquote>
+<p>◆ <strong>Cei sase piloni doctrinari fundamentali:</strong></p>
+<ul>
+<li><p><strong>DEMNITATEA —</strong> dreptul inalienabil la pensie
+demna, recunoastere a contributiei sociale a fiecarui cetatean de-a
+lungul intregii vieti active;</p></li>
+<li><p><strong>CONTRACTUL INTERGENERATIONAL —</strong> obligatia morala
+si juridica a generatiei active de a sustine generatia pensionata,
+consacrata in politici publice coerente si sustenabile;</p></li>
+<li><p><strong>STATUL SOCIAL ACTIV —</strong> interventia activa si
+legitima a statului pentru corectarea inegalitatilor si garantarea unui
+minim decent de trai pentru toti cetatenii;</p></li>
+<li><p><strong>SOLIDARITATEA NATIONALA —</strong> coeziunea nationala ca
+valoare suprema, inclusiv intre generatii, regiuni si categorii sociale
+diferite;</p></li>
+<li><p><strong>TRADITIA SI VALORILE —</strong> familia, comunitatea si
+valorile morale traditionale ca fundament al coeziunii si rezistentei
+sociale;</p></li>
+<li><p><strong>JUSTITIA DISTRIBUTIVA —</strong> distributia echitabila a
+avutiei nationale, combaterea saraciei varstnicilor si a discriminarii
+pe criterii de varsta.</p></li>
+</ul>
+<blockquote>
+<p><strong>1.2 Pozitionarea Ideologica</strong></p>
+</blockquote>
+<p>P.C.S. ocupa o pozitie de centru-stanga social pe spectrul politic
+romanesc si european. Aceasta pozitionare nu este una de opozitie
+sistematica, ci una de constructie programatica: recunoastem economia de
+piata si proprietatea privata, insa sustinem cu fermitate ca statul
+trebuie sa corecteze esecurile pietei si sa garanteze un nivel minim de
+trai demn.</p>
+<table>
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 38%" />
+<col style="width: 38%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>DIMENSIUNE</strong></td>
+<td><strong>POZITIA P.C.S.</strong></td>
+<td><strong>PRINCIPIU DIRECTOR</strong></td>
+</tr>
+<tr class="even">
+<td><strong>Economic</strong></td>
+<td>Economie sociala de piata</td>
+<td>Piata libera cu protectie sociala solida</td>
+</tr>
+<tr class="odd">
+<td><strong>Social</strong></td>
+<td>Stat social puternic si activ</td>
+<td>Protectia varstnicilor — obligatie constitutionala</td>
+</tr>
+<tr class="even">
+<td><strong>Fiscal</strong></td>
+<td>Fiscalitate progresiva moderata</td>
+<td>Cine castiga mai mult, contribuie proportional</td>
+</tr>
+<tr class="odd">
+<td><strong>Cultural</strong></td>
+<td>Conservator moderat</td>
+<td>Traditia si inovatia sociale se completeaza</td>
+</tr>
+<tr class="even">
+<td><strong>European</strong></td>
+<td>Pro-european reformist</td>
+<td>UE = garantia standardelor sociale minime</td>
+</tr>
+<tr class="odd">
+<td><strong>Democratic</strong></td>
+<td>Democratie participativa</td>
+<td>Seniorii au dreptul sa fie reprezentati</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>1.3 Relatia cu Celelalte Forte Politice</strong></p>
+</blockquote>
+<p>P.C.S. nu se defineste prin negarea celorlalte partide. Suntem un
+partid tematic, capabil sa colaboreze cu orice forta politica ce
+onoreaza angajamentele fata de seniori.</p>
+<ul>
+<li><p>Nu vom intra in coalitii care prevad taieri de pensii, inghetarea
+indexarii sau eliminarea de beneficii sociale;</p></li>
+<li><p>Vom vota orice initiativa legislativa in favoarea seniorilor,
+indiferent de autorul politic;</p></li>
+<li><p>Vom combate demagogia electorala: orice promisiune trebuie
+insotita de sursa de finantare identificata;</p></li>
+<li><p>Solicitam inscrierea obligatorie a unui capitol dedicat
+seniorilor in orice program de guvernare.</p></li>
+</ul>
+<p><strong>CAP. II</strong></p>
+<p><strong>VIZIUNEA STRATEGICA 2026 — 2034</strong></p>
+<blockquote>
+<p><strong>2.1 Romania Demnitatii — Obiectivul Central</strong></p>
+<p>Viziunea P.C.S. este o Romania in care varsta a treia nu este un
+blestem, ci o implinire. O tara in care seniorii traiesc in
+demnitate, sunt tratati cu respect de institutii, au acces deplin la
+sanatate, cultura si viata sociala activa, iar experienta lor este
+valorificata — nu risipita.</p>
+</blockquote>
+<p>Pana in 2034, Romania trebuie sa atinga standardele europene in
+materie de protectie sociala a varstnicilor. Aceasta nu este o aspiratie
+utopica — este o obligatie asumata prin tratate internationale si prin
+Constitutia Romaniei. P.C.S. va face din aceasta obligatie o prioritate
+guvernamentala reala, cu indicatori masurabili si responsabili
+nominalizati.</p>
+<blockquote>
+<p><strong>2.2 Cele Sapte Obiective Strategice pentru 2034</strong></p>
+</blockquote>
+<ol type="1">
+<li><p><strong>PENSIA DEMNA</strong> — Pensie minima garantata de 2.500
+lei, indexata anual la rata reala a inflatiei declarata de INS;</p></li>
+<li><p><strong>SANATATEA</strong> — Ingrijire medicala gratuita
+integrala pentru toti seniorii cu venituri sub media
+nationala;</p></li>
+<li><p><strong>REPREZENTAREA</strong> — Cel putin 3 reprezentanti ai
+seniorilor in fiecare Consiliu Local si Judetean din
+Romania;</p></li>
+<li><p><strong>FISCALITATEA</strong> — Eliminarea impozitului pe pensii
+sub 3.500 lei si reducere cu 50% pana la 5.000 lei;</p></li>
+<li><p><strong>INFRASTRUCTURA</strong> — Retea nationala de 200 Centre
+de Zi pentru Seniori operationale pana in 2030;</p></li>
+<li><p><strong>DREPTURILE</strong> — Lege organica anti-discriminare
+varsta cu sanctiuni penale efective si compensatii;</p></li>
+<li><p><strong>ECHITATEA</strong> — Pensie minima garantata egala cu
+cosul minim al unui trai decent, calculat semestrial de INS.</p></li>
+</ol>
+<blockquote>
+<p><strong>2.3 Cele Trei Prioritati Nationale</strong></p>
+</blockquote>
+<p>◆ <strong>PRIORITATEA I — PENSIA DEMNA</strong></p>
+<p>Pensia trebuie sa reflecte munca depusa si sa asigure un trai minimal
+decent. Formula actuala de calcul este inechitabila, iar indexarea
+insuficienta. P.C.S. propune o reforma structurala a sistemului de
+pensii, cu efecte directe si masurate anual:</p>
+<ul>
+<li><p>indexare automata la inflatia reala publicata de INS, nu la cea
+estimata in prognoza Guvernului;</p></li>
+<li><p>recalcularea tuturor pensiilor din sistemul public pe baza
+contributivitate reale, verificate documentar;</p></li>
+<li><p>pensie minima de stat garantata pentru cei cu minimum 25 de ani
+de contributii, indiferent de valoarea punctului;</p></li>
+<li><p>eliminarea impozitarii pensiilor sub 3.500 lei si reducere
+proportionala pana la 5.000 lei;</p></li>
+<li><p>indemnizatie speciala pentru ingrijitorii informali care au
+suplinit statul in ingrijirea varstnicilor dependenti.</p></li>
+</ul>
+<p>◆ <strong>PRIORITATEA II — SANATATEA INTEGRALA</strong></p>
+<p>Accesul la sanatate este un drept constitutional garantat de Art. 34
+din Constitutia Romaniei. Pentru seniori, costul medicamentelor si al
+serviciilor medicale private este deseori imposibil de suportat din
+pensia lunara. P.C.S. propune un pachet minim garantat:</p>
+<ul>
+<li><p>gratuitate totala pentru medicamentele cronicilor: diabet,
+hipertensiune, cardiovascular, oncologie, reumatologie;</p></li>
+<li><p>consultatii gratuite la medicul de familie de minimum sase ori pe
+an pentru seniori;</p></li>
+<li><p>program national de stomatologie preventiva si restaurativa
+gratuita, inclusiv proteze dentare integrale;</p></li>
+<li><p>sectii de geriatrie obligatorii in toate spitalele judetene si
+municipale;</p></li>
+<li><p>asistenta medicala la domiciliu garantata prin lege pentru
+seniorii nedeplasabili.</p></li>
+</ul>
+<p>◆ <strong>PRIORITATEA III — INCLUZIUNEA SOCIALA ACTIVA</strong></p>
+<p>Izolarea sociala a seniorilor este o forma de violenta
+institutionala tolerata. P.C.S. propune transformarea seniorului din
+consumator pasiv in actor social activ:</p>
+<ul>
+<li><p>Centre de Zi gratuite cu activitati culturale, recreative si de
+socializare in fiecare oras cu peste 10.000 locuitori;</p></li>
+<li><p>program national de alfabetizare digitala: tableta si abonament
+internet gratuit pentru seniorii izolati;</p></li>
+<li><p>transport public gratuit pe intreg teritoriul national, inclusiv
+interurban;</p></li>
+<li><p>acces gratuit la toate institutiile culturale de stat: teatre,
+muzee, opera, filarmonice;</p></li>
+<li><p>vacante sociale subventionate la statiunile balneoclimaterice
+romanesti.</p></li>
+</ul>
+<p><strong>CAP. III</strong></p>
+<p><strong>POLITICI SOCIALE</strong></p>
+<blockquote>
+<p><strong>3.1 Reforma Structurala a Sistemului de Pensii</strong></p>
+</blockquote>
+<p>Sistemul public de pensii din Romania este confruntat cu trei crize
+simultane: o criza de echitate (valori inegale pentru contributii
+similare), o criza de sustenabilitate (deteriorarea raportului
+contributori/beneficiari) si o criza de credibilitate (promisiuni
+legislative nerespectate). P.C.S. propune o reforma coerenta pe trei
+paliere:</p>
+<p>◆ <strong>Palierul I — Echitate si Recalculare</strong></p>
+<ul>
+<li><p>recalcularea obligatorie a tuturor pensiilor stabilite anterior
+anului 2010, cu verificarea documentatiei de salarizare si
+contributie;</p></li>
+<li><p>eliminarea inegalitatilor flagrante intre pensiile speciale si
+pensiile din sistemul public general;</p></li>
+<li><p>plafonarea pensiilor speciale la cel mult trei ori nivelul
+pensiei medii nationale, cu aplicare progresiva.</p></li>
+</ul>
+<p>◆ <strong>Palierul II — Sustenabilitate pe Termen Lung</strong></p>
+<ul>
+<li><p>stimulente fiscale pentru angajatorii care mentin in activitate
+angajatii cu varsta peste 60 de ani;</p></li>
+<li><p>contributii suplimentare voluntare facilitate prin
+deductibilitate fiscala integrala;</p></li>
+<li><p>diversificarea portofoliului fondului de pensii al statului catre
+instrumente cu risc moderat si randament real.</p></li>
+</ul>
+<p>◆ <strong>Palierul III — Transparenta si Control Civic</strong></p>
+<ul>
+<li><p>cont individual digital accesibil fiecarui asigurat, afisand in
+timp real contributiile acumulate si pensia estimata;</p></li>
+<li><p>raport anual public al Casei Nationale de Pensii, auditat de un
+organism extern independent;</p></li>
+<li><p>eliminarea conditiilor de penalizare pentru iesirea anticipata
+partiala la pensie in profesiile cu uzura fizica accentuata.</p></li>
+</ul>
+<blockquote>
+<p><strong>3.2 Ingrijire Profesionala la Domiciliu si in
+Institutii</strong></p>
+</blockquote>
+<p>Romania inregistreaza un deficit structural acut de servicii de
+ingrijire. Aproximativ 800.000 de persoane varstnice au nevoie de
+ingrijire permanenta, insa sistemul public acopera sub 10% din necesar.
+P.C.S. propune:</p>
+<ul>
+<li><p>indemnizatie lunara de ingrijitor informal de minimum 30% din
+salariul minim brut, platita de stat familiilor care ingrijesc varstnici
+dependenti la domiciliu;</p></li>
+<li><p>standarde nationale obligatorii de calitate pentru caminele de
+batrani, cu inspectii trimestriale si sanctionare efectiva;</p></li>
+<li><p>subventionarea de catre stat a minimum 20% din locurile in
+caminele private acreditate, pentru seniorii cu venituri
+mici;</p></li>
+<li><p>servicii de asistenta sociala la domiciliu de minimum 4 ore
+saptamanal, garantate prin lege pentru varstnicii singuri;</p></li>
+<li><p>program national de constructie a 200 camine moderne de batrani
+in 2026-2030, co-finantat din fonduri europene.</p></li>
+</ul>
+<blockquote>
+<p><strong>3.3 Locuinta, Utilitati si Mediul de Trai</strong></p>
+</blockquote>
+<p>Calitatea locuintei si accesul la utilitati sunt conditii de baza ale
+unui trai demn. Seniorii romani, majoritari in blocurile construite
+intre 1960-1989, suporta costurile cele mai ridicate ale dezechilibrului
+energetic national. P.C.S. propune:</p>
+<ul>
+<li><p>compensatie lunara la facturile de energie electrica si termica
+pentru seniorii cu venituri sub pragul de saracie
+energetica;</p></li>
+<li><p>program national de reabilitare termica a blocurilor cu populatie
+formata majoritar din seniori, acoperit 80% din fonduri publice;</p></li>
+<li><p>interdictia executarii silite si a evacuarii fortate a
+seniorilor de peste 70 de ani din locuintele ocupate in baza
+contractelor cu autoritatile locale;</p></li>
+<li><p>scutire totala de impozit pe proprietate pentru seniorii care
+detin o singura locuinta cu valoare sub media nationala.</p></li>
+</ul>
+<p><strong>CAP. IV</strong></p>
+<p><strong>POLITICI ECONOMICE SI FISCALE</strong></p>
+<blockquote>
+<p><strong>4.1 Fiscalitate Echitabila — Povara Minima pentru
+Seniori</strong></p>
+</blockquote>
+<p>Sistemul fiscal actual trateaza veniturile din pensii similar cu
+salariile, ignorand ca pensia reprezinta o restituire a contributiilor
+acumulate de-a lungul intregii vieti active, nu un venit nou. P.C.S.
+propune o reforma fiscala proportionala:</p>
+<ul>
+<li><p>eliminarea impozitului pe venit pentru pensii pana la 3.500
+lei;</p></li>
+<li><p>cota redusa de 5% pentru pensiile intre 3.500 lei si 5.000
+lei;</p></li>
+<li><p>deductibilitate integrala a cheltuielilor medicale dovedite din
+baza de calcul a impozitului pe pensii;</p></li>
+<li><p>TVA de 5% pentru medicamentele, aparatura medicala si produsele
+de ingrijire destinate varstnicilor;</p></li>
+<li><p>scutire de taxa pe succesiune pentru mostenitorii directi ai
+seniorilor cu averi sub pragul mediu national.</p></li>
+</ul>
+<blockquote>
+<p><strong>4.2 Economia Varstei a Treia — Potential
+Valorificat</strong></p>
+<p>Seniorii nu sunt o povara economica. Sunt consumatori activi
+(circa 18% din consumul final al gospodariilor), proprietari de active,
+detinatori de cunostinte si experienta unica. Transformarea lor din
+&#39;cost social&#39; in &#39;resursa nationala&#39; necesita politici specifice si
+vizionare.</p>
+</blockquote>
+<ul>
+<li><p>program national de micro-creditare fara dobanda pentru
+seniorii antreprenori cu varste pana la 75 de ani;</p></li>
+<li><p>recunoasterea juridica si remunerarea fiscala a activitatilor de
+voluntariat ale seniorilor in sectorul public si non-profit;</p></li>
+<li><p>stimulente fiscale pentru angajatorii care reintegreaza in
+activitate seniorii cu expertiza unica;</p></li>
+<li><p>Bursa Nationala de Mentorat: seniori experti care transmit
+cunostinte tinerilor profesionisti.</p></li>
+</ul>
+<p><strong>CAP. V</strong></p>
+<p><strong>POLITICI DE SANATATE PENTRU VARSTA A TREIA</strong></p>
+<blockquote>
+<p><strong>5.1 Accesul Universal — Pachetul Minim Garantat</strong></p>
+</blockquote>
+<p>Sanatatea nu poate fi un privilegiu rezervat celor cu posibilitati
+financiare. Sistemul public de sanatate trebuie sa garanteze ca niciun
+senior roman nu refuza un tratament necesar din motive financiare.
+P.C.S. propune un pachet minim garantat al varstnicilor:</p>
+<ul>
+<li><p>lista extinsa a medicamentelor compensate 100%, actualizata
+semestrial conform protocoalelor clinice europene;</p></li>
+<li><p>eliminarea co-platii pentru consultatii si spitalizari pentru
+seniorii cu venituri sub media nationala;</p></li>
+<li><p>program national de screening oncologic gratuit, anual, pentru
+persoanele de peste 55 de ani;</p></li>
+<li><p>obligativitatea unui specialist geriatru in fiecare spital
+judetean si municipal;</p></li>
+<li><p>program national de stomatologie preventiva si restaurativa
+gratuita, inclusiv proteze dentare.</p></li>
+</ul>
+<blockquote>
+<p><strong>5.2 Sanatatea Mintala — Prioritate Ignorata</strong></p>
+</blockquote>
+<p>Depresia clinica afecteaza 15-20% din populatia varstnica. Dementa
+senila este a doua cauza de dizabilitate in randul persoanelor de peste
+65 de ani. Cu toate acestea, sanatatea mintala a varstnicilor este un
+subiect sistematic neglijat in politicile publice romanesti:</p>
+<ul>
+<li><p>servicii de psihoterapie gratuita pentru seniorii
+diagnosticati cu depresie, anxietate sau tulburari
+post-traumatice;</p></li>
+<li><p>retea nationala de unitati specializate in diagnosticarea precoce
+si managementul dementei senile, accesibile in fiecare judet;</p></li>
+<li><p>formare obligatorie a medicilor de familie si a asistentilor
+sociali in psihiatria geriatrica;</p></li>
+<li><p>campanie nationala de destigmatizare a bolilor mintale in randul
+varstnicilor si al familiilor acestora.</p></li>
+</ul>
+<p><strong>CAP. VI</strong></p>
+<p><strong>EDUCATIE CONTINUA, CULTURA SI VIAȚA ACTIVA</strong></p>
+<blockquote>
+<p><strong>6.1 Invatarea pe Tot Parcursul Vietii</strong></p>
+</blockquote>
+<p>Invatarea nu are varsta. Conceptul de lifelong learning este
+recunoscut de Comisia Europeana ca prioritate strategica. Romania
+trebuie sa isi construiasca o infrastructura de educatie continua
+accesibila seniorilor:</p>
+<ul>
+<li><p>Universitati ale Varstei a Treia finantate din bugetul de stat,
+in toate orasele cu peste 30.000 de locuitori;</p></li>
+<li><p>cursuri gratuite acreditate de informatica, limbi straine, arte,
+nutritie si educatie civica;</p></li>
+<li><p>acces gratuit la toate bibliotecile publice si la platformele
+educationale nationale;</p></li>
+<li><p>program &#39;Romania Digitala a Varstnicilor&#39;: dispozitiv digital si
+abonament internet gratuit pentru seniorii izolati.</p></li>
+</ul>
+<blockquote>
+<p><strong>6.2 Cultura, Sport si Recreere</strong></p>
+</blockquote>
+<p>Participarea la viata culturala si sportiva este un drept
+constitutional si un factor dovedit de longevitate si sanatate. P.C.S.
+propune politici concrete de incluziune culturala activa:</p>
+<ul>
+<li><p>acces gratuit la toate institutiile culturale de stat: teatre
+nationale, opere, muzee, filarmonice, cinematografe publice;</p></li>
+<li><p>program national de turism social intern subventionat: statiuni
+balneare, destinatii culturale si istorice, la costuri
+accesibile;</p></li>
+<li><p>retea nationala de Cluburi Sociale pentru Seniori — minimum
+unul in fiecare oras, cu facilitati de recreere;</p></li>
+<li><p>Jocurile Nationale ale Seniorilor: competitii sportive si
+culturale anuale cu finantare de stat.</p></li>
+</ul>
+<p><strong>CAP. VII</strong></p>
+<p><strong>DREPTURILE FUNDAMENTALE ALE SENIORILOR</strong></p>
+<blockquote>
+<p><strong>7.1 Carta Drepturilor Seniorului Roman</strong></p>
+</blockquote>
+<p>P.C.S. propune adoptarea prin Lege organica a Cartei Drepturilor
+Seniorului Roman, document cu forta legala deplina, care sa codifice
+si sa garanteze drepturile fundamentale ale persoanelor iesite din
+campul muncii:</p>
+<table>
+<colgroup>
+<col style="width: 5%" />
+<col style="width: 44%" />
+<col style="width: 50%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>Nr.</strong></td>
+<td><strong>DREPTUL FUNDAMENTAL</strong></td>
+<td><strong>GARANTIA PROPUSA DE P.C.S.</strong></td>
+</tr>
+<tr class="even">
+<td><strong>I</strong></td>
+<td>Dreptul la o pensie demna</td>
+<td>Indexare automata la inflatia reala — lege organica</td>
+</tr>
+<tr class="odd">
+<td><strong>II</strong></td>
+<td>Dreptul la sanatate integrala</td>
+<td>Pachet medical minim garantat gratuit pentru toti</td>
+</tr>
+<tr class="even">
+<td><strong>III</strong></td>
+<td>Dreptul la locuinta sigura</td>
+<td>Protectie legala impotriva evacuarilor abuzive</td>
+</tr>
+<tr class="odd">
+<td><strong>IV</strong></td>
+<td>Dreptul la informare corecta</td>
+<td>Comunicare clara si accesibila din partea institutiilor</td>
+</tr>
+<tr class="even">
+<td><strong>V</strong></td>
+<td>Dreptul la participare politica</td>
+<td>Cota minima de 25% in listele electorale P.C.S.</td>
+</tr>
+<tr class="odd">
+<td><strong>VI</strong></td>
+<td>Dreptul la demnitate si respect</td>
+<td>Lege speciala anti-discriminare varsta cu sanctiuni</td>
+</tr>
+<tr class="even">
+<td><strong>VII</strong></td>
+<td>Dreptul la ingrijire de calitate</td>
+<td>Standarde nationale minime obligatorii pentru camine</td>
+</tr>
+<tr class="odd">
+<td><strong>VIII</strong></td>
+<td>Dreptul la cultura si recreere</td>
+<td>Acces gratuit la institutiile culturale de stat</td>
+</tr>
+<tr class="even">
+<td><strong>IX</strong></td>
+<td>Dreptul la protectia patrimoniului</td>
+<td>Reglementare stricta a contractelor imobiliare</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>7.2 Combaterea Abuzurilor — Toleranta Zero</strong></p>
+</blockquote>
+<p>Abuzul asupra varstnicilor — fizic, emotional, financiar sau prin
+neglijenta — afecteaza statistic 1 din 6 varstnici. Este o realitate
+ascunsa si o rusine nationala. P.C.S. propune un cadru de toleranta
+zero:</p>
+<ul>
+<li><p>lege speciala de protectie a varstnicilor cu circumstante
+agravante pentru cazurile savarsite de ingrijitori sau
+institutii;</p></li>
+<li><p>linie telefonica nationala TELVERDE gratuita, functionala 24/7,
+pentru sesizarea abuzurilor;</p></li>
+<li><p>unitate speciala in Politia Romana dedicata cazurilor de abuz,
+exploatare financiara si violenta asupra varstnicilor;</p></li>
+<li><p>formare obligatorie a asistentilor sociali, medicilor si
+politistilor in identificarea abuzului;</p></li>
+<li><p>registru public national al institutiilor rezidentiale
+sanctionate, actualizat lunar.</p></li>
+</ul>
+<p><strong>CAP. VIII</strong></p>
+<p><strong>REPREZENTARE POLITICA SI INSTITUTIONALA</strong></p>
+<blockquote>
+<p><strong>8.1 Seniorii in Structurile de Decizie</strong></p>
+<p>Seniorii reprezinta peste 27% din electoratul national al
+Romaniei, insa prezenta lor in Parlament, Guvern si Consilii Locale este
+dramatic sub-reprezentata. P.C.S. isi propune sa schimbe aceasta
+realitate prin mijloace democratice si institutionale.</p>
+</blockquote>
+<ul>
+<li><p>cota minima obligatorie de 25% locuri eligibile pe listele
+electorale ale P.C.S. rezervate candidatilor seniori;</p></li>
+<li><p>infiintarea Consiliului National al Seniorilor — organ
+consultativ cu aviz obligatoriu pentru orice proiect de lege cu impact
+direct;</p></li>
+<li><p>Mediatorul Seniorilor — institutie publica independenta pe
+modelul Avocatul Poporului;</p></li>
+<li><p>comisie parlamentara permanenta dedicata problemelor
+seniorilor, cu membri desemnati de organizatiile
+seniorilor;</p></li>
+<li><p>consultare publica obligatorie a organizatiilor seniorilor
+inainte de adoptarea oricarei legi cu impact direct.</p></li>
+</ul>
+<blockquote>
+<p><strong>8.2 Parteneriatul cu Societatea Civila</strong></p>
+</blockquote>
+<p>P.C.S. recunoaste rolul central al sindicatelor seniorilor, al
+asociatiilor de pacienti cronici si al ONG-urilor specializate in
+apararea drepturilor varstnicilor. Angajamentele noastre sunt:</p>
+<ul>
+<li><p>consultare obligatorie a organizatiilor reprezentative ale
+seniorilor inainte de orice initiativa legislativa
+relevanta;</p></li>
+<li><p>co-finantare publica transparenta pentru ONG-urile cu activitate
+dovedita in domeniul protectiei varstnicilor;</p></li>
+<li><p>participare activa la dialogul social tripartit: Guvern —
+Patronate — Sindicate, cu reprezentant distinct al
+seniorilor.</p></li>
+</ul>
+<p><strong>CAP. IX</strong></p>
+<p><strong>POLITICA EXTERNA SI DIMENSIUNEA EUROPEANA</strong></p>
+<blockquote>
+<p><strong>9.1 Romania Europeana — Garantia Drepturilor
+Sociale</strong></p>
+</blockquote>
+<p>P.C.S. sustine cu fermitate si fara echivoc apartenenta Romaniei la
+Uniunea Europeana si la NATO. Integrarea europeana reprezinta cea mai
+solida garantie institutionala a drepturilor sociale ale seniorilor
+romani:</p>
+<ul>
+<li><p>directivele europene de protectie sociala constituie standardul
+minim obligatoriu pe care Romania trebuie sa il respecte si sa il
+depaseasca;</p></li>
+<li><p>fondurile europene structurale si de coeziune trebuie utilizate
+prioritar pentru infrastructura sociala dedicata varstnicilor;</p></li>
+<li><p>Pilonul European al Drepturilor Sociale trebuie implementat
+integral si cu termene clare in legislatia romaneasca;</p></li>
+<li><p>portabilitatea pensiilor in spatiul UE trebuie sa fie reala,
+rapida si garantata institutional.</p></li>
+</ul>
+<blockquote>
+<p><strong>9.2 Seniorii Romani din Diaspora</strong></p>
+</blockquote>
+<p>Aproximativ 4-5 milioane de romani lucreaza sau au lucrat in
+strainatate. O mare parte vor reveni la pensie in Romania. Drepturile
+lor trebuie garantate prin instrumente internationale clare si prin
+servicii consulare de calitate:</p>
+<ul>
+<li><p>acorduri bilaterale de recunoastere si totalizare a
+contributiilor cu toate statele membre UE si cu principalele state
+terte;</p></li>
+<li><p>birouri de consiliere si asistenta pentru seniorii din
+diaspora in toate ambasadele si consulatele Romaniei;</p></li>
+<li><p>platforma digitala integrata pentru calculul si monitorizarea
+pensiei totale, inclusiv perioadele din strainatate;</p></li>
+<li><p>program special de reintegrare sociala pentru seniorii
+reveniti din diaspora, cu acces prioritar la servicii sociale.</p></li>
+</ul>
+<p><strong>CAP. X</strong></p>
+<p><strong>CONTRACTUL CU ALEGATORII — 10 ANGAJAMENTE FERME</strong></p>
+<blockquote>
+<p>Fiecare angajament de mai jos este insotit de un termen de
+implementare, un indicator de monitorizare si un responsabil
+institutional nominalizat. P.C.S. se angajeaza sa publice semestrial un
+Raport de Progres public, auditat de o comisie independenta. Nicio
+promisiune fara acoperire. Niciun termen fara responsabil.</p>
+</blockquote>
+<table>
+<colgroup>
+<col style="width: 4%" />
+<col style="width: 57%" />
+<col style="width: 18%" />
+<col style="width: 19%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>NR.</strong></td>
+<td><strong>ANGAJAMENTUL ASUMAT</strong></td>
+<td><strong>TERMEN</strong></td>
+<td><strong>INDICATOR</strong></td>
+</tr>
+<tr class="even">
+<td><strong>1</strong></td>
+<td>Pensie minima garantata de 2.500 lei, indexata anual la inflatia
+reala INS</td>
+<td>An 1</td>
+<td>HG + OUG</td>
+</tr>
+<tr class="odd">
+<td><strong>2</strong></td>
+<td>Gratuitate totala medicamente boli cronice — lista extinsa 200+
+molecule</td>
+<td>6 luni</td>
+<td>HG Sanatate</td>
+</tr>
+<tr class="even">
+<td><strong>3</strong></td>
+<td>Eliminarea impozitului pe pensii sub 3.500 lei si reducere 50% pana
+la 5.000 lei</td>
+<td>An 1</td>
+<td>Lege buget</td>
+</tr>
+<tr class="odd">
+<td><strong>4</strong></td>
+<td>Transport public gratuit national pentru toti seniorii cu
+legitimatie</td>
+<td>18 luni</td>
+<td>OUG + CFR/STB</td>
+</tr>
+<tr class="even">
+<td><strong>5</strong></td>
+<td>100 Centre de Zi pentru Seniori in orase cu peste 20.000 de
+locuitori</td>
+<td>2 ani</td>
+<td>Prog. nat. MMSS</td>
+</tr>
+<tr class="odd">
+<td><strong>6</strong></td>
+<td>Lege organica anti-abuz varstnici cu TELVERDE 24/7 si unitate
+speciala Politie</td>
+<td>3 luni</td>
+<td>Lege organica</td>
+</tr>
+<tr class="even">
+<td><strong>7</strong></td>
+<td>Recalcularea echitabila a tuturor pensiilor din sistemul public
+anterior lui 2010</td>
+<td>2 ani</td>
+<td>Lege + CNPP</td>
+</tr>
+<tr class="odd">
+<td><strong>8</strong></td>
+<td>Consiliul National al Seniorilor — aviz obligatoriu pentru legile
+care ii privesc</td>
+<td>6 luni</td>
+<td>Lege organica</td>
+</tr>
+<tr class="even">
+<td><strong>9</strong></td>
+<td>Program national digital: 500.000 seniori instruiti + tableta
+gratuita pana 2028</td>
+<td>2 ani</td>
+<td>Prog. MCEIP</td>
+</tr>
+<tr class="odd">
+<td><strong>10</strong></td>
+<td>Indemnizatie lunara pentru ingrijitorii informali ai varstnicilor
+dependenti</td>
+<td>An 1</td>
+<td>HG + MMSS</td>
+</tr>
+</tbody>
+</table>
+<p>P.C.S. va publica la fiecare 6 luni un Raport de Monitorizare public,
+cu surse de date verificabile, responsabili institutionali nominalizati
+si un indicator vizual al gradului de indeplinire al fiecarui
+angajament. Cetatenii au dreptul sa stie. Noi avem obligatia sa
+raportam.</p>
+<p><strong>ADOPTARE SI SEMNATURI OFICIALE</strong></p>
+<p><img src="data:image/png;base64,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" style="width:0.58333in;height:0.58333in" /> <strong>CONGRESUL FONDATOR
+P.C.S.</strong></p>
+<p>Iasi, Sos. Bucium nr. 23 — _____________ 2026</p>
+<p>Subsemnatii, delegati ai Congresului Fondator al Partidului
+Conservator al Seniorilor (P.C.S.), intrunit la Iasi, Sos. Bucium nr.
+23, in data de _______________ 2026, adoptam in mod liber si democratic
+prezentul Program Politic si Doctrina, ca document programatic
+fundamental al Partidului, in conformitate cu Art. 10 alin. (1) lit. b)
+din Legea nr. 14/2003 privind partidele politice, republicata.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><p><strong>PRESEDINTE FONDATOR</strong></p>
+<p>___________________________</p>
+<p>Nume si prenume</p>
+<p>Semnatura: ___________________</p>
+<p>C.N.P.: ______________________</p></td>
+<td><p><strong>SECRETAR GENERAL FONDATOR</strong></p>
+<p>___________________________</p>
+<p>Nume si prenume</p>
+<p>Semnatura: ___________________</p>
+<p>C.N.P.: ______________________</p></td>
+</tr>
+<tr class="even">
+<td><p><strong>TREZORIER NATIONAL</strong></p>
+<p>___________________________</p>
+<p>Nume si prenume</p>
+<p>Semnatura: ___________________</p>
+<p>C.N.P.: ______________________</p></td>
+<td><strong>STAMPILA OFFICIALA P.C.S.</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Conf. Legii nr. 14/2003 privind partidele politice | Conf. Legii nr.
+334/2006 | Constitutia Romaniei | Tratatele UE</p>
+</body>
+</html>

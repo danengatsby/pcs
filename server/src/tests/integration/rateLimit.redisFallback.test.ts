@@ -19,7 +19,7 @@ function buildRes() {
 
 test("rate limiter uses Redis when RATE_LIMIT_STORE=redis (smoke)", async () => {
   // Note: this test expects a Redis instance reachable via REDIS_URL.
-  // In dev we run: docker run -d --name pcp-redis-test -p 6381:6379 redis:7-alpine
+  // In dev we run: docker run -d --name pcs-redis-test -p 6381:6379 redis:7-alpine
   const limiter = createRateLimiter({
     scope: "integration-redis",
     windowMs: 5_000,

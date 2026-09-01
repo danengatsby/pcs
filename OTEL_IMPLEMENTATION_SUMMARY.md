@@ -178,7 +178,7 @@ echo ""
 echo "✅ Application started!"
 echo "📊 View traces: http://localhost:16686"
 echo ""
-echo "Select 'pcp-server' from the service dropdown"
+echo "Select 'pcs-server' from the service dropdown"
 echo "Click 'Find Traces' to see requests"
 echo ""
 echo "Stop server with: kill $SERVER_PID"
@@ -186,7 +186,7 @@ echo "Stop server with: kill $SERVER_PID"
 
 ### What to Look For in Jaeger UI
 
-**Server Traces (`pcp-server`):**
+**Server Traces (`pcs-server`):**
 1. HTTP request spans showing:
    - Method, path, status code
    - Total duration and breakdown
@@ -201,7 +201,7 @@ echo "Stop server with: kill $SERVER_PID"
    - `n1_queries_detected` event appears when patterns found
    - Check span attributes for query_count vs unique_queries ratio
 
-**Client Traces (`pcp-client`):**
+**Client Traces (`pcs-client`):**
 1. Page navigation spans
 2. Network request spans (Fetch/XHR)
 3. User interaction spans (if instrumented)

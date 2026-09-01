@@ -24,10 +24,10 @@ test("buildVolunteerSignupNotificationText should not include plaintext password
 
 test("buildNewsLink should point to the SPA news detail route", () => {
   const previousBaseUrl = env.publicBaseUrl;
-  env.publicBaseUrl = "https://pcp.test/";
+  env.publicBaseUrl = "https://pcs.test/";
 
   try {
-    assert.equal(buildNewsLink(123), "https://pcp.test/news/123");
+    assert.equal(buildNewsLink(123), "https://pcs.test/news/123");
   } finally {
     env.publicBaseUrl = previousBaseUrl;
   }

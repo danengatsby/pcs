@@ -32,9 +32,9 @@ export type SignupUniformResponse = {
 
 export type ParsedCookies = Record<string, string>;
 
-export const refreshTokenCookieName = "pcp_refresh_token";
-export const refreshCsrfCookieName = "pcp_refresh_csrf";
+export const refreshTokenCookieName = "pcs_refresh_token";
+export const refreshCsrfCookieName = "pcs_refresh_csrf";
 export const refreshCookiePath = "/api/auth";
 export const refreshCsrfHeaderName = "x-csrf-token";
 export const signupUniformMessage = "Cererea de creare cont a fost procesata. Daca ai deja cont, foloseste autentificarea.";
-export const dummySigninPasswordHash = `scrypt$pcp-dummy-salt$${"ab".repeat(64)}`;
+export const dummySigninPasswordHash = `scrypt$pcs-dummy-salt$${"ab".repeat(64)}`;

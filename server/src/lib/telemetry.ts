@@ -41,7 +41,7 @@ export function initTelemetry(): void {
 
   const resource = Resource.default().merge(
     new Resource({
-      [SemanticResourceAttributes.SERVICE_NAME]: "pcp-server",
+      [SemanticResourceAttributes.SERVICE_NAME]: "pcs-server",
       [SemanticResourceAttributes.SERVICE_VERSION]: "2.0.0",
       environment: env.nodeEnv,
     })

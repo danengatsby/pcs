@@ -1,6 +1,6 @@
-# PCP Platform
+# PCS Platform
 
-Aplicatie full-stack pentru partidul politic PCP, construita cu:
+Aplicatie full-stack pentru partidul politic PCS, construita cu:
 
 - Node.js API cu adaptoare Express + Fastify
 - PostgreSQL (persistenta date)
@@ -8,7 +8,7 @@ Aplicatie full-stack pentru partidul politic PCP, construita cu:
 
 ## Structura
 
-- `client/` - aplicatia Vite (interfata publica PCP)
+- `client/` - aplicatia Vite (interfata publica PCS)
 - `server/` - API Node.js + scripturi DB
 - `server/sql/` - schema si seed SQL
 
@@ -151,12 +151,12 @@ Metadata release/build (optional, recomandat in productie):
 - Activare: `METRICS_ENABLED` (implicit `true` in development/test, `false` in production).
 - In productie, daca `METRICS_ENABLED=true`, `METRICS_BEARER_TOKEN` este obligatoriu.
 - Metrici expuse:
-  - `pcp_http_request_duration_seconds` (histogram latență API)
-  - `pcp_auth_failures_total` (failures autentificare)
-  - `pcp_auth_refresh_failures_total` (failures refresh token)
-  - `pcp_email_failures_total` (failures trimitere emailuri)
-- Reguli de alerta Prometheus: `monitoring/prometheus/alerts.pcp.yml`.
-- Template scrape config Prometheus: `monitoring/prometheus/prometheus.pcp.example.yml`.
+  - `pcs_http_request_duration_seconds` (histogram latență API)
+  - `pcs_auth_failures_total` (failures autentificare)
+  - `pcs_auth_refresh_failures_total` (failures refresh token)
+  - `pcs_email_failures_total` (failures trimitere emailuri)
+- Reguli de alerta Prometheus: `monitoring/prometheus/alerts.pcs.yml`.
+- Template scrape config Prometheus: `monitoring/prometheus/prometheus.pcs.example.yml`.
 - Config local Prometheus (docker compose): `monitoring/prometheus/prometheus.local.yml`.
 - Ghid setup productie: `monitoring/prometheus/README.md`.
 
@@ -168,7 +168,7 @@ pm2 startOrRestart ecosystem.config.cjs
 pm2 save
 ```
 
-Procesul PM2 pentru acest repo este `pcp-server`.
+Procesul PM2 pentru acest repo este `pcs-server`.
 Aplicatia citeste configuratia din `server/.env`.
 
 ## Runbook productie

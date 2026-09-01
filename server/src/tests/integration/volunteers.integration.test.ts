@@ -45,8 +45,8 @@ test("volunteers route should create volunteer and reject duplicate email", asyn
     assert.ok(Array.isArray(listRows));
     const inserted = listRows?.find((item) => item.status === "nou" && item.role === "ADERENT");
     assert.ok(inserted);
-    assert.equal(inserted?.fullName, "Aderent PCP");
-    assert.match(inserted?.email ?? "", /^ascuns\+\d+@pcp\.invalid$/);
+    assert.equal(inserted?.fullName, "Aderent PCS");
+    assert.match(inserted?.email ?? "", /^ascuns\+\d+@pcs\.invalid$/);
     assert.equal(inserted?.password, "protejata");
     assert.equal(inserted?.status, "nou");
     assert.equal(inserted?.role, "ADERENT");

@@ -5,7 +5,7 @@ export function readEmailNotificationsEnabled(): boolean {
 }
 
 export function readEmailFrom(enabled: boolean): string {
-  const raw = process.env.EMAIL_FROM?.trim() ?? "no-reply@pcp.local";
+  const raw = process.env.EMAIL_FROM?.trim() ?? "no-reply@pcs.local";
   if (enabled && !isLikelyEmail(raw)) {
     throw new Error(`EMAIL_FROM invalid: ${raw}`);
   }

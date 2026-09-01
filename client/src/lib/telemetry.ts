@@ -36,7 +36,7 @@ export function initClientTelemetry(): void {
   // Create the resource
   const resource = Resource.default().merge(
     new Resource({
-      [SemanticResourceAttributes.SERVICE_NAME]: "pcp-client",
+      [SemanticResourceAttributes.SERVICE_NAME]: "pcs-client",
       [SemanticResourceAttributes.SERVICE_VERSION]: "2.0.0",
       "client.type": "web",
     })
@@ -78,7 +78,7 @@ export function initClientTelemetry(): void {
 /**
  * Get a tracer for the client
  */
-export function getClientTracer(name: string = "pcp-client") {
+export function getClientTracer(name: string = "pcs-client") {
   return trace.getTracer(name, "2.0.0");
 }
 

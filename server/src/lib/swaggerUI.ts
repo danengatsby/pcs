@@ -13,7 +13,7 @@ const apiDocsHtml = `<!DOCTYPE html>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex,nofollow">
-  <title>PCP Platform API Documentation</title>
+  <title>PCS Platform API Documentation</title>
   <link rel="stylesheet" href="${apiDocsAssetsPath}/swagger-ui.css">
   <style>
     html {

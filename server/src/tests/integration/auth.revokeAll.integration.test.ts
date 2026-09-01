@@ -63,8 +63,8 @@ test("auth should revoke all refresh sessions for current user", async () => {
     assert.equal(typeof csrfToken, "string");
 
     const setCookie = signinResponse.headers["set-cookie"] as CookieHeader;
-    const refreshCookiePair = readCookiePair(setCookie, "pcp_refresh_token");
-    const csrfCookiePair = readCookiePair(setCookie, "pcp_refresh_csrf");
+    const refreshCookiePair = readCookiePair(setCookie, "pcs_refresh_token");
+    const csrfCookiePair = readCookiePair(setCookie, "pcs_refresh_csrf");
     assert.ok(refreshCookiePair);
     assert.ok(csrfCookiePair);
 

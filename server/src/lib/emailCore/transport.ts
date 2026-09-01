@@ -13,7 +13,7 @@ import {
 } from "./smtpClient.js";
 import type { LineReader, SendEmailInput, SmtpSocket } from "./types.js";
 
-const smtpEhloClientName = "pcp-api";
+const smtpEhloClientName = "pcs-api";
 
 export async function sendEmailViaSmtp(input: SendEmailInput): Promise<void> {
   const recipients = normalizeRecipients(input.to);

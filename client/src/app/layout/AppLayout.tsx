@@ -18,14 +18,14 @@ export function AppLayout() {
       <footer className="site-footer">
         <div className="container footer-inner">
           <div className="footer-left">
-            <strong>PCP</strong>
+            <strong>PCS</strong>
             <div className="muted">
               Platformă civică și informare publică
               {user ? ` · Conectat ca ${user.fullName}` : ''}
             </div>
           </div>
           <div className="footer-right muted">
-            © {new Date().getFullYear()} PCP
+            © {new Date().getFullYear()} PCS
           </div>
         </div>
       </footer>

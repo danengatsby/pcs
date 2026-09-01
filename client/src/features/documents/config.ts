@@ -10,16 +10,16 @@ export const documents: DocumentItem[] = [
   {
     slug: 'statut',
     menuLabel: 'Statut',
-    pageTitle: 'Statut PCP',
+    pageTitle: 'Statut PCS',
     description: 'Documentul statutar al partidului, disponibil integral pentru consultare online.',
-    assetPath: '/documents/Statut_PCP_v7.html',
+    assetPath: '/documents/Statut_PCS_v7.html',
   },
   {
     slug: 'program-politic',
     menuLabel: 'Program politic',
-    pageTitle: 'Program Politic PCP',
-    description: 'Programul politic al PCP, afișat în format integral direct în platformă.',
-    assetPath: '/documents/Program_Politic_PCP_PRO.html',
+    pageTitle: 'Program Politic PCS',
+    description: 'Programul politic al PCS, afișat în format integral direct în platformă.',
+    assetPath: '/documents/Program_Politic_PCS_PRO.html',
   },
   {
     slug: 'legea-14',

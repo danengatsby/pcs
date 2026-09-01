@@ -43,21 +43,21 @@ test("metrics endpoint should expose latency/auth/refresh/email series", async (
 
   const metricsPayload = await readMetricsPayload();
 
-  assert.match(metricsPayload, /# TYPE pcp_http_request_duration_seconds histogram/);
-  assert.match(metricsPayload, /# TYPE pcp_auth_failures_total counter/);
-  assert.match(metricsPayload, /# TYPE pcp_auth_refresh_failures_total counter/);
-  assert.match(metricsPayload, /# TYPE pcp_email_failures_total counter/);
+  assert.match(metricsPayload, /# TYPE pcs_http_request_duration_seconds histogram/);
+  assert.match(metricsPayload, /# TYPE pcs_auth_failures_total counter/);
+  assert.match(metricsPayload, /# TYPE pcs_auth_refresh_failures_total counter/);
+  assert.match(metricsPayload, /# TYPE pcs_email_failures_total counter/);
 
   assert.match(
     metricsPayload,
-    /pcp_http_request_duration_seconds_count\{[^}]*route="\/api\/unknown-route"[^}]*\}\s+[1-9]\d*/
+    /pcs_http_request_duration_seconds_count\{[^}]*route="\/api\/unknown-route"[^}]*\}\s+[1-9]\d*/
   );
   assert.match(
     metricsPayload,
-    /pcp_auth_failures_total\{[^}]*route="\/api\/auth\/refresh"[^}]*\}\s+[1-9]\d*/
+    /pcs_auth_failures_total\{[^}]*route="\/api\/auth\/refresh"[^}]*\}\s+[1-9]\d*/
   );
   assert.match(
     metricsPayload,
-    /pcp_auth_refresh_failures_total\{[^}]*\}\s+[1-9]\d*/
+    /pcs_auth_refresh_failures_total\{[^}]*\}\s+[1-9]\d*/
   );
 });

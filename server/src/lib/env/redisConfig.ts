@@ -5,8 +5,8 @@ export function readRedisUrl(): string {
 }
 
 export function readRedisKeyPrefix(): string {
-  const raw = process.env.REDIS_KEY_PREFIX?.trim() ?? "pcp";
-  return raw || "pcp";
+  const raw = process.env.REDIS_KEY_PREFIX?.trim() ?? "pcs";
+  return raw || "pcs";
 }
 
 export function readRedisConnectTimeoutMs(): number {

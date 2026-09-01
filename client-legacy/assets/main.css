@@ -1,4 +1,4 @@
-/* PCP public site - minimal styling bundle.
+/* PCS public site - minimal styling bundle.
    This repo currently serves static HTML from /client and expects /assets/main.css.
    Keep this file dependency-free. */
 
@@ -121,7 +121,7 @@ img {
   }
 }
 
-.hero-pcp-logo {
+.hero-pcs-logo {
   width: 86px;
   height: 86px;
   border-radius: 14px;

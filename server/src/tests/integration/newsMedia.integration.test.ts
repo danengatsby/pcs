@@ -39,7 +39,7 @@ const onePixelPng = Buffer.from(
 );
 
 function createTempUploadPath(): string {
-  return path.join(os.tmpdir(), `pcp-media-test-${Date.now()}-${Math.random().toString(16).slice(2)}.png`);
+  return path.join(os.tmpdir(), `pcs-media-test-${Date.now()}-${Math.random().toString(16).slice(2)}.png`);
 }
 
 async function readAdminToken(email: string, password: string): Promise<string> {

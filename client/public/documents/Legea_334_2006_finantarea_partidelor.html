@@ -111,13 +111,13 @@
       border-top: 1px solid #8fb0ff;
       padding-top: 10px;
     }
-    .pcp-doc-top {
+    .pcs-doc-top {
       position: sticky;
       top: 0;
       z-index: 999;
       margin-bottom: 18px;
     }
-    .pcp-doc-back {
+    .pcs-doc-back {
       border: 1px solid rgba(215, 231, 255, 0.7);
       border-radius: 10px;
       background: rgba(255, 255, 255, 0.08);
@@ -127,7 +127,7 @@
       padding: 8px 14px;
       cursor: pointer;
     }
-    .pcp-doc-back:hover {
+    .pcs-doc-back:hover {
       background: rgba(255, 255, 255, 0.16);
     }
     @media (max-width: 900px) {
@@ -157,7 +157,7 @@
 </head>
 <body>
 <script>
-function pcpDocGoBack(fallback) {
+function pcsDocGoBack(fallback) {
   try {
     if (document.referrer) {
       var referrerUrl = new URL(document.referrer);
@@ -172,8 +172,8 @@ function pcpDocGoBack(fallback) {
   window.location.href = fallback;
 }
 </script>
-<div class="pcp-doc-top">
-  <button type="button" class="pcp-doc-back" onclick="pcpDocGoBack('../lege334.html')">Inapoi</button>
+<div class="pcs-doc-top">
+  <button type="button" class="pcs-doc-back" onclick="pcsDocGoBack('../lege334.html')">Inapoi</button>
 </div>
 
 <p class="subtitle">PARLAMENTUL ROMÂNIEI</p>

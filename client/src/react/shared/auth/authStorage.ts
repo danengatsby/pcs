@@ -4,7 +4,7 @@ export type StoredAuthSession = {
   csrfToken: string | null
 }
 
-const STORAGE_KEY = 'pcp.auth.session'
+const STORAGE_KEY = 'pcs.auth.session'
 let inMemoryAccessToken: string | null = null
 
 function safeParse<T>(raw: string | null): T | null {

@@ -36,9 +36,9 @@ export const sendAdminEmailTestHandler: RequestHandler = async (req, res, next) 
       return;
     }
 
-    const subject = payload.subject?.trim() || `Test notificare PCP (${new Date().toISOString()})`;
+    const subject = payload.subject?.trim() || `Test notificare PCS (${new Date().toISOString()})`;
     const message = payload.message?.trim() || [
-      "Acesta este un email de test trimis din panoul admin PCP.",
+      "Acesta este un email de test trimis din panoul admin PCS.",
       "",
       `Destinatar: ${recipient}`,
       `Trimis la: ${new Date().toISOString()}`,

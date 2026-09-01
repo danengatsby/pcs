@@ -22,23 +22,23 @@ const latencyBucketsSeconds = [
 ] as const;
 
 const httpRequestDurationMetric = new HistogramMetric(
-  "pcp_http_request_duration_seconds",
+  "pcs_http_request_duration_seconds",
   "HTTP request latency in seconds.",
   latencyBucketsSeconds
 );
 
 const authFailuresMetric = new CounterMetric(
-  "pcp_auth_failures_total",
+  "pcs_auth_failures_total",
   "Total number of authentication failures grouped by code and route."
 );
 
 const refreshFailuresMetric = new CounterMetric(
-  "pcp_auth_refresh_failures_total",
+  "pcs_auth_refresh_failures_total",
   "Total number of refresh-token failures grouped by code."
 );
 
 const emailFailuresMetric = new CounterMetric(
-  "pcp_email_failures_total",
+  "pcs_email_failures_total",
   "Total number of failed outgoing email notification attempts grouped by action."
 );
 

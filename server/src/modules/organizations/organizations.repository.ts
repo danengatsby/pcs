@@ -2,9 +2,9 @@ import type { ListOrganizationsQuery, OrganizationRecord } from "./organizations
 
 const organizationsSeed: OrganizationRecord[] = [
   {
-    id: "org-national-pcp",
+    id: "org-national-pcs",
     level: "national",
-    name: "PCP Organizatia Nationala",
+    name: "PCS Organizatia Nationala",
     county: "Bucuresti",
     membersCount: 0,
     createdAt: new Date(0).toISOString(),

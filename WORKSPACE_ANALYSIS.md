@@ -1,6 +1,6 @@
-# PCP Platform - Comprehensive Workspace Analysis
+# PCS Platform - Comprehensive Workspace Analysis
 
-**Project**: Full-stack political party (PCP) platform
+**Project**: Full-stack political party (PCS) platform
 **Tech Stack**: Node.js + PostgreSQL + React + TypeScript
 **Architecture**: Monorepo with Express/Fastify dual adapters
 **Analysis Date**: April 2026
@@ -59,8 +59,8 @@
 - JWT access tokens via `jose` library (standard crypto, not external services)
 - Refresh token rotation with CSRF protection
 - Dual-cookie strategy:
-  - `pcp_refresh_token` (HttpOnly, path-restricted)
-  - `pcp_refresh_csrf` (CSRF token for double-submit validation)
+  - `pcs_refresh_token` (HttpOnly, path-restricted)
+  - `pcs_refresh_csrf` (CSRF token for double-submit validation)
   - CSRF header: `x-csrf-token`
 - Token hashing in database (not stored raw)
 - Token revocation tracking via `AuthRevokedToken` table
@@ -840,7 +840,7 @@ Server (Express/Fastify)
 **PM2 Configuration**:
 ```javascript
 apps: [{
-  name: "pcp-server",
+  name: "pcs-server",
   script: "server/dist/index.js",
   exec_mode: "fork",
   instances: 1,
@@ -950,7 +950,7 @@ npm run db:seed      # Load demo data
 
 ### Alert Rules 📢
 
-**File**: `monitoring/prometheus/alerts.pcp.yml`
+**File**: `monitoring/prometheus/alerts.pcs.yml`
 - Rules defined but content not visible in analysis
 - Likely includes:
   - High error rate threshold
@@ -962,7 +962,7 @@ npm run db:seed      # Load demo data
 **Grafana Integration**:
 - Dashboard provisioning via `monitoring/grafana/provisioning/`
 - Dashboard files in `monitoring/grafana/dashboards/`
-- JSON API overview in `pcp-api-overview.json`
+- JSON API overview in `pcs-api-overview.json`
 - Admin credentials via secret file
 
 ### Logging Strategy 🔍
@@ -1075,4 +1075,4 @@ npm run db:seed      # Load demo data
 
 ---
 
-*Analysis completed: April 2026 | PCP Platform v2.0.0*
+*Analysis completed: April 2026 | PCS Platform v2.0.0*

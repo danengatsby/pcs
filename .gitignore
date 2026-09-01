@@ -12,5 +12,5 @@ coverage
 playwright-report
 test-results
 xx
-monitoring/prometheus/secrets/pcp_metrics_bearer_token
+monitoring/prometheus/secrets/pcs_metrics_bearer_token
 monitoring/grafana/secrets/grafana_admin_password

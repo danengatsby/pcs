@@ -1,5 +1,5 @@
 /**
- * OpenAPI 3.0 Specification for PCP Platform API
+ * OpenAPI 3.0 Specification for PCS Platform API
  * Static contract kept in sync with handlers by tests
  */
 
@@ -115,12 +115,12 @@ const optionalCsrfHeaderParameter = {
 export const openApiSpec = {
   openapi: "3.0.0",
   info: {
-    title: "PCP Platform API",
+    title: "PCS Platform API",
     version: packageVersion,
     description:
       "Romanian political platform API for news, volunteers, members, and administration management",
     contact: {
-      name: "PCP Development Team",
+      name: "PCS Development Team",
     },
   },
   servers: [
@@ -980,7 +980,7 @@ export const openApiSpec = {
       post: {
         tags: ["Authentication"],
         summary: "Sign up new user",
-        description: "Register a new PCP account using the live signup contract.",
+        description: "Register a new PCS account using the live signup contract.",
         operationId: "signupUser",
         parameters: [
           {
@@ -3766,7 +3766,7 @@ export const openApiSpec = {
     },
   ],
   externalDocs: {
-    description: "PCP Platform Documentation",
-    url: "https://pcp.ro/docs",
+    description: "PCS Platform Documentation",
+    url: "https://pcpens.online",
   },
 };

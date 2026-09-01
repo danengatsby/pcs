@@ -22,7 +22,7 @@ export async function exportAdminVolunteersCsvHandler(
 
     const exportDate = new Date().toISOString().slice(0, 10);
     res.setHeader("Content-Type", "text/csv; charset=utf-8");
-    res.setHeader("Content-Disposition", `attachment; filename="pcp-volunteers-${exportDate}.csv"`);
+    res.setHeader("Content-Disposition", `attachment; filename="pcs-volunteers-${exportDate}.csv"`);
     res.status(200);
     res.write(`\uFEFF${volunteerCsvHeader}\n`);
 

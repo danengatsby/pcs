@@ -84,15 +84,15 @@ async function queueNotification(
 export async function sendSignupNotificationEmail(input: SignupNotificationInput): Promise<void> {
   await queueNotification("auth.signup_email", {
     to: [input.email],
-    subject: "Cont PCP creat cu succes",
+    subject: "Cont PCS creat cu succes",
     text: [
       `Salut, ${input.fullName}!`,
       "",
-      "Contul tau pe platforma PCP a fost creat cu succes.",
+      "Contul tau pe platforma PCS a fost creat cu succes.",
       "Poti intra in platforma pentru a-ti completa profilul si a urmari noutatile.",
       "",
       "Multumim,",
-      "Echipa PCP",
+      "Echipa PCS",
     ].join("\n"),
   });
 }
@@ -106,13 +106,13 @@ export async function sendVolunteerStatusChangedEmail(
     text: [
       `Salut, ${input.fullName}!`,
       "",
-      "Statusul tau de voluntar in platforma PCP a fost actualizat.",
+      "Statusul tau de voluntar in platforma PCS a fost actualizat.",
       `Status anterior: ${input.previousStatus}`,
       `Status nou: ${input.nextStatus}`,
       `Actualizat de: ${input.updatedBy}`,
       "",
       "Multumim pentru implicare,",
-      "Echipa PCP",
+      "Echipa PCS",
     ].join("\n"),
   });
 }
@@ -124,7 +124,7 @@ export async function sendVolunteerSignupNotificationEmail(
 
   await queueNotification("volunteer.signup_email", {
     to: [input.email],
-    subject: "Confirmare inscriere aderent PCP-Partidul Conservator al Seniorilor",
+    subject: "Confirmare inscriere aderent PCS-Partidul Conservator al Seniorilor",
     text: messageText,
   });
 }
@@ -138,7 +138,7 @@ export function buildVolunteerSignupNotificationText(
   return [
     `Salut, ${input.fullName}!`,
     "",
-    "Inscrierea dvs. ca aderent in platforma PCP-Partidul Conservator al Seniorilor a fost inregistrata cu succes.",
+    "Inscrierea dvs. ca aderent in platforma PCS-Partidul Conservator al Seniorilor a fost inregistrata cu succes.",
     "Veti primi actualizari pe email privind pasii urmatori.",
     "",
     "Va puteti loga cu adresa de email folosita la inscriere si parola setata in formular.",
@@ -153,11 +153,11 @@ export function buildVolunteerSignupNotificationText(
     `Arii de interes: ${skills}`,
     `Motivatie: ${input.motivation}`,
     "",
-    "INSCRIEREA NU VA FACE DEVENITI MEMBRU AL PCP, CI ARATA INTERESUL DVS. PENRU ACEST PARTID.",
+    "INSCRIEREA NU VA FACE DEVENITI MEMBRU AL PCS, CI ARATA INTERESUL DVS. PENRU ACEST PARTID.",
     "INSCRIEREA CA MEMBRU DE PARTID SE FACE CU UN FORMULAR SPECIAL TRIMIS PRIN POSTA CARE SE VA COMPLETA SI SE VA TRIMITE INAPOI LA SEDIUL PARTIDULUI PENTRU INREGISTRARE.",
     "",
     "Multumim pentru interes,",
-    "Echipa PCP-Partidul Conservator al Seniorilor",
+    "Echipa PCS-Partidul Conservator al Seniorilor",
     "https://pcpens.online/index.html",
   ].join("\n");
 }
@@ -174,7 +174,7 @@ export async function sendNewsPublishedNotificationEmail(
     to: recipients,
     subject: `Stire publicata: ${input.title}`,
     text: [
-      "A fost publicata o stire noua pe platforma PCP.",
+      "A fost publicata o stire noua pe platforma PCS.",
       "",
       `Titlu: ${input.title}`,
       `Categorie: ${input.category}`,

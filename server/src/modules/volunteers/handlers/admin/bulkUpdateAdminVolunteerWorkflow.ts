@@ -28,7 +28,7 @@ export async function bulkUpdateAdminVolunteerWorkflowHandler(
   try {
     const authUser = readAuthUser(res);
     const statusUpdatedBy = authUser ? Number(authUser.id) : null;
-    const updatedByLabel = authUser?.fullName || authUser?.email || "administrator PCP";
+    const updatedByLabel = authUser?.fullName || authUser?.email || "administrator PCS";
     const requestedVolunteerIds = parsed.data.target.type === "ids"
       ? parsed.data.target.volunteerIds
       : [];

@@ -10,7 +10,7 @@ export function DocumentPage() {
       <section className="document-page">
         <div className="document-page__hero">
           <div>
-            <div className="hero-kicker">Documente PCP</div>
+            <div className="hero-kicker">Documente PCS</div>
             <h1>Document indisponibil</h1>
             <p className="lead">Documentul cerut nu există sau nu este publicat în această secțiune.</p>
           </div>
@@ -26,7 +26,7 @@ export function DocumentPage() {
     <section className="document-page">
       <div className="document-page__hero">
         <div>
-          <div className="hero-kicker">Documente PCP</div>
+          <div className="hero-kicker">Documente PCS</div>
           <h1>{document.pageTitle}</h1>
           <p className="lead">{document.description}</p>
         </div>

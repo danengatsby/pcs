@@ -4,7 +4,7 @@
 
 ## Overview
 
-This document describes the distributed tracing setup for the PCP application using OpenTelemetry and Jaeger. The implementation enables end-to-end visibility into application performance across client and server.
+This document describes the distributed tracing setup for the PCS application using OpenTelemetry and Jaeger. The implementation enables end-to-end visibility into application performance across client and server.
 
 ## Architecture
 
@@ -117,8 +117,8 @@ npm run start --workspace server
 
 1. Open browser: http://localhost:16686
 2. Select service from dropdown:
-   - `pcp-server` - Backend traces
-   - `pcp-client` - Frontend traces
+   - `pcs-server` - Backend traces
+   - `pcs-client` - Frontend traces
 3. Click "Find Traces" to load recent traces
 4. Click on a trace to view details
 

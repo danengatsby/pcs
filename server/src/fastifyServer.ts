@@ -47,8 +47,8 @@ const manifestPageCspHeader = buildManifestPageCspHeaderValue();
 const permissionsPolicyHeader = buildPermissionsPolicyHeaderValue();
 
 type FastifyRequestWithMeta = FastifyRequest & {
-  pcpRequestId?: string;
-  pcpRequestStartedAt?: bigint;
+  pcsRequestId?: string;
+  pcsRequestStartedAt?: bigint;
 };
 
 function buildCspHeaderValue(): string {
@@ -185,7 +185,7 @@ export async function createFastifyServer(): Promise<FastifyInstance> {
 
   fastify.addHook("onRequest", async (request, reply) => {
     const req = request as FastifyRequestWithMeta;
-    req.pcpRequestStartedAt = process.hrtime.bigint();
+    req.pcsRequestStartedAt = process.hrtime.bigint();
 
     const incomingRequestIdHeader = request.headers["x-request-id"];
     const incomingRequestId = typeof incomingRequestIdHeader === "string"
@@ -195,7 +195,7 @@ export async function createFastifyServer(): Promise<FastifyInstance> {
         : undefined;
 
     const requestId = readOrCreateRequestId(request, incomingRequestId);
-    req.pcpRequestId = requestId;
+    req.pcsRequestId = requestId;
     reply.header("X-Request-Id", requestId);
 
     applySecurityHeaders(reply, cspHeader);
@@ -217,7 +217,7 @@ export async function createFastifyServer(): Promise<FastifyInstance> {
 
   fastify.addHook("onResponse", async (request, reply) => {
     const req = request as FastifyRequestWithMeta;
-    const startedAt = req.pcpRequestStartedAt ?? process.hrtime.bigint();
+    const startedAt = req.pcsRequestStartedAt ?? process.hrtime.bigint();
     const elapsedSeconds = Number(process.hrtime.bigint() - startedAt) / 1_000_000_000;
     const routePath = readFastifyRequestPath(request);
 
@@ -245,7 +245,7 @@ export async function createFastifyServer(): Promise<FastifyInstance> {
           statusCode: reply.statusCode,
           headers: redactHeaders(reply.getHeaders() as unknown as Record<string, unknown>),
         },
-        requestId: req.pcpRequestId ?? "unknown",
+        requestId: req.pcsRequestId ?? "unknown",
         responseTime: Math.round(elapsedSeconds * 1000),
       },
       "request completed"
@@ -254,7 +254,7 @@ export async function createFastifyServer(): Promise<FastifyInstance> {
 
   fastify.setErrorHandler((error, request, reply) => {
     const req = request as FastifyRequestWithMeta;
-    const requestId = req.pcpRequestId ?? "unknown";
+    const requestId = req.pcsRequestId ?? "unknown";
     const requestPath = readFastifyRequestPath(request);
 
     if (error instanceof AppError) {
@@ -393,7 +393,7 @@ export async function createFastifyServer(): Promise<FastifyInstance> {
   fastify.setNotFoundHandler((request, reply) => {
     const requestPath = readFastifyRequestPath(request);
     if (requestPath.startsWith("/api/")) {
-      const requestId = (request as FastifyRequestWithMeta).pcpRequestId ?? "unknown";
+      const requestId = (request as FastifyRequestWithMeta).pcsRequestId ?? "unknown";
       sendFastifyError(reply, requestId, 404, "API_ROUTE_NOT_FOUND", "Ruta API inexistenta.");
       return;
     }

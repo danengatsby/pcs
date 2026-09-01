@@ -29,7 +29,7 @@ export function readClamAvConfigFromEnv(): ClamAvConfig {
   const timeoutParsed = timeoutRaw ? Number(timeoutRaw) : NaN;
   const timeoutMs = Number.isFinite(timeoutParsed) && timeoutParsed > 0 ? Math.floor(timeoutParsed) : 30_000;
 
-  const clamdHost = (process.env.NEWS_MEDIA_CLAMD_HOST ?? "").trim() || "pcp-clamav";
+  const clamdHost = (process.env.NEWS_MEDIA_CLAMD_HOST ?? "").trim() || "pcs-clamav";
   const clamdPortRaw = (process.env.NEWS_MEDIA_CLAMD_PORT ?? "").trim();
   const clamdPortParsed = clamdPortRaw ? Number(clamdPortRaw) : NaN;
   const clamdPort = Number.isFinite(clamdPortParsed) && clamdPortParsed > 0 ? Math.floor(clamdPortParsed) : 3310;

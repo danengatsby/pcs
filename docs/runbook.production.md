@@ -1,4 +1,4 @@
-# PCP Production Runbook
+# PCS Production Runbook
 
 Acest runbook standardizeaza release-ul pentru productie cu aceeasi ordine folosita in CI: build predictibil, smoke compilat pe artefactul rezultat, apoi deploy + verificari post-release.
 
@@ -44,7 +44,7 @@ Scop: reducere artefacte stale, reducere expunere cod sursa si output determinis
 Pe host-ul de productie:
 
 ```bash
-cd /var/www/pcp
+cd /var/www/pcs
 npm ci
 npm run build
 NODE_ENV=production node server/dist/scripts/migrateDb.js
@@ -72,7 +72,7 @@ Verificari frontend public:
 
 ```bash
 curl -fsSI https://pcpens.online/
-curl -fsSI https://pcpens.online/manifest_pcp.html
+curl -fsSI https://pcpens.online/manifest_pcs.html
 curl -fsSI https://pcpens.online/admin/volunteers
 ```
 

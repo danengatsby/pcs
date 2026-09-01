@@ -293,7 +293,7 @@ client/src/
 
 Run all tests:
 ```bash
-cd /var/www/pcp
+cd /var/www/pcs
 npm run test --workspace client
 
 # Output:

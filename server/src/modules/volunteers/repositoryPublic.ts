@@ -70,8 +70,8 @@ export async function listPublicVolunteers(limit: number): Promise<VolunteerPubl
 
   return volunteers.map((row) => ({
     id: `v-${row.id.toString()}`,
-    fullName: "Aderent PCP",
-    email: `ascuns+${row.id.toString()}@pcp.invalid`,
+    fullName: "Aderent PCS",
+    email: `ascuns+${row.id.toString()}@pcs.invalid`,
     password: "protejata",
     status: toVolunteerWorkflowStatus(row.workflowStatus),
     role: roleMap.get(row.email.toLowerCase()) ?? "FARA_CONT",

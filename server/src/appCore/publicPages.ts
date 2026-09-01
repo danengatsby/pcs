@@ -1,4 +1,4 @@
-export const manifestPageFileName = "manifest_pcp.html";
+export const manifestPageFileName = "manifest_pcs.html";
 
 export function buildManifestPageCspHeaderValue(): string {
   return [

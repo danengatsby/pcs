@@ -1,0 +1,182 @@
+groups:
+  - name: pcs-api-recording
+    interval: 1m
+    rules:
+      - record: pcs:api_latency_seconds:p95_5m
+        expr: histogram_quantile(0.95, sum by (le) (rate(pcs_http_request_duration_seconds_bucket{route!="/api/metrics",route!="/api/health"}[5m])))
+      - record: pcs:auth_failures:rate5m
+        expr: sum(rate(pcs_auth_failures_total[5m]))
+      - record: pcs:refresh_failures:rate5m
+        expr: sum(rate(pcs_auth_refresh_failures_total[5m]))
+      - record: pcs:email_failures:increase15m
+        expr: sum(increase(pcs_email_failures_total[15m]))
+      - record: pcs:api_latency_seconds:p95_baseline_14d
+        expr: avg_over_time(pcs:api_latency_seconds:p95_5m[14d])
+      - record: pcs:auth_failures:baseline_rate_14d
+        expr: avg_over_time(pcs:auth_failures:rate5m[14d])
+      - record: pcs:refresh_failures:baseline_rate_14d
+        expr: avg_over_time(pcs:refresh_failures:rate5m[14d])
+      - record: pcs:email_failures:baseline_increase15m_14d
+        expr: avg_over_time(pcs:email_failures:increase15m[14d])
+
+  - name: pcs-api-observability
+    rules:
+      - alert: PCSApiLatencyP95Warning
+        expr: |
+          (
+            count_over_time(pcs:api_latency_seconds:p95_5m[14d]) < 10080
+            and pcs:api_latency_seconds:p95_5m > 1.2
+          )
+          or
+          (
+            count_over_time(pcs:api_latency_seconds:p95_5m[14d]) >= 10080
+            and pcs:api_latency_seconds:p95_5m
+              > clamp_min(pcs:api_latency_seconds:p95_baseline_14d * 1.35, 1.0)
+          )
+        for: 10m
+        labels:
+          severity: warning
+          service: pcs-api
+        annotations:
+          summary: PCS API latency p95 este ridicata
+          description: Prag bootstrap 1.2s, apoi prag dinamic pe baseline 14 zile.
+
+      - alert: PCSApiLatencyP95Critical
+        expr: |
+          (
+            count_over_time(pcs:api_latency_seconds:p95_5m[14d]) < 10080
+            and pcs:api_latency_seconds:p95_5m > 2.5
+          )
+          or
+          (
+            count_over_time(pcs:api_latency_seconds:p95_5m[14d]) >= 10080
+            and pcs:api_latency_seconds:p95_5m
+              > clamp_min(pcs:api_latency_seconds:p95_baseline_14d * 1.8, 2.0)
+          )
+        for: 5m
+        labels:
+          severity: critical
+          service: pcs-api
+        annotations:
+          summary: PCS API latency p95 critica
+          description: Prag bootstrap 2.5s, apoi prag dinamic pe baseline 14 zile.
+
+      - alert: PCSAuthFailureRateHigh
+        expr: |
+          (
+            count_over_time(pcs:auth_failures:rate5m[14d]) < 10080
+            and pcs:auth_failures:rate5m > 0.2
+          )
+          or
+          (
+            count_over_time(pcs:auth_failures:rate5m[14d]) >= 10080
+            and pcs:auth_failures:rate5m
+              > clamp_min(pcs:auth_failures:baseline_rate_14d * 3, 0.1)
+          )
+        for: 10m
+        labels:
+          severity: warning
+          service: pcs-api
+        annotations:
+          summary: Rata mare de auth failures
+          description: Prag bootstrap 0.2/s, apoi prag dinamic pe baseline 14 zile.
+
+      - alert: PCSAuthFailureRateCritical
+        expr: |
+          (
+            count_over_time(pcs:auth_failures:rate5m[14d]) < 10080
+            and pcs:auth_failures:rate5m > 0.6
+          )
+          or
+          (
+            count_over_time(pcs:auth_failures:rate5m[14d]) >= 10080
+            and pcs:auth_failures:rate5m
+              > clamp_min(pcs:auth_failures:baseline_rate_14d * 6, 0.25)
+          )
+        for: 5m
+        labels:
+          severity: critical
+          service: pcs-api
+        annotations:
+          summary: Rata critica de auth failures
+          description: Escaladare rapida pentru spike puternic de autentificari esuate.
+
+      - alert: PCSRefreshFailureRateHigh
+        expr: |
+          (
+            count_over_time(pcs:refresh_failures:rate5m[14d]) < 10080
+            and pcs:refresh_failures:rate5m > 0.05
+          )
+          or
+          (
+            count_over_time(pcs:refresh_failures:rate5m[14d]) >= 10080
+            and pcs:refresh_failures:rate5m
+              > clamp_min(pcs:refresh_failures:baseline_rate_14d * 3, 0.03)
+          )
+        for: 10m
+        labels:
+          severity: warning
+          service: pcs-api
+        annotations:
+          summary: Rata mare de refresh failures
+          description: Prag bootstrap 0.05/s, apoi prag dinamic pe baseline 14 zile.
+
+      - alert: PCSRefreshFailureRateCritical
+        expr: |
+          (
+            count_over_time(pcs:refresh_failures:rate5m[14d]) < 10080
+            and pcs:refresh_failures:rate5m > 0.15
+          )
+          or
+          (
+            count_over_time(pcs:refresh_failures:rate5m[14d]) >= 10080
+            and pcs:refresh_failures:rate5m
+              > clamp_min(pcs:refresh_failures:baseline_rate_14d * 6, 0.08)
+          )
+        for: 5m
+        labels:
+          severity: critical
+          service: pcs-api
+        annotations:
+          summary: Rata critica de refresh failures
+          description: Spike sever in fluxul de refresh token.
+
+      - alert: PCSEmailFailuresDetected
+        expr: |
+          (
+            count_over_time(pcs:email_failures:increase15m[14d]) < 10080
+            and pcs:email_failures:increase15m > 1
+          )
+          or
+          (
+            count_over_time(pcs:email_failures:increase15m[14d]) >= 10080
+            and pcs:email_failures:increase15m
+              > clamp_min(pcs:email_failures:baseline_increase15m_14d * 4, 1)
+          )
+        for: 0m
+        labels:
+          severity: warning
+          service: pcs-api
+        annotations:
+          summary: Au aparut email failures
+          description: Prag bootstrap >1/15m, apoi prag dinamic pe baseline 14 zile.
+
+      - alert: PCSEmailFailuresCritical
+        expr: |
+          (
+            count_over_time(pcs:email_failures:increase15m[14d]) < 10080
+            and pcs:email_failures:increase15m > 3
+          )
+          or
+          (
+            count_over_time(pcs:email_failures:increase15m[14d]) >= 10080
+            and pcs:email_failures:increase15m
+              > clamp_min(pcs:email_failures:baseline_increase15m_14d * 8, 3)
+          )
+        for: 0m
+        labels:
+          severity: critical
+          service: pcs-api
+        annotations:
+          summary: Spike critic de email failures
+          description: Numar ridicat de esecuri SMTP intr-o fereastra scurta.

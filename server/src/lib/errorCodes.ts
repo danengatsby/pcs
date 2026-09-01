@@ -1,5 +1,5 @@
 /**
- * Canonical error codes used across the PCP API.
+ * Canonical error codes used across the PCS API.
  *
  * Goals:
  * - avoid ad-hoc strings scattered through handlers

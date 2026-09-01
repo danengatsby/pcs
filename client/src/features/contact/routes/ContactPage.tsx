@@ -9,7 +9,7 @@ export function ContactPage() {
       <section className="hero">
         <div className="hero-kicker">Contact & înscrieri</div>
         <h1>Contact</h1>
-        <p className="lead">Înscriere aderent și informații de contact pentru platforma PCP.</p>
+        <p className="lead">Înscriere aderent și informații de contact pentru platforma PCS.</p>
       </section>
 
       <div className="mt-18">

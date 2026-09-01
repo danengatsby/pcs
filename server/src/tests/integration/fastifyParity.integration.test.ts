@@ -138,7 +138,7 @@ test("fastify adapter should expose api docs parity", async () => {
     .expect(200);
 
   assert.match(String(htmlResponse.headers["content-type"] ?? ""), /text\/html/i);
-  assert.match(htmlResponse.text, /PCP Platform API Documentation/i);
+  assert.match(htmlResponse.text, /PCS Platform API Documentation/i);
   assert.match(htmlResponse.text, /\/api-docs\/static\/swagger-ui\.css/);
 
   const assetResponse = await request(server.server)
@@ -158,10 +158,10 @@ test("fastify adapter should expose api docs parity", async () => {
 
 test("fastify adapter should expose manifest page parity", async () => {
   const response = await request(server.server)
-    .get("/manifest_pcp.html")
+    .get("/manifest_pcs.html")
     .expect(200);
 
-  assert.match(response.text, /Manifestul PCP/i);
+  assert.match(response.text, /Manifestul PCS/i);
   assert.match(String(response.headers["content-security-policy"] ?? ""), /unsafe-inline/i);
 });
 

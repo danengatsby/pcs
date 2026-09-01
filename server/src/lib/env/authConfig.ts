@@ -27,7 +27,7 @@ export function readAuthTokenTtlSeconds(): number {
 }
 
 export function readAuthTokenIssuer(): string {
-  const raw = process.env.AUTH_TOKEN_ISSUER?.trim() ?? "pcp-api";
+  const raw = process.env.AUTH_TOKEN_ISSUER?.trim() ?? "pcs-api";
   if (!raw) {
     throw new Error("AUTH_TOKEN_ISSUER invalid.");
   }
@@ -35,7 +35,7 @@ export function readAuthTokenIssuer(): string {
 }
 
 export function readAuthTokenAudience(): string {
-  const raw = process.env.AUTH_TOKEN_AUDIENCE?.trim() ?? "pcp-client";
+  const raw = process.env.AUTH_TOKEN_AUDIENCE?.trim() ?? "pcs-client";
   if (!raw) {
     throw new Error("AUTH_TOKEN_AUDIENCE invalid.");
   }

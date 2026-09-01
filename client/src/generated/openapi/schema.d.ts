@@ -247,7 +247,7 @@ export interface paths {
         put?: never;
         /**
          * Sign up new user
-         * @description Register a new PCP account using the live signup contract.
+         * @description Register a new PCS account using the live signup contract.
          */
         post: operations["signupUser"];
         delete?: never;

@@ -1,8 +1,8 @@
 {
-  "name": "pcp-platform",
+  "name": "pcs-platform",
   "version": "2.0.0",
   "private": true,
-  "description": "Aplicatie full-stack pentru Partidul Politic PCP",
+  "description": "Aplicatie full-stack pentru Partidul Politic PCS",
   "workspaces": [
     "server",
     "client"

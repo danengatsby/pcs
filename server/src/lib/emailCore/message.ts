@@ -35,7 +35,7 @@ export function buildRawMessage(input: SendEmailInput, recipients: string[]): st
   const from = sanitizeHeaderValue(env.emailFrom);
   const toHeader = recipients.join(", ");
   const replyTo = sanitizeHeaderValue(input.replyTo?.trim() || env.emailReplyTo || "");
-  const messageId = `<${randomUUID()}@${env.emailSmtpHost || "pcp.local"}>`;
+  const messageId = `<${randomUUID()}@${env.emailSmtpHost || "pcs.local"}>`;
   const body = dotStuffBody(input.text);
 
   const headers = [

@@ -21,8 +21,8 @@ type SeedEntry = {
   status: VolunteerWorkflowStatus;
 };
 
-const DEFAULT_SEED_PASSWORD = "PcpSeed!2026";
-const SEED_EMAIL_DOMAIN = "seed.pcp.local";
+const DEFAULT_SEED_PASSWORD = "PcsSeed!2026";
+const SEED_EMAIL_DOMAIN = "seed.pcs.local";
 
 function normalizeText(value: string): string {
   return value

@@ -1,6 +1,6 @@
-# PCP Platform API Documentation Guide
+# PCS Platform API Documentation Guide
 
-The PCP API exposes a static OpenAPI 3.0 document and Swagger UI from the running server. The contract is maintained in code, checked against the runtime route registry, and served with the same URLs on both HTTP adapters.
+The PCS API exposes a static OpenAPI 3.0 document and Swagger UI from the running server. The contract is maintained in code, checked against the runtime route registry, and served with the same URLs on both HTTP adapters.
 
 ## Runtime Defaults
 

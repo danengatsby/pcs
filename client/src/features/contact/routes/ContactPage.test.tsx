@@ -43,7 +43,7 @@ describe('ContactPage', () => {
     expect(screen.getByText('Contact & înscrieri')).toBeInTheDocument()
     expect(screen.getByText('Contact')).toBeInTheDocument()
     expect(
-      screen.getByText('Înscriere aderent și informații de contact pentru platforma PCP.')
+      screen.getByText('Înscriere aderent și informații de contact pentru platforma PCS.')
     ).toBeInTheDocument()
   })
 

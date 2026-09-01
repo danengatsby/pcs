@@ -283,7 +283,7 @@ async function executeHandler(
 
 export function createExpressChainHandler(handlers: RequestHandler[]): RouteHandlerMethod {
   return async (request, reply) => {
-    const requestId = (request as FastifyRequest & { pcpRequestId?: string }).pcpRequestId ?? "unknown";
+    const requestId = (request as FastifyRequest & { pcsRequestId?: string }).pcsRequestId ?? "unknown";
     const req = createExpressLikeRequest(request);
     const res = createExpressLikeResponse(reply, requestId);
 

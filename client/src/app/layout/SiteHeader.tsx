@@ -96,7 +96,7 @@ export function SiteHeader() {
       </a>
       <div className="container header-inner">
         <Link className="brand" to="/" onClick={handleNavigation}>
-          PCP - PARTIDUL SENIORILOR !
+          PCS - PARTIDUL SENIORILOR !
         </Link>
 
         <nav className="nav" aria-label="Meniu principal">

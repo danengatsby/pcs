@@ -153,7 +153,7 @@ export async function updateAdminVolunteerWorkflowHandler(
         email: updated.email,
         previousStatus: existing.workflowStatus,
         nextStatus: updated.workflowStatus,
-        updatedBy: authUser?.fullName || authUser?.email || "administrator PCP",
+        updatedBy: authUser?.fullName || authUser?.email || "administrator PCS",
       });
     }
 

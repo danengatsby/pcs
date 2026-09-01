@@ -26,15 +26,15 @@ describe('authStorage', () => {
 
     expect(authStorage.getAccessToken()).toBe('access-token')
     expect(authStorage.getCsrfToken()).toBe('csrf-token')
-    expect(sessionStorage.getItem('pcp.auth.session')).toBe(JSON.stringify({ csrfToken: 'csrf-token' }))
-    expect(localStorage.getItem('pcp.auth.session')).toBeNull()
+    expect(sessionStorage.getItem('pcs.auth.session')).toBe(JSON.stringify({ csrfToken: 'csrf-token' }))
+    expect(localStorage.getItem('pcs.auth.session')).toBeNull()
   })
 
   it('migrates a legacy localStorage session into sessionStorage', () => {
-    localStorage.setItem('pcp.auth.session', JSON.stringify({ csrfToken: 'legacy-csrf' }))
+    localStorage.setItem('pcs.auth.session', JSON.stringify({ csrfToken: 'legacy-csrf' }))
 
     expect(authStorage.get()).toEqual({ csrfToken: 'legacy-csrf' })
-    expect(sessionStorage.getItem('pcp.auth.session')).toBe(JSON.stringify({ csrfToken: 'legacy-csrf' }))
-    expect(localStorage.getItem('pcp.auth.session')).toBeNull()
+    expect(sessionStorage.getItem('pcs.auth.session')).toBe(JSON.stringify({ csrfToken: 'legacy-csrf' }))
+    expect(localStorage.getItem('pcs.auth.session')).toBeNull()
   })
 })

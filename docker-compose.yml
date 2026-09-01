@@ -3,18 +3,18 @@ version: "3.9"
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: pcp-postgres
+    container_name: pcs-postgres
     restart: unless-stopped
     env_file:
       - ./server/.env
     ports:
       - "127.0.0.1:${POSTGRES_PORT:-5433}:5432"
     volumes:
-      - pcp_postgres_data:/var/lib/postgresql/data
+      - pcs_postgres_data:/var/lib/postgresql/data
 
   redis:
     image: redis:7-alpine
-    container_name: pcp-redis
+    container_name: pcs-redis
     restart: unless-stopped
     profiles:
       - cache
@@ -24,7 +24,7 @@ services:
 
   prometheus:
     image: prom/prometheus:v2.54.1
-    container_name: pcp-prometheus
+    container_name: pcs-prometheus
     user: "0:0"
     restart: unless-stopped
     profiles:
@@ -39,13 +39,13 @@ services:
       - "--web.enable-lifecycle"
     volumes:
       - ./monitoring/prometheus/prometheus.local.yml:/etc/prometheus/prometheus.yml:ro
-      - ./monitoring/prometheus/alerts.pcp.yml:/etc/prometheus/rules/alerts.pcp.yml:ro
-      - ./monitoring/prometheus/secrets/pcp_metrics_bearer_token:/etc/prometheus/secrets/pcp_metrics_bearer_token:ro
-      - pcp_prometheus_data:/prometheus
+      - ./monitoring/prometheus/alerts.pcs.yml:/etc/prometheus/rules/alerts.pcs.yml:ro
+      - ./monitoring/prometheus/secrets/pcs_metrics_bearer_token:/etc/prometheus/secrets/pcs_metrics_bearer_token:ro
+      - pcs_prometheus_data:/prometheus
 
   grafana:
     image: grafana/grafana:11.3.0
-    container_name: pcp-grafana
+    container_name: pcs-grafana
     user: "0:0"
     restart: unless-stopped
     profiles:
@@ -62,11 +62,11 @@ services:
       - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
       - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
       - ./monitoring/grafana/secrets/grafana_admin_password:/etc/grafana/secrets/grafana_admin_password:ro
-      - pcp_grafana_data:/var/lib/grafana
+      - pcs_grafana_data:/var/lib/grafana
 
   news_media_cleanup:
     image: node:20-alpine
-    container_name: pcp-news-media-cleanup
+    container_name: pcs-news-media-cleanup
     restart: unless-stopped
     profiles:
       - maintenance
@@ -104,7 +104,7 @@ services:
 
   jaeger:
     image: jaegertracing/all-in-one:latest
-    container_name: pcp-jaeger
+    container_name: pcs-jaeger
     restart: unless-stopped
     profiles:
       - monitoring
@@ -122,14 +122,14 @@ services:
 
   clamav:
     image: clamav/clamav:stable
-    container_name: pcp-clamav
+    container_name: pcs-clamav
     restart: unless-stopped
     profiles:
       - security
     ports:
       - "${CLAMAV_PORT:-3310}:3310"
     volumes:
-      - pcp_clamav_db:/var/lib/clamav
+      - pcs_clamav_db:/var/lib/clamav
     environment:
       # The official image updates definitions automatically (freshclam).
       # You can control update frequency via image envs if needed; defaults are usually sane.
@@ -138,7 +138,7 @@ services:
       CLAMD_CONF_MaxScanSize: "${CLAMAV_MAX_SCAN_SIZE:-26214400}"
 
 volumes:
-  pcp_postgres_data:
-  pcp_prometheus_data:
-  pcp_grafana_data:
-  pcp_clamav_db:
+  pcs_postgres_data:
+  pcs_prometheus_data:
+  pcs_grafana_data:
+  pcs_clamav_db:

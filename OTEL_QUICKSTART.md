@@ -13,7 +13,7 @@
 ### Step 1: Start Jaeger Backend
 
 ```bash
-cd /var/www/pcp
+cd /var/www/pcs
 docker-compose --profile monitoring up -d jaeger
 ```
 
@@ -25,7 +25,7 @@ curl http://localhost:16686/api/health
 
 ### Step 2: Create `.env` for Server Tracing
 
-Create or update `/var/www/pcp/server/.env`:
+Create or update `/var/www/pcs/server/.env`:
 
 ```bash
 # Add these lines to enable tracing
@@ -35,7 +35,7 @@ OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318/v1/traces
 
 ### Step 3: Create `.env` for Client Tracing
 
-Create `/var/www/pcp/client/.env`:
+Create `/var/www/pcs/client/.env`:
 
 ```bash
 # Client-side tracing
@@ -92,13 +92,13 @@ Actions to generate traces:
 ### Step 7: View Traces in Jaeger UI
 
 1. Open: http://localhost:16686
-2. Select service: `pcp-server` or `pcp-client`
+2. Select service: `pcs-server` or `pcs-client`
 3. Click "Find Traces"
 4. Click on a trace to view details
 
 ## 🔍 What to Look For
 
-### Server Traces (`pcp-server`)
+### Server Traces (`pcs-server`)
 
 - **HTTP Requests**: Each page load or API call appears as a trace
   - Attributes show: method, status code, URL path
@@ -112,7 +112,7 @@ Actions to generate traces:
   - Server logs show "N+1 query patterns detected" warnings
   - Traces show suspicious_pattern_count in span events
 
-### Client Traces (`pcp-client`)
+### Client Traces (`pcs-client`)
 
 - **Page Loads**: Navigation events
   - `page_view_*` spans show page navigation
@@ -129,7 +129,7 @@ Actions to generate traces:
 
 ### Finding an N+1 Problem
 
-1. In Jaeger UI, click on a trace for **pcp-server**
+1. In Jaeger UI, click on a trace for **pcs-server**
 2. Look for span with high `db.query_count` (e.g., 50) but low `db.unique_queries` (e.g., 2)
 3. Click on the span to see events
 4. Find `n1_queries_detected` event
@@ -160,7 +160,7 @@ This means: "50 similar queries for categories, but only 2 unique query types - 
 **Check 1: Is Jaeger running?**
 ```bash
 docker-compose ps | grep jaeger
-# Should show pcp-jaeger container running
+# Should show pcs-jaeger container running
 ```
 
 **Check 2: Is tracing enabled?**

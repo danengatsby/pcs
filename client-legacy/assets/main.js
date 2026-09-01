@@ -1,5 +1,5 @@
 /**
- * PCP public site - minimal JS bundle.
+ * PCS public site - minimal JS bundle.
  * The HTML references `/assets/main.js`.
  *
  * Responsibilities:
@@ -38,12 +38,12 @@ function renderHeaderFooter() {
     header.append(
       el("div", { class: "container" }, [
         el("div", { class: "nav" }, [
-          el("a", { href: "/", class: "brand" }, [document.createTextNode("PCP")]),
+          el("a", { href: "/", class: "brand" }, [document.createTextNode("PCS")]),
           el("nav", { class: "nav-links" }, [
             el("a", { href: "/" }, [document.createTextNode("Acasa")]),
             el("a", { href: "/aderenti.html" }, [document.createTextNode("Aderenti")]),
             el("a", { href: "/program.html" }, [document.createTextNode("Program")]),
-            el("a", { href: "/revista/docs/Revista_PCP.html" }, [document.createTextNode("Stiri")]),
+            el("a", { href: "/revista/docs/Revista_PCS.html" }, [document.createTextNode("Stiri")]),
             el("a", { href: "/admin.html" }, [document.createTextNode("Admin")])
           ])
         ])
@@ -58,7 +58,7 @@ function renderHeaderFooter() {
         el("div", { class: "footer-grid" }, [
           el("div", {}, [
             el("strong", {}, [document.createTextNode("Partidul Conservator al Seniorilor")]),
-            el("div", { class: "muted" }, [document.createTextNode("Platforma oficiala PCP")])
+            el("div", { class: "muted" }, [document.createTextNode("Platforma oficiala PCS")])
           ]),
           el("div", { class: "footer-links" }, [
             el("a", { href: "/gdpr.html" }, [document.createTextNode("GDPR")]),

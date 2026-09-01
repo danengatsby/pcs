@@ -8,22 +8,22 @@ SELECT
 FROM (
   VALUES
     (
-      'PCP propune pachetul de transparenta administrativa',
+      'PCS propune pachetul de transparenta administrativa',
       'Noul pachet legislativ simplifica accesul cetatenilor la date publice.',
       'Comunicat',
-      'Propunerea PCP include raportare trimestriala digitala si publicarea automata a contractelor publice.',
+      'Propunerea PCS include raportare trimestriala digitala si publicarea automata a contractelor publice.',
       NOW() - INTERVAL '5 days'
     ),
     (
       'Consultari regionale pentru strategia de educatie',
-      'Echipele PCP au inceput sesiuni publice in 12 judete.',
+      'Echipele PCS au inceput sesiuni publice in 12 judete.',
       'Eveniment',
       'Sunt colectate propuneri din partea profesorilor, elevilor si antreprenorilor locali.',
       NOW() - INTERVAL '3 days'
     ),
     (
       'Program pilot pentru incubatoare civice locale',
-      'PCP lanseaza un program de micro-finantare pentru initiative comunitare.',
+      'PCS lanseaza un program de micro-finantare pentru initiative comunitare.',
       'Initiativa',
       'Programul include mentorat, sprijin logistic si raportare de impact.',
       NOW() - INTERVAL '1 day'

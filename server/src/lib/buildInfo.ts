@@ -46,7 +46,7 @@ function readBuildTime(): string {
 export const packageVersion = readPackageVersion();
 
 export const buildInfo: BuildInfo = {
-  appName: process.env.APP_NAME?.trim() || "pcp-api",
+  appName: process.env.APP_NAME?.trim() || "pcs-api",
   appVersion: process.env.APP_VERSION?.trim() || packageVersion,
   appRelease: process.env.APP_RELEASE?.trim() || "enterprise-modernized",
   commitSha: process.env.APP_COMMIT_SHA?.trim() || "",

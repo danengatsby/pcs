@@ -1,4 +1,4 @@
-# PCP API Routing
+# PCS API Routing
 
 Acest proiect mentine paritatea Express/Fastify printr-o singura sursa de adevar pentru endpoint-urile API.
 

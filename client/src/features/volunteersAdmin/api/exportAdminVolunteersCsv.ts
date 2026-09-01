@@ -5,7 +5,7 @@ import { buildVolunteersAdminSearchParams } from '../queryState'
 function readFilename(response: Response): string {
   const headerValue = response.headers.get('content-disposition') ?? ''
   const match = /filename="([^"]+)"/i.exec(headerValue)
-  return match?.[1] ?? 'pcp-volunteers.csv'
+  return match?.[1] ?? 'pcs-volunteers.csv'
 }
 
 async function readExportError(response: Response): Promise<Error> {

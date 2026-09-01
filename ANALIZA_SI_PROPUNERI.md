@@ -1,4 +1,4 @@
-# 📊 ANALIZA APLICAȚIEI PCP - RAPORT COMPLET
+# 📊 ANALIZA APLICAȚIEI PCS - RAPORT COMPLET
 
 **Data**: Aprilie 2026
 **Scor general**: **8.2/10** - Aplicație Production-Ready
@@ -8,7 +8,7 @@
 
 ## 🎯 REZUMAT EXECUTIVE
 
-Aplicația PCP este o platformă full-stack bine structurată pentru un partid politic, construită cu:
+Aplicația PCS este o platformă full-stack bine structurată pentru un partid politic, construită cu:
 - **Frontend**: React 18.3 + TypeScript + Vite (responsive, modern)
 - **Backend**: Node.js cu dual-adapter (Express + Fastify)
 - **Database**: PostgreSQL 15+ cu Prisma ORM
@@ -374,7 +374,7 @@ npm run build && npx bundlesize --quiet
 
 4. **Lipsă alerting**:
    - Prometheus metrics colectate, dar nu sunt alerte
-   - Recomandare: Alerting rules în `monitoring/prometheus/alerts.pcp.yml`
+   - Recomandare: Alerting rules în `monitoring/prometheus/alerts.pcs.yml`
 
 #### 🔴 PRIORITATE - PROPUNERE OPENTELEMETRY:
 ```bash

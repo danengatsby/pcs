@@ -137,7 +137,7 @@ test("api docs should be exposed in express adapter with canonical routing", asy
     .expect(200);
 
   assert.match(String(htmlResponse.headers["content-type"] ?? ""), /text\/html/i);
-  assert.match(htmlResponse.text, /PCP Platform API Documentation/i);
+  assert.match(htmlResponse.text, /PCS Platform API Documentation/i);
   assert.match(htmlResponse.text, /\/api-docs\/static\/swagger-ui\.css/);
 
   const assetResponse = await request(app)
@@ -157,10 +157,10 @@ test("api docs should be exposed in express adapter with canonical routing", asy
 
 test("manifest page should be exposed in express adapter with manifest-specific CSP", async () => {
   const response = await request(app)
-    .get("/manifest_pcp.html")
+    .get("/manifest_pcs.html")
     .expect(200);
 
-  assert.match(response.text, /Manifestul PCP/i);
+  assert.match(response.text, /Manifestul PCS/i);
 
   const cspHeader = String(response.headers["content-security-policy"] ?? "");
   assert.match(cspHeader, /unsafe-inline/i);
