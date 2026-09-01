@@ -10,6 +10,7 @@ import {
   loadContactPage,
   loadDocumentPage,
   loadHomePage,
+  loadHomeTopicPages,
   loadManifestPage,
   loadNewsDetailPage,
   loadNewsListPage,
@@ -47,6 +48,9 @@ function lazyNamed<TProps>(
 }
 
 const HomePage = lazyNamed(loadHomePage, 'HomePage')
+const NewsCommunicationPage = lazyNamed(loadHomeTopicPages, 'NewsCommunicationPage')
+const VolunteeringPage = lazyNamed(loadHomeTopicPages, 'VolunteeringPage')
+const TransparencyPage = lazyNamed(loadHomeTopicPages, 'TransparencyPage')
 const NewsListPage = lazyNamed(loadNewsListPage, 'NewsListPage')
 const NewsDetailPage = lazyNamed(loadNewsDetailPage, 'NewsDetailPage')
 const AuthPolicyPage = lazyNamed(loadAuthPolicyPage, 'AuthPolicyPage')
@@ -69,6 +73,9 @@ export const router = createBrowserRouter([
     errorElement: routeErrorElement,
     children: [
       { path: '/', element: renderRoute(<HomePage />) },
+      { path: '/initiative/stiri-si-comunicare', element: renderRoute(<NewsCommunicationPage />) },
+      { path: '/initiative/voluntariat', element: renderRoute(<VolunteeringPage />) },
+      { path: '/initiative/transparenta', element: renderRoute(<TransparencyPage />) },
       { path: '/news', element: renderRoute(<NewsListPage />) },
       { path: '/news/:id', element: renderRoute(<NewsDetailPage />) },
       { path: '/documente/:documentSlug', element: renderRoute(<DocumentPage />) },

@@ -35,30 +35,24 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="grid">
-        <article className="card">
+      <section className="grid" aria-label="Direcții de implicare PCS">
+        <Link className="card home-topic-card" to="/initiative/stiri-si-comunicare">
           <h2>Știri & comunicare</h2>
           <p>Publicăm actualizări, comunicate și materiale media. Urmărește ultimele noutăți.</p>
-          <Link className="text-link" to="/news">
-            Mergi la Știri →
-          </Link>
-        </article>
+          <span className="text-link">Descoperă această direcție →</span>
+        </Link>
 
-        <article className="card">
+        <Link className="card home-topic-card" to="/initiative/voluntariat">
           <h2>Voluntariat</h2>
           <p>Implică-te în campanii locale și activități comunitare. Înscriere rapidă și organizare pe județe.</p>
-          <Link className="text-link" to="/contact">
-            Vreau să ajut →
-          </Link>
-        </article>
+          <span className="text-link">Află cum te poți implica →</span>
+        </Link>
 
-        <article className="card">
+        <Link className="card home-topic-card" to="/initiative/transparenta">
           <h2>Transparență</h2>
           <p>Lucrăm cu reguli clare, date structurate și procese auditate. Încredere prin transparență.</p>
-          <Link className="text-link" to="/auth/policy">
-            Politici & securitate →
-          </Link>
-        </article>
+          <span className="text-link">Vezi principiile și documentele →</span>
+        </Link>
       </section>
 
       <section className="split">

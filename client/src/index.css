@@ -302,7 +302,7 @@
 }
 
 .hero-logo img {
-  width: min(180px, 28vw);
+  width: min(280px, 30vw);
   height: auto;
   display: block;
   filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.12));
@@ -435,6 +435,101 @@
 .card .text-link {
   display: inline-block;
   margin-top: 12px;
+}
+
+.home-topic-card {
+  display: flex;
+  min-height: 190px;
+  flex-direction: column;
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.home-topic-card p {
+  flex: 1;
+}
+
+.home-topic-card:hover {
+  border-color: var(--accent-border);
+  box-shadow: var(--shadow);
+  transform: translateY(-3px);
+}
+
+.home-topic-card:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.topic-page {
+  display: grid;
+  gap: 18px;
+}
+
+.topic-page__back {
+  width: fit-content;
+}
+
+.topic-page__hero {
+  padding: clamp(24px, 5vw, 48px);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--accent-bg), transparent 72%);
+}
+
+.topic-page__hero h1 {
+  max-width: 16ch;
+  margin-bottom: 18px;
+  line-height: 1.05;
+}
+
+.topic-page__section {
+  display: grid;
+  gap: 14px;
+  padding-top: 8px;
+}
+
+.topic-page__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.topic-page__card {
+  border-top: 4px solid var(--accent);
+}
+
+.topic-page__card h3 {
+  margin: 0 0 10px;
+  color: var(--text-h);
+  font-size: 1.15rem;
+}
+
+.topic-page__card p,
+.topic-page__commitment p {
+  color: var(--text);
+}
+
+.topic-page__commitment {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: clamp(20px, 4vw, 32px);
+  border: 1px solid var(--accent-border);
+  border-radius: 18px;
+  background: var(--social-bg);
+}
+
+.topic-page__commitment > div:first-child {
+  max-width: 66ch;
+}
+
+.topic-page__actions {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .news-card {
@@ -1235,10 +1330,17 @@ textarea {
     justify-content: flex-start;
   }
   .hero-logo img {
-    width: 128px;
+    width: min(240px, 64vw);
   }
   .home .grid {
     grid-template-columns: 1fr;
+  }
+  .topic-page__grid {
+    grid-template-columns: 1fr;
+  }
+  .topic-page__commitment {
+    align-items: flex-start;
+    flex-direction: column;
   }
   .home .split {
     grid-template-columns: 1fr;

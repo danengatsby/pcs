@@ -1,4 +1,5 @@
 export const loadHomePage = () => import('@features/home/routes/HomePage')
+export const loadHomeTopicPages = () => import('@features/home/routes/HomeTopicPages')
 export const loadNewsListPage = () => import('@features/news/routes/NewsListPage')
 export const loadNewsDetailPage = () => import('@features/news/routes/NewsDetailPage')
 export const loadAuthPolicyPage = () => import('@features/auth/routes/AuthPolicyPage')
