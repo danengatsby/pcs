@@ -57,7 +57,7 @@ function renderHeaderFooter() {
       el("div", { class: "container" }, [
         el("div", { class: "footer-grid" }, [
           el("div", {}, [
-            el("strong", {}, [document.createTextNode("Partidul Conservator al Pensionarilor")]),
+            el("strong", {}, [document.createTextNode("Partidul Conservator al Seniorilor")]),
             el("div", { class: "muted" }, [document.createTextNode("Platforma oficiala PCP")])
           ]),
           el("div", { class: "footer-links" }, [

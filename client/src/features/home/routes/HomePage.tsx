@@ -7,12 +7,12 @@ export function HomePage() {
       <section className="hero">
         <div className="hero-shell">
           <div className="hero-copy">
-            <div className="hero-kicker">Platforma Partidului Conservator al Pensionarilor</div>
+            <div className="hero-kicker">Platforma Partidului Conservator al Seniorilor</div>
             <h1 className="home__headline">
               <span className="home__headline-prefix">PCP —</span>
               <span className="home__headline-main">PARTIDUL</span>
               <span className="home__headline-subtitle">CONSERVATOR AL</span>
-              <span className="home__headline-tail">PENSIONARILOR</span>
+              <span className="home__headline-tail">SENIORILOR</span>
             </h1>
             <p className="lead">
               Inițiative civice, știri și mobilizare voluntară. Construim o platformă modernă pentru informare,

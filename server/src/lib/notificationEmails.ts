@@ -124,7 +124,7 @@ export async function sendVolunteerSignupNotificationEmail(
 
   await queueNotification("volunteer.signup_email", {
     to: [input.email],
-    subject: "Confirmare inscriere aderent PCP-Partidul Conservator al Pensionarilor",
+    subject: "Confirmare inscriere aderent PCP-Partidul Conservator al Seniorilor",
     text: messageText,
   });
 }
@@ -138,7 +138,7 @@ export function buildVolunteerSignupNotificationText(
   return [
     `Salut, ${input.fullName}!`,
     "",
-    "Inscrierea dvs. ca aderent in platforma PCP-Partidul Conservator al Pensionarilor a fost inregistrata cu succes.",
+    "Inscrierea dvs. ca aderent in platforma PCP-Partidul Conservator al Seniorilor a fost inregistrata cu succes.",
     "Veti primi actualizari pe email privind pasii urmatori.",
     "",
     "Va puteti loga cu adresa de email folosita la inscriere si parola setata in formular.",
@@ -157,7 +157,7 @@ export function buildVolunteerSignupNotificationText(
     "INSCRIEREA CA MEMBRU DE PARTID SE FACE CU UN FORMULAR SPECIAL TRIMIS PRIN POSTA CARE SE VA COMPLETA SI SE VA TRIMITE INAPOI LA SEDIUL PARTIDULUI PENTRU INREGISTRARE.",
     "",
     "Multumim pentru interes,",
-    "Echipa PCP-Partidul Conservator al Pensionarilor",
+    "Echipa PCP-Partidul Conservator al Seniorilor",
     "https://pcpens.online/index.html",
   ].join("\n");
 }
