@@ -532,6 +532,26 @@
   gap: 10px;
 }
 
+.topic-page__news {
+  display: grid;
+  gap: 16px;
+  padding: clamp(20px, 4vw, 32px);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--surface) 76%, transparent);
+}
+
+.topic-page__news-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.topic-page__news-header p {
+  color: var(--text);
+}
+
 .news-card {
   position: relative;
   display: flex;
@@ -1339,6 +1359,10 @@ textarea {
     grid-template-columns: 1fr;
   }
   .topic-page__commitment {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .topic-page__news-header {
     align-items: flex-start;
     flex-direction: column;
   }

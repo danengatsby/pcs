@@ -1,4 +1,7 @@
+import { type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { NewsPanels } from '@features/news/components/NewsPanels'
+import { useNews } from '@features/news/hooks/useNews'
 
 type TopicSection = {
   title: string
@@ -21,6 +24,7 @@ type TopicPageProps = {
     label: string
     to: string
   }
+  children?: ReactNode
 }
 
 function HomeTopicPage({
@@ -33,6 +37,7 @@ function HomeTopicPage({
   commitment,
   primaryAction,
   secondaryAction,
+  children,
 }: TopicPageProps) {
   return (
     <div className="topic-page">
@@ -58,6 +63,8 @@ function HomeTopicPage({
         </div>
       </section>
 
+      {children}
+
       <section className="topic-page__commitment">
         <div>
           <div className="hero-kicker">Angajamentul nostru</div>
@@ -80,6 +87,11 @@ function HomeTopicPage({
 }
 
 export function NewsCommunicationPage() {
+  const { items, loading, error } = useNews()
+  const sourcedNews = items
+    .filter((item) => item.sourceName && item.sourceUrl)
+    .slice(0, 4)
+
   return (
     <HomeTopicPage
       kicker="Informare publică"
@@ -107,7 +119,27 @@ export function NewsCommunicationPage() {
       commitment="Publicăm legătura către articolul-sursă atunci când cităm presa, actualizăm informațiile care se schimbă și corectăm vizibil eventualele erori."
       primaryAction={{ label: 'Vezi toate știrile', to: '/news' }}
       secondaryAction={{ label: 'Propune un subiect', to: '/contact' }}
-    />
+    >
+      <section className="topic-page__news" aria-labelledby="senior-news-title">
+        <div className="topic-page__news-header">
+          <div>
+            <div className="hero-kicker">Actualitate</div>
+            <h2 id="senior-news-title">Știri recente pentru seniori</h2>
+            <p>Selecție de informații utile, cu acces direct la publicația sau instituția citată.</p>
+          </div>
+          <Link className="btn" to="/news">
+            Vezi arhiva de știri
+          </Link>
+        </div>
+
+        {loading ? <p>Se încarcă știrile…</p> : null}
+        {error ? <p className="alert error">Știrile nu au putut fi încărcate: {error}</p> : null}
+        {!loading && !error && sourcedNews.length === 0 ? (
+          <p>Nu există momentan știri cu sursă publicată.</p>
+        ) : null}
+        {sourcedNews.length > 0 ? <NewsPanels items={sourcedNews} /> : null}
+      </section>
+    </HomeTopicPage>
   )
 }
 
