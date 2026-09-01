@@ -12,6 +12,11 @@ const publishedAtSchema = z
 
 const newsTagSchema = z.string().trim().min(2).max(40);
 
+const sourceUrlSchema = z.string().trim().max(1000).optional().refine(
+  (value) => value === undefined || value === "" || /^https?:\/\//i.test(value),
+  { message: "Linkul sursei trebuie sa inceapa cu http:// sau https://." }
+);
+
 const newsMediaSchema = z.object({
   assetId: z.coerce.number().int().positive(),
   kind: z.enum(newsMediaKindValues).optional(),
@@ -24,6 +29,8 @@ export const newsWriteSchema = z.object({
   summary: z.string().trim().min(10).max(320),
   category: z.string().trim().min(2).max(80).default("Comunicat"),
   content: z.string().trim().min(10).max(20000),
+  sourceName: z.string().trim().max(160).optional(),
+  sourceUrl: sourceUrlSchema,
   publishedAt: publishedAtSchema,
   status: z.enum(newsStatusValues).default("published"),
   tags: z.array(newsTagSchema).max(20).default([]),
@@ -34,6 +41,14 @@ export const newsWriteSchema = z.object({
       code: z.ZodIssueCode.custom,
       path: ["publishedAt"],
       message: "Pentru statusul scheduled trebuie setata data publicarii.",
+    });
+  }
+
+  if (Boolean(value.sourceName) !== Boolean(value.sourceUrl)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: value.sourceName ? ["sourceUrl"] : ["sourceName"],
+      message: "Numele sursei si linkul sursei trebuie completate impreuna.",
     });
   }
 });

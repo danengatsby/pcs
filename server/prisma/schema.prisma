@@ -39,6 +39,8 @@ model News {
   summary     String   @db.VarChar(320)
   category    String   @default("Comunicat") @db.VarChar(80)
   content     String   @default("") @db.Text
+  sourceName  String   @map("source_name") @default("") @db.VarChar(160)
+  sourceUrl   String   @map("source_url") @default("") @db.VarChar(1000)
   status      String   @default("published") @db.VarChar(20)
   tags        Json
   publishedAt DateTime @map("published_at") @default(now()) @db.Timestamptz(6)

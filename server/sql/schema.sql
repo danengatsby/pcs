@@ -4,12 +4,18 @@ CREATE TABLE IF NOT EXISTS news (
   summary VARCHAR(320) NOT NULL,
   category VARCHAR(80) NOT NULL DEFAULT 'Comunicat',
   content TEXT NOT NULL DEFAULT '',
+  source_name VARCHAR(160) NOT NULL DEFAULT '',
+  source_url VARCHAR(1000) NOT NULL DEFAULT '',
   status VARCHAR(20) NOT NULL DEFAULT 'published'
     CHECK (status IN ('draft', 'scheduled', 'published')),
   tags JSONB NOT NULL DEFAULT '[]'::jsonb,
   published_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_news_source_url_unique
+  ON news (source_url)
+  WHERE source_url <> '';
 
 CREATE TABLE IF NOT EXISTS users (
   id BIGSERIAL PRIMARY KEY,

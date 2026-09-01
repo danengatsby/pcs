@@ -48,6 +48,8 @@ export async function updateAdminNews(req: Request, res: Response, next: NextFun
           summary: payload.summary,
           category: payload.category,
           content: payload.content,
+          sourceName: payload.sourceName,
+          sourceUrl: payload.sourceUrl,
           publishedAt: payload.publishedAt,
           status: payload.status,
           tags,

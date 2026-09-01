@@ -7,6 +7,8 @@ type PublicNewsSelectRow = {
   title: string;
   summary: string;
   category: string;
+  sourceName: string;
+  sourceUrl: string;
   publishedAt: Date;
   tags: unknown;
 };
@@ -39,6 +41,8 @@ function mapPublicNewsRow(row: PublicNewsSelectRow): NewsRow {
     title: row.title,
     summary: row.summary,
     category: row.category,
+    sourceName: row.sourceName,
+    sourceUrl: row.sourceUrl,
     publishedAt: row.publishedAt.toISOString(),
     tags: parseNewsTags(row.tags),
   };
@@ -63,6 +67,8 @@ export async function listPublicNewsOffsetPage(input: {
         title: true,
         summary: true,
         category: true,
+        sourceName: true,
+        sourceUrl: true,
         publishedAt: true,
         tags: true,
       },
@@ -118,6 +124,8 @@ export async function listPublicNewsKeysetPage(input: {
       title: true,
       summary: true,
       category: true,
+      sourceName: true,
+      sourceUrl: true,
       publishedAt: true,
       tags: true,
     },

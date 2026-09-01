@@ -126,7 +126,33 @@ describe('NewsDetailPage', () => {
       </MemoryRouter>
     )
 
-    expect(screen.getByText(`Publicat: ${publishedAt}`)).toBeInTheDocument()
+    expect(screen.getByText('Publicat: 5 aprilie 2026')).toBeInTheDocument()
+  })
+
+  it('shows the original cited article', () => {
+    const item = buildNewsItem({
+      sourceName: 'AGERPRES',
+      sourceUrl: 'https://agerpres.ro/articol-test',
+    })
+
+    vi.mocked(useNewsById).mockReturnValue({
+      item,
+      loading: false,
+      error: null,
+    })
+
+    render(
+      <MemoryRouter initialEntries={['/news/1']}>
+        <Routes>
+          <Route path="/news/:id" element={<NewsDetailPage />} />
+        </Routes>
+      </MemoryRouter>
+    )
+
+    expect(screen.getByText('Sursă: AGERPRES')).toBeInTheDocument()
+    const sourceLink = screen.getByRole('link', { name: /Citește articolul original/ })
+    expect(sourceLink).toHaveAttribute('href', 'https://agerpres.ro/articol-test')
+    expect(sourceLink).toHaveAttribute('target', '_blank')
   })
 
   it('displays back to list link', () => {

@@ -56,6 +56,8 @@ test("admin should create and read news through API", async () => {
         summary: "Acesta este un sumar valid pentru integrare API news.",
         category: "Comunicat",
         content: "Acesta este continutul complet al stirii pentru testarea fluxului admin.",
+        sourceName: "Sursa de integrare",
+        sourceUrl: "https://example.test/stire-sursa",
       })
       .expect(201);
 
@@ -68,6 +70,8 @@ test("admin should create and read news through API", async () => {
 
     assert.equal(detailResponse.body?.data?.id, createdNewsId);
     assert.equal(detailResponse.body?.data?.title, title);
+    assert.equal(detailResponse.body?.data?.sourceName, "Sursa de integrare");
+    assert.equal(detailResponse.body?.data?.sourceUrl, "https://example.test/stire-sursa");
   } finally {
     if (createdNewsId > 0) {
       await deleteNewsById(createdNewsId);

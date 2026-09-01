@@ -26,6 +26,8 @@ export type NewsRow = {
   title: string;
   summary: string;
   category: string;
+  sourceName: string;
+  sourceUrl: string;
   publishedAt: string;
   tags: string[];
 };

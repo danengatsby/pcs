@@ -123,6 +123,8 @@ export async function runMigrationSmokeChecks(): Promise<void> {
     { tableName: "volunteers", columnName: "crm_priority" },
     { tableName: "volunteers", columnName: "reminder_at" },
     { tableName: "volunteers", columnName: "skill_tags" },
+    { tableName: "news", columnName: "source_name" },
+    { tableName: "news", columnName: "source_url" },
     { tableName: "news_media_assets", columnName: "deleted_at" },
     { tableName: "news_media_links", columnName: "asset_id" },
     { tableName: "auth_refresh_tokens", columnName: "token_hash" },

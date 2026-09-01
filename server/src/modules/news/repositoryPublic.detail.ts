@@ -9,6 +9,8 @@ type PublicNewsDetailSelectRow = {
   summary: string;
   category: string;
   content: string;
+  sourceName: string;
+  sourceUrl: string;
   publishedAt: Date;
   tags: unknown;
   status: string;
@@ -30,6 +32,8 @@ function mapNewsDbRow(row: PublicNewsDetailSelectRow): NewsDbRow {
     summary: row.summary,
     category: row.category,
     content: row.content,
+    sourceName: row.sourceName,
+    sourceUrl: row.sourceUrl,
     publishedAt: row.publishedAt.toISOString(),
     tags: parseNewsTags(row.tags),
     status: row.status as NewsStatus,
@@ -53,6 +57,8 @@ export async function readPublicNewsDetailById(id: number): Promise<NewsDetailRo
       summary: true,
       category: true,
       content: true,
+      sourceName: true,
+      sourceUrl: true,
       publishedAt: true,
       tags: true,
       status: true,

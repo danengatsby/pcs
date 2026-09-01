@@ -852,6 +852,8 @@ export interface components {
             title: string;
             summary: string;
             category: string;
+            sourceName: string;
+            sourceUrl: string;
             /** Format: date-time */
             publishedAt: string;
             tags: string[];
@@ -862,6 +864,8 @@ export interface components {
             summary: string;
             category: string;
             content: string;
+            sourceName: string;
+            sourceUrl: string;
             /** Format: date-time */
             publishedAt: string;
             tags: string[];
@@ -872,6 +876,8 @@ export interface components {
             title: string;
             summary: string;
             category: string;
+            sourceName: string;
+            sourceUrl: string;
             /** Format: date-time */
             publishedAt: string;
             tags: string[];
@@ -886,6 +892,8 @@ export interface components {
             summary: string;
             category: string;
             content: string;
+            sourceName: string;
+            sourceUrl: string;
             /** Format: date-time */
             publishedAt: string;
             tags: string[];
@@ -900,6 +908,9 @@ export interface components {
             /** @default Comunicat */
             category: string;
             content: string;
+            sourceName?: string;
+            /** @description Link HTTP(S) catre articolul citat. Se completeaza impreuna cu sourceName. */
+            sourceUrl?: string;
             /**
              * Format: date-time
              * @description Obligatoriu cand `status=scheduled`.

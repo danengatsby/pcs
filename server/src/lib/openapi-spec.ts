@@ -2409,7 +2409,7 @@ export const openApiSpec = {
       },
       NewsListItem: {
         type: "object",
-        required: ["id", "title", "summary", "category", "publishedAt", "tags"],
+        required: ["id", "title", "summary", "category", "sourceName", "sourceUrl", "publishedAt", "tags"],
         properties: {
           id: positiveIntegerSchema,
           title: {
@@ -2419,6 +2419,12 @@ export const openApiSpec = {
             type: "string",
           },
           category: {
+            type: "string",
+          },
+          sourceName: {
+            type: "string",
+          },
+          sourceUrl: {
             type: "string",
           },
           publishedAt: {
@@ -2435,7 +2441,7 @@ export const openApiSpec = {
       },
       NewsDetailItem: {
         type: "object",
-        required: ["id", "title", "summary", "category", "content", "publishedAt", "tags", "media"],
+        required: ["id", "title", "summary", "category", "content", "sourceName", "sourceUrl", "publishedAt", "tags", "media"],
         properties: {
           id: positiveIntegerSchema,
           title: {
@@ -2448,6 +2454,12 @@ export const openApiSpec = {
             type: "string",
           },
           content: {
+            type: "string",
+          },
+          sourceName: {
+            type: "string",
+          },
+          sourceUrl: {
             type: "string",
           },
           publishedAt: {
@@ -2470,7 +2482,7 @@ export const openApiSpec = {
       },
       NewsAdminListItem: {
         type: "object",
-        required: ["id", "title", "summary", "category", "publishedAt", "tags", "media", "status", "createdAt"],
+        required: ["id", "title", "summary", "category", "sourceName", "sourceUrl", "publishedAt", "tags", "media", "status", "createdAt"],
         properties: {
           id: positiveIntegerSchema,
           title: {
@@ -2480,6 +2492,12 @@ export const openApiSpec = {
             type: "string",
           },
           category: {
+            type: "string",
+          },
+          sourceName: {
+            type: "string",
+          },
+          sourceUrl: {
             type: "string",
           },
           publishedAt: {
@@ -2515,6 +2533,8 @@ export const openApiSpec = {
           "summary",
           "category",
           "content",
+          "sourceName",
+          "sourceUrl",
           "publishedAt",
           "tags",
           "media",
@@ -2533,6 +2553,12 @@ export const openApiSpec = {
             type: "string",
           },
           content: {
+            type: "string",
+          },
+          sourceName: {
+            type: "string",
+          },
+          sourceUrl: {
             type: "string",
           },
           publishedAt: {
@@ -2584,6 +2610,15 @@ export const openApiSpec = {
             type: "string",
             minLength: 10,
             maxLength: 20000,
+          },
+          sourceName: {
+            type: "string",
+            maxLength: 160,
+          },
+          sourceUrl: {
+            type: "string",
+            maxLength: 1000,
+            description: "Link HTTP(S) catre articolul citat. Se completeaza impreuna cu sourceName.",
           },
           publishedAt: {
             type: "string",

@@ -14,6 +14,8 @@ type NewsWriteDbInput = {
   summary: string;
   category: string;
   content: string;
+  sourceName?: string;
+  sourceUrl?: string;
   publishedAt: string | undefined;
   status: NewsStatus;
   tags: string[];
@@ -25,6 +27,8 @@ type NewsDbSelectRow = {
   summary: string;
   category: string;
   content: string;
+  sourceName: string;
+  sourceUrl: string;
   publishedAt: Date;
   status: string;
   tags: unknown;
@@ -36,6 +40,8 @@ type NewsListSelectRow = {
   title: string;
   summary: string;
   category: string;
+  sourceName: string;
+  sourceUrl: string;
   publishedAt: Date;
   status: string;
   tags: unknown;
@@ -57,6 +63,8 @@ function mapNewsDbRow(row: NewsDbSelectRow): NewsDbRow {
     summary: row.summary,
     category: row.category,
     content: row.content,
+    sourceName: row.sourceName,
+    sourceUrl: row.sourceUrl,
     publishedAt: row.publishedAt.toISOString(),
     status: row.status as NewsStatus,
     tags: parseNewsTags(row.tags),
@@ -70,6 +78,8 @@ function mapNewsListRow(row: NewsListSelectRow): NewsAdminListDbRow {
     title: row.title,
     summary: row.summary,
     category: row.category,
+    sourceName: row.sourceName,
+    sourceUrl: row.sourceUrl,
     publishedAt: row.publishedAt.toISOString(),
     status: row.status as NewsStatus,
     tags: parseNewsTags(row.tags),
@@ -122,6 +132,8 @@ export async function listAdminNewsKeysetPage(input: {
       title: true,
       summary: true,
       category: true,
+      sourceName: true,
+      sourceUrl: true,
       publishedAt: true,
       status: true,
       tags: true,
@@ -157,6 +169,8 @@ export async function readAdminNewsById(
       summary: true,
       category: true,
       content: true,
+      sourceName: true,
+      sourceUrl: true,
       publishedAt: true,
       status: true,
       tags: true,
@@ -178,6 +192,8 @@ export async function insertAdminNews(input: NewsWriteDbInput, runner: QueryRunn
       summary: input.summary,
       category: input.category,
       content: input.content,
+      sourceName: input.sourceName,
+      sourceUrl: input.sourceUrl,
       publishedAt: input.publishedAt ? new Date(input.publishedAt) : undefined,
       status: input.status,
       tags: input.tags,
@@ -188,6 +204,8 @@ export async function insertAdminNews(input: NewsWriteDbInput, runner: QueryRunn
       summary: true,
       category: true,
       content: true,
+      sourceName: true,
+      sourceUrl: true,
       publishedAt: true,
       status: true,
       tags: true,
@@ -213,6 +231,8 @@ export async function updateAdminNewsById(
         summary: input.summary,
         category: input.category,
         content: input.content,
+        sourceName: input.sourceName,
+        sourceUrl: input.sourceUrl,
         publishedAt: input.publishedAt ? new Date(input.publishedAt) : undefined,
         status: input.status,
         tags: input.tags,
@@ -223,6 +243,8 @@ export async function updateAdminNewsById(
         summary: true,
         category: true,
         content: true,
+        sourceName: true,
+        sourceUrl: true,
         publishedAt: true,
         status: true,
         tags: true,

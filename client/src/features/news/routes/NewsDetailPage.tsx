@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
 import { useNewsById } from '../hooks/useNewsById'
+import { formatNewsDate } from '../formatNewsDate'
 
 export function NewsDetailPage() {
   const params = useParams()
@@ -8,12 +9,12 @@ export function NewsDetailPage() {
   const { item, loading, error } = useNewsById(id)
 
   return (
-    <div className="home">
+    <div className="home news-detail">
       <section className="hero">
         <div className="hero-kicker">Știri și comunicate</div>
         <h1>{item?.title ?? 'Știre'}</h1>
         <p className="lead">
-          {item?.publishedAt ? `Publicat: ${item.publishedAt}` : 'Detaliu știre'}
+          {item?.publishedAt ? `Publicat: ${formatNewsDate(item.publishedAt)}` : 'Detaliu știre'}
         </p>
       </section>
 
@@ -36,6 +37,20 @@ export function NewsDetailPage() {
             ) : (
               <p className="muted mt-18">Conținut indisponibil.</p>
             )}
+
+            {item.sourceName && item.sourceUrl ? (
+              <div className="news-source-box mt-18">
+                <span>Sursă: {item.sourceName}</span>
+                <a
+                  className="text-link"
+                  href={item.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Citește articolul original ↗
+                </a>
+              </div>
+            ) : null}
           </article>
         ) : null}
       </section>

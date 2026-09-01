@@ -117,6 +117,26 @@ describe('NewsListPage', () => {
     expect(screen.getByText('Summary for news 1')).toBeInTheDocument()
   })
 
+  it('links each panel to the cited article', () => {
+    const items = buildNewsItems(1)
+    vi.mocked(useNews).mockReturnValue({
+      items,
+      loading: false,
+      error: null,
+    })
+
+    render(
+      <MemoryRouter>
+        <NewsListPage />
+      </MemoryRouter>
+    )
+
+    const sourceLink = screen.getByRole('link', { name: /Citește articolul citat/ })
+    expect(sourceLink).toHaveAttribute('href', 'https://example.test/articol')
+    expect(sourceLink).toHaveAttribute('target', '_blank')
+    expect(sourceLink).toHaveAttribute('rel', 'noopener noreferrer')
+  })
+
   it('renders page header correctly', () => {
     vi.mocked(useNews).mockReturnValue({
       items: [],
@@ -131,7 +151,7 @@ describe('NewsListPage', () => {
     )
 
     expect(screen.getByText('Știri și comunicate')).toBeInTheDocument()
-    expect(screen.getByText('Actualizări, comunicate și materiale informative.')).toBeInTheDocument()
+    expect(screen.getByText('Informații recente și utile pentru seniori, verificate din surse publice.')).toBeInTheDocument()
   })
 
   it('handles multiple news items', () => {

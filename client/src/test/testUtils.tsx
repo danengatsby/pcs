@@ -65,7 +65,7 @@ export function buildAdminUser() {
 /**
  * Creates mock news items for testing
  */
-export function buildNewsItem(overrides: Partial<{ id: number; title: string; summary: string; content: string; status: string; category: string; publishedAt: string }> = {}) {
+export function buildNewsItem(overrides: Partial<{ id: number; title: string; summary: string; content: string; status: string; category: string; publishedAt: string; sourceName: string; sourceUrl: string }> = {}) {
   return {
     id: 1,
     title: 'Test News',
@@ -74,6 +74,8 @@ export function buildNewsItem(overrides: Partial<{ id: number; title: string; su
     status: 'published',
     category: 'Comunicat',
     publishedAt: '2026-04-05T10:00:00.000Z',
+    sourceName: 'Sursa Test',
+    sourceUrl: 'https://example.test/articol',
     ...overrides,
   }
 }
