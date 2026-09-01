@@ -33,6 +33,7 @@
     "test:e2e": "npm run test:e2e --workspace server",
     "test:e2e:browser": "npm run test:e2e:browser:fullstack",
     "test:e2e:browser:fullstack": "NODE_ENV=test AUTH_REFRESH_ENABLED=1 AUTH_RATE_LIMIT_MAX=1000 VOLUNTEER_RATE_LIMIT_MAX=1000 CAPTCHA_MODE=disabled EMAIL_NOTIFICATIONS_ENABLED=false CORS_ORIGIN=http://127.0.0.1:4010 CORS_CREDENTIALS=true PORT=4010 npm run build && NODE_ENV=test AUTH_REFRESH_ENABLED=1 AUTH_RATE_LIMIT_MAX=1000 VOLUNTEER_RATE_LIMIT_MAX=1000 CAPTCHA_MODE=disabled EMAIL_NOTIFICATIONS_ENABLED=false CORS_ORIGIN=http://127.0.0.1:4010 CORS_CREDENTIALS=true PORT=4010 node server/dist/scripts/migrateDb.js && playwright test --config=playwright.fullstack.config.ts",
+    "generate:manifest-downloads": "node scripts/generate-manifest-downloads.mjs",
     "email:outbox-worker": "npm run email:outbox-worker --workspace server"
   },
   "overrides": {
@@ -45,8 +46,10 @@
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.58.2",
     "concurrently": "^9.2.1",
+    "docx": "^9.7.1",
     "eslint": "^10.0.2",
     "globals": "^17.4.0",
+    "jsdom": "^27.4.0",
     "typescript-eslint": "^8.56.1",
     "vitest": "^4.1.11"
   }

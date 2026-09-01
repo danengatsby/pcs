@@ -216,12 +216,44 @@
   flex: 1;
   min-height: 0;
   display: flex;
+  flex-direction: column;
   background: #0d1b2a;
+}
+
+.manifest-page__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 14px max(20px, calc((100vw - 1120px) / 2));
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.manifest-page__toolbar > div:first-child {
+  display: grid;
+  gap: 2px;
+}
+
+.manifest-page__toolbar strong {
+  color: var(--text-h);
+}
+
+.manifest-page__toolbar span {
+  color: var(--text);
+  font-size: 14px;
+}
+
+.manifest-page__downloads {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .manifest-page__frame {
   flex: 1;
   width: 100%;
+  min-height: 0;
   border: 0;
   display: block;
   background: #0d1b2a;
@@ -1314,6 +1346,11 @@ textarea {
 }
 
 @media (max-width: 900px) {
+  .manifest-page__toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 14px 16px;
+  }
   .header-inner {
     height: auto;
     min-height: 64px;
