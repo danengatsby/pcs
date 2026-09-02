@@ -44,6 +44,10 @@ describe('VolunteerWorkflowForm', () => {
       />,
     )
 
+    expect(screen.getByLabelText('Nume complet')).toHaveValue('Ana Pop')
+    expect(screen.getByLabelText('Email')).toHaveValue('ana@example.test')
+    expect(screen.getByLabelText('Telefon')).toHaveValue('0712345678')
+    expect(screen.getByLabelText('Motivație')).toHaveValue('Vreau sa ajut.')
     expect(screen.getByLabelText('Status')).toHaveValue('nou')
     expect(screen.getByLabelText(/Județ/)).toHaveValue('Cluj')
     expect(screen.getByLabelText('Localitate')).toHaveValue('Cluj-Napoca')
@@ -69,6 +73,10 @@ describe('VolunteerWorkflowForm', () => {
       />,
     )
 
+    fireEvent.change(screen.getByLabelText('Nume complet'), { target: { value: '  Ana Maria Pop  ' } })
+    fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'ANA.NOUA@example.test' } })
+    fireEvent.change(screen.getByLabelText('Telefon'), { target: { value: ' 0722333444 ' } })
+    fireEvent.change(screen.getByLabelText('Motivație'), { target: { value: '  Vreau să coordonez proiecte locale.  ' } })
     fireEvent.change(screen.getByLabelText('Status'), { target: { value: 'activ' } })
     fireEvent.change(screen.getByLabelText(/Județ/), { target: { value: 'Bihor' } })
     fireEvent.change(screen.getByLabelText('Localitate'), { target: { value: '  Oradea  ' } })
@@ -91,6 +99,10 @@ describe('VolunteerWorkflowForm', () => {
     await user.click(screen.getByRole('button', { name: 'Salvează' }))
 
     expect(onSubmit).toHaveBeenCalledWith({
+      fullName: 'Ana Maria Pop',
+      email: 'ana.noua@example.test',
+      phone: '0722333444',
+      motivation: 'Vreau să coordonez proiecte locale.',
       status: 'activ',
       internalNotes: 'Confirmat telefonic',
       county: 'Bihor',
@@ -153,6 +165,10 @@ describe('VolunteerWorkflowForm', () => {
     await user.click(screen.getByRole('button', { name: 'Salvează' }))
 
     expect(onSubmit).toHaveBeenCalledWith({
+      fullName: 'Ana Pop',
+      email: 'ana@example.test',
+      phone: '0712345678',
+      motivation: 'Vreau sa ajut.',
       status: 'nou',
       internalNotes: 'Mutat în alt flux',
       county: 'Cluj',

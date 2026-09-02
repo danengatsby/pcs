@@ -21,6 +21,7 @@ test("admin endpoints should update volunteer workflow, export csv and expose au
   const adminEmail = buildTestEmail("admin-workflow");
   const ownerEmail = buildTestEmail("admin-owner");
   const volunteerEmail = buildTestEmail("admin-volunteer");
+  const updatedVolunteerEmail = buildTestEmail("admin-volunteer-updated");
   const password = "ParolaFoarteBuna#2026";
 
   try {
@@ -163,6 +164,10 @@ test("admin endpoints should update volunteer workflow, export csv and expose au
       .patch(`/api/admin/volunteers/${volunteer!.id}/workflow`)
       .set("Authorization", `Bearer ${token}`)
       .send({
+        fullName: "Voluntar Admin Actualizat",
+        email: updatedVolunteerEmail,
+        phone: "0722333444",
+        motivation: "Doresc să coordonez proiecte locale și activități comunitare.",
         status: "contactat",
         internalNotes: "Voluntar contactat telefonic de echipa locala.",
         ownerUserId: Number(selectedOwner!.id),
@@ -178,6 +183,10 @@ test("admin endpoints should update volunteer workflow, export csv and expose au
       .expect(200);
 
     const updatedVolunteer = workflowResponse.body?.data?.volunteer as {
+      fullName?: string;
+      email?: string;
+      phone?: string;
+      motivation?: string;
       statusUpdatedByUserId?: string | null;
       statusUpdatedByName?: string | null;
       statusUpdatedByEmail?: string | null;
@@ -192,6 +201,10 @@ test("admin endpoints should update volunteer workflow, export csv and expose au
       skillTags?: string[];
       accountRole?: string | null;
     } | undefined;
+    assert.equal(updatedVolunteer?.fullName, "Voluntar Admin Actualizat");
+    assert.equal(updatedVolunteer?.email, updatedVolunteerEmail.toLowerCase());
+    assert.equal(updatedVolunteer?.phone, "0722333444");
+    assert.equal(updatedVolunteer?.motivation, "Doresc să coordonez proiecte locale și activități comunitare.");
     assert.equal(updatedVolunteer?.statusUpdatedByUserId, adminUserId);
     assert.equal(updatedVolunteer?.statusUpdatedByName, "Admin Workflow");
     assert.equal(updatedVolunteer?.statusUpdatedByEmail, adminEmail.toLowerCase());
@@ -206,6 +219,26 @@ test("admin endpoints should update volunteer workflow, export csv and expose au
     assert.deepEqual(updatedVolunteer?.skillTags, ["telefonic", "teren"]);
     // CRM contact tracking must not grant a political membership role.
     assert.equal(updatedVolunteer?.accountRole, "SUSTINATOR");
+
+    const synchronizedIdentity = await query<{
+      user_name: string;
+      user_email: string;
+      membership_name: string;
+      membership_email: string;
+    }>(`
+      SELECT
+        u.full_name AS user_name,
+        LOWER(u.email) AS user_email,
+        mr.full_name AS membership_name,
+        LOWER(mr.email) AS membership_email
+      FROM users u
+      JOIN membership_records mr ON mr.user_id = u.id
+      WHERE LOWER(u.email) = LOWER($1)
+    `, [updatedVolunteerEmail]);
+    assert.equal(synchronizedIdentity.rows[0]?.user_name, "Voluntar Admin Actualizat");
+    assert.equal(synchronizedIdentity.rows[0]?.user_email, updatedVolunteerEmail.toLowerCase());
+    assert.equal(synchronizedIdentity.rows[0]?.membership_name, "Voluntar Admin Actualizat");
+    assert.equal(synchronizedIdentity.rows[0]?.membership_email, updatedVolunteerEmail.toLowerCase());
 
     const activeWorkflowResponse = await request(app)
       .patch(`/api/admin/volunteers/${volunteer!.id}/workflow`)
@@ -228,12 +261,12 @@ test("admin endpoints should update volunteer workflow, export csv and expose au
     assert.equal(activeWorkflowResponse.body?.data?.volunteer?.accountRole, "SUSTINATOR");
 
     const csvResponse = await request(app)
-      .get(`/api/admin/volunteers/export.csv?search=${encodeURIComponent(volunteerEmail)}`)
+      .get(`/api/admin/volunteers/export.csv?search=${encodeURIComponent(updatedVolunteerEmail)}`)
       .set("Authorization", `Bearer ${token}`)
       .expect(200);
 
     assert.match(String(csvResponse.headers["content-type"] ?? ""), /text\/csv/i);
-    assert.match(csvResponse.text, new RegExp(escapeRegExp(volunteerEmail.toLowerCase())));
+    assert.match(csvResponse.text, new RegExp(escapeRegExp(updatedVolunteerEmail.toLowerCase())));
     assert.match(csvResponse.text, /door-to-door \| fundraising/);
 
     const auditResponse = await request(app)
@@ -291,7 +324,9 @@ test("admin endpoints should update volunteer workflow, export csv and expose au
     assert.equal(volunteerAuditPageTwoRows?.[0]?.details?.nextStatus, "contactat");
   } finally {
     await deleteVolunteerByEmail(volunteerEmail);
+    await deleteVolunteerByEmail(updatedVolunteerEmail);
     await deleteUserByEmail(volunteerEmail);
+    await deleteUserByEmail(updatedVolunteerEmail);
     await deleteUserByEmail(ownerEmail);
     await deleteUserByEmail(adminEmail);
   }

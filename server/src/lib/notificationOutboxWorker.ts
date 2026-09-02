@@ -1,6 +1,7 @@
 import { env } from "./env.js";
 import { appLogger } from "./logger.js";
 import { processNotificationEmailOutboxBatch } from "./notificationOutbox.js";
+import { withOutboxDistributedLock } from "./outboxDistributedLock.js";
 
 const outboxWorkerIntervalMs = 15_000;
 const outboxWorkerBatchSize = 25;
@@ -16,7 +17,8 @@ async function runOutboxPass(trigger: string): Promise<void> {
 
   runInFlight = (async () => {
     try {
-      let claimedTotal = 0;
+      const lockResult = await withOutboxDistributedLock("pcs:outbox:notifications", async () => {
+        let claimedTotal = 0;
       let sentTotal = 0;
       let retriedTotal = 0;
       let failedTotal = 0;
@@ -47,6 +49,12 @@ async function runOutboxPass(trigger: string): Promise<void> {
           },
           "Email outbox processed"
         );
+      }
+        return claimedTotal;
+      });
+
+      if (lockResult === null) {
+        appLogger.debug({ trigger }, "Email outbox worker skipped: another instance owns the lock");
       }
     } catch (error) {
       appLogger.error({ err: error, trigger }, "Email outbox worker pass failed");

@@ -93,6 +93,10 @@ export async function updateAdminVolunteerWorkflowHandler(
 
     const updated = await updateAdminVolunteerWorkflow({
       volunteerId,
+      fullName: parsed.data.fullName,
+      email: parsed.data.email,
+      phone: parsed.data.phone,
+      motivation: parsed.data.motivation,
       status: parsed.data.status,
       internalNotes: parsed.data.internalNotes,
       statusUpdatedBy,
@@ -118,6 +122,10 @@ export async function updateAdminVolunteerWorkflowHandler(
 
     if (authUser) {
       const changedFields = {
+        fullName: existing.fullName !== updated.fullName,
+        email: existing.email !== updated.email,
+        phone: existing.phone !== updated.phone,
+        motivation: existing.motivation !== updated.motivation,
         status: existing.workflowStatus !== updated.workflowStatus,
         county: existing.county !== updated.county,
         locality: existing.locality !== updated.locality,
@@ -144,6 +152,14 @@ export async function updateAdminVolunteerWorkflowHandler(
         targetId: updated.id,
         details: {
           changedFields,
+          previousFullName: existing.fullName,
+          nextFullName: updated.fullName,
+          previousEmail: existing.email,
+          nextEmail: updated.email,
+          previousPhone: existing.phone,
+          nextPhone: updated.phone,
+          previousMotivationLength: existing.motivation.length,
+          nextMotivationLength: updated.motivation.length,
           previousStatus: existing.workflowStatus,
           nextStatus: updated.workflowStatus,
           previousCounty: existing.county,
@@ -201,6 +217,15 @@ export async function updateAdminVolunteerWorkflowHandler(
   } catch (error) {
     if (error instanceof Error && error.message === "VOLUNTEER_OWNER_INVALID") {
       next(new AppError(400, "VOLUNTEER_OWNER_INVALID", "Responsabilul selectat nu este valid."));
+      return;
+    }
+    if (
+      typeof error === "object"
+      && error !== null
+      && "code" in error
+      && (error as { code?: unknown }).code === "P2002"
+    ) {
+      next(new AppError(409, "VOLUNTEER_EMAIL_EXISTS", "Adresa de email este deja folosită."));
       return;
     }
 

@@ -1,8 +1,6 @@
 import { isIP } from "node:net";
 import { readBooleanFlag, readPositiveInt } from "./shared.js";
 
-export type HttpServerAdapter = "express" | "fastify";
-
 export function readPort(): number {
   const raw = process.env.PORT ?? "4000";
   const parsed = Number(raw);
@@ -112,11 +110,3 @@ export function readShutdownGraceMs(): number {
   return readPositiveInt(raw, "SHUTDOWN_GRACE_MS");
 }
 
-export function readHttpServerAdapter(): HttpServerAdapter {
-  const raw = process.env.HTTP_SERVER_ADAPTER?.trim().toLowerCase() ?? "fastify";
-  if (raw === "express" || raw === "fastify") {
-    return raw;
-  }
-
-  throw new Error(`HTTP_SERVER_ADAPTER invalid: ${raw}`);
-}

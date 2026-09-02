@@ -76,6 +76,22 @@ function buildAuditChangeLines(entry: VolunteerAdminAuditRow): string[] {
   const changedFields = details.changedFields
   const lines: string[] = []
 
+  if (changedFields?.fullName && (details.previousFullName || details.nextFullName)) {
+    lines.push(`Nume: ${formatAuditValue(details.previousFullName)} -> ${formatAuditValue(details.nextFullName)}`)
+  }
+  if (changedFields?.email && (details.previousEmail || details.nextEmail)) {
+    lines.push(`Email: ${formatAuditValue(details.previousEmail)} -> ${formatAuditValue(details.nextEmail)}`)
+  }
+  if (changedFields?.phone && (details.previousPhone || details.nextPhone)) {
+    lines.push(`Telefon: ${formatAuditValue(details.previousPhone)} -> ${formatAuditValue(details.nextPhone)}`)
+  }
+  if (
+    typeof details.previousMotivationLength === 'number'
+    && typeof details.nextMotivationLength === 'number'
+    && details.previousMotivationLength !== details.nextMotivationLength
+  ) {
+    lines.push(`Motivație: ${details.previousMotivationLength} -> ${details.nextMotivationLength} caractere`)
+  }
   if (changedFields?.status && (details.previousStatus || details.nextStatus)) {
     lines.push(`Status: ${formatAuditValue(details.previousStatus)} -> ${formatAuditValue(details.nextStatus)}`)
   }
@@ -252,7 +268,7 @@ export function VolunteerDetailsPanel({ volunteer, canManage = true, canPromote 
         ) : null}
 
         <div className="volunteer-admin__workflow">
-          <h3 className="volunteer-admin__workflow-title">Workflow / CRM</h3>
+          <h3 className="volunteer-admin__workflow-title">Date voluntar și workflow / CRM</h3>
           {detailError ? <div className="alert error">{detailError}</div> : null}
           {canManageWorkflow ? (
             <>

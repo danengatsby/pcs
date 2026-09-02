@@ -17,6 +17,10 @@ import {
 } from '../types'
 
 export type VolunteerWorkflowFormValues = {
+  fullName: string
+  email: string
+  phone: string
+  motivation: string
   status: VolunteerWorkflowStatus
   internalNotes: string
   county?: string
@@ -34,6 +38,10 @@ export type VolunteerWorkflowFormValues = {
 }
 
 type VolunteerWorkflowFormState = {
+  fullName: string
+  email: string
+  phone: string
+  motivation: string
   status: VolunteerWorkflowStatus
   internalNotes: string
   county: string
@@ -120,6 +128,10 @@ function normalizeTagsInput(value: string): string[] {
 
 function buildVolunteerWorkflowFormState(volunteer: VolunteerAdminRow): VolunteerWorkflowFormState {
   return {
+    fullName: volunteer.fullName,
+    email: volunteer.email,
+    phone: volunteer.phone ?? '',
+    motivation: volunteer.motivation ?? '',
     status: volunteer.workflowStatus,
     internalNotes: volunteer.internalNotes ?? '',
     county: volunteer.county ?? '',
@@ -204,7 +216,11 @@ function areFormStatesEqual(
   current: VolunteerWorkflowFormState,
   next: VolunteerWorkflowFormState,
 ): boolean {
-  return current.status === next.status
+  return current.fullName === next.fullName
+    && current.email === next.email
+    && current.phone === next.phone
+    && current.motivation === next.motivation
+    && current.status === next.status
     && current.internalNotes === next.internalNotes
     && current.county === next.county
     && current.locality === next.locality
@@ -372,6 +388,10 @@ export function VolunteerWorkflowForm({
         }
 
         onSubmit({
+          fullName: formValues.fullName.trim(),
+          email: formValues.email.trim().toLowerCase(),
+          phone: formValues.phone.trim(),
+          motivation: formValues.motivation.trim(),
           status: formValues.status,
           internalNotes: formValues.internalNotes.trim(),
           county: normalizeOptionalInput(formValues.county),
@@ -392,6 +412,32 @@ export function VolunteerWorkflowForm({
       }}
       className="form"
     >
+      <Input
+        label="Nume complet"
+        value={formValues.fullName}
+        onChange={(event: ChangeEvent<HTMLInputElement>) => updateDraftValue('fullName', event.target.value)}
+        required
+        minLength={2}
+        maxLength={160}
+      />
+
+      <Input
+        label="Email"
+        type="email"
+        value={formValues.email}
+        onChange={(event: ChangeEvent<HTMLInputElement>) => updateDraftValue('email', event.target.value)}
+        required
+        maxLength={180}
+      />
+
+      <Input
+        label="Telefon"
+        type="tel"
+        value={formValues.phone}
+        onChange={(event: ChangeEvent<HTMLInputElement>) => updateDraftValue('phone', event.target.value)}
+        maxLength={40}
+      />
+
       <Select
         label="Status"
         value={formValues.status}
@@ -477,6 +523,19 @@ export function VolunteerWorkflowForm({
         placeholder="ex: juridic, IT"
         maxLength={220}
       />
+
+      <label className="field">
+        <span>Motivație</span>
+        <textarea
+          id="volunteer-workflow-motivation"
+          value={formValues.motivation}
+          onChange={(event: ChangeEvent<HTMLTextAreaElement>) => updateDraftValue('motivation', event.target.value)}
+          rows={4}
+          required
+          minLength={10}
+          maxLength={1500}
+        />
+      </label>
 
       <Input
         label="Tag-uri CRM"

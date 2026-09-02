@@ -78,6 +78,10 @@ export const volunteerSchema = z.object({
 }).strict();
 
 export const workflowUpdateSchema = z.object({
+  fullName: z.string().trim().min(2).max(160).optional(),
+  email: z.string().trim().email().max(180).transform((value) => value.toLowerCase()).optional(),
+  phone: z.string().trim().max(40).optional(),
+  motivation: z.string().trim().min(10).max(1500).optional(),
   status: z.enum(volunteerStatusValues),
   internalNotes: z.string().trim().max(5000).default(""),
   county: z.string().trim().min(2).max(120).transform((value, ctx) => {

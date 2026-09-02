@@ -7,6 +7,7 @@ Acest runbook standardizeaza release-ul pentru productie cu aceeasi ordine folos
 Preconditii:
 - `server/.env` actualizat pentru mediul tinta
 - `CAPTCHA_MODE=required`, `CAPTCHA_SECRET_KEY` pe server si `VITE_CAPTCHA_SITE_KEY` in mediul buildului frontend
+- `NEWS_MEDIA_CLAMAV_ENABLED=1`, `NEWS_MEDIA_CLAMAV_MODE=clamd` si profilul Docker `production` pornit pentru serviciul ClamAV
 - `TEST_DATABASE_URL` exportat catre o baza dedicata, cu `test` sau `testing` in nume
 - backup/snapshot DB recent daca release-ul contine migrari SQL
 
@@ -46,6 +47,7 @@ Pe host-ul de productie:
 ```bash
 cd /var/www/pcs
 npm ci
+docker compose --profile production up -d clamav
 npm run build
 NODE_ENV=production node server/dist/scripts/migrateDb.js
 pm2 startOrRestart ecosystem.config.cjs

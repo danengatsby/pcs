@@ -37,6 +37,62 @@ export function readClamAvConfigFromEnv(): ClamAvConfig {
   return { enabled, mode, clamscanPath, timeoutMs, clamdHost, clamdPort };
 }
 
+export function validateClamAvConfigForEnvironment(nodeEnv: string, config = readClamAvConfigFromEnv()): void {
+  if (nodeEnv !== "production") {
+    return;
+  }
+
+  if (!config.enabled) {
+    throw new Error("NEWS_MEDIA_CLAMAV_ENABLED=1 este obligatoriu in productie.");
+  }
+}
+
+export async function checkClamAvAvailability(
+  config = readClamAvConfigFromEnv()
+): Promise<{ status: "up" | "down" | "disabled"; message: string }> {
+  if (!config.enabled) {
+    return { status: "disabled", message: "ClamAV dezactivat." };
+  }
+
+  if (config.mode === "clamd") {
+    return new Promise((resolve) => {
+      const socket = net.createConnection({ host: config.clamdHost, port: config.clamdPort });
+      const timeout = setTimeout(() => {
+        socket.destroy();
+        resolve({ status: "down", message: "ClamAV daemon timeout." });
+      }, config.timeoutMs);
+
+      socket.once("connect", () => {
+        clearTimeout(timeout);
+        socket.end();
+        resolve({ status: "up", message: "ok" });
+      });
+      socket.once("error", (error) => {
+        clearTimeout(timeout);
+        socket.destroy();
+        resolve({ status: "down", message: error.message });
+      });
+    });
+  }
+
+  return new Promise((resolve) => {
+    const child = spawn(config.clamscanPath, ["--version"], { stdio: "ignore" });
+    const timeout = setTimeout(() => {
+      child.kill("SIGKILL");
+      resolve({ status: "down", message: "ClamAV executable timeout." });
+    }, config.timeoutMs);
+
+    child.once("error", (error) => {
+      clearTimeout(timeout);
+      resolve({ status: "down", message: error.message });
+    });
+    child.once("close", (code) => {
+      clearTimeout(timeout);
+      resolve(code === 0 ? { status: "up", message: "ok" } : { status: "down", message: `clamscan exit ${code}` });
+    });
+  });
+}
+
 type ScanResult = {
   exitCode: number | null;
   stdout: string;

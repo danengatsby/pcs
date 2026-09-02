@@ -9,7 +9,6 @@ import {
   readCorsOrigins,
   readDatabaseUrl,
   readHealthcheckDbTimeoutMs,
-  readHttpServerAdapter,
   readLogLevel,
   readPort,
   readShutdownGraceMs,
@@ -71,6 +70,7 @@ import {
   readOtelEnabled,
   readOtelExporterUrl,
 } from "./env/telemetryConfig.js";
+import { validateClamAvConfigForEnvironment } from "./clamav.js";
 
 const currentFile = fileURLToPath(import.meta.url);
 const currentDir = path.dirname(currentFile);
@@ -80,6 +80,7 @@ dotenv.config({ path: envPath });
 
 const nodeEnv = readNodeEnv();
 const publicBaseUrl = readPublicBaseUrl();
+validateClamAvConfigForEnvironment(nodeEnv);
 
 const corsOrigins = readCorsOrigins();
 const corsCredentials = readCorsCredentials();
@@ -124,7 +125,6 @@ if (corsCredentials && corsOrigins.includes("*")) {
 
 export const env = {
   nodeEnv,
-  httpServerAdapter: readHttpServerAdapter(),
   port: readPort(),
   bindHost: readBindHost(nodeEnv),
   corsOrigins,

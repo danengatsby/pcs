@@ -28,6 +28,10 @@ export type VolunteerAdminRecordSource = 'volunteer' | 'user' | 'both'
 
 export type VolunteerWorkflowAuditDetails = {
   changedFields?: {
+    fullName?: boolean
+    email?: boolean
+    phone?: boolean
+    motivation?: boolean
     status?: boolean
     county?: boolean
     locality?: boolean
@@ -42,6 +46,14 @@ export type VolunteerWorkflowAuditDetails = {
     tags?: boolean
     skillTags?: boolean
   }
+  previousFullName?: string
+  nextFullName?: string
+  previousEmail?: string
+  nextEmail?: string
+  previousPhone?: string
+  nextPhone?: string
+  previousMotivationLength?: number
+  nextMotivationLength?: number
   previousStatus?: string
   nextStatus?: string
   previousCounty?: string
@@ -125,6 +137,10 @@ export type AdminVolunteersListResponse = {
 }
 
 export type VolunteerWorkflowUpdateInput = {
+  fullName?: string
+  email?: string
+  phone?: string
+  motivation?: string
   status: VolunteerWorkflowStatus
   internalNotes: string
   county?: string

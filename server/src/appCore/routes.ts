@@ -1,7 +1,8 @@
 import express from "express";
 import { existsSync } from "node:fs";
 import path from "node:path";
-import { getApiRouteDefinitions, type ApiRouteDefinition } from "./apiRouteRegistry.js";
+import { getApiRouteDefinitions } from "./apiRouteRegistry.js";
+import type { ApiRouteDefinition } from "./apiRouteTypes.js";
 import { sendError } from "../lib/http.js";
 import { buildManifestPageCspHeaderValue, manifestPageFileName } from "./publicPages.js";
 

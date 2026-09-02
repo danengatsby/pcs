@@ -2,6 +2,7 @@ import { env } from "../lib/env.js";
 import { buildInfo } from "../lib/buildInfo.js";
 import { prisma } from "../lib/prisma.js";
 import { isRuntimeDraining, readRuntimeSnapshot } from "../lib/runtimeState.js";
+import { checkClamAvAvailability, readClamAvConfigFromEnv } from "../lib/clamav.js";
 
 type DependencyStatus = {
   status: "up" | "down";
@@ -18,6 +19,7 @@ type ReadinessReport = {
   build: typeof buildInfo;
   dependencies: {
     database: DependencyStatus;
+    antivirus: DependencyStatus;
   };
 };
 
@@ -71,9 +73,17 @@ async function checkDatabaseDependency(): Promise<DependencyStatus> {
 }
 
 export async function buildReadinessReport(): Promise<ReadinessReport> {
-  const database = await checkDatabaseDependency();
+  const [database, antivirusResult] = await Promise.all([
+    checkDatabaseDependency(),
+    checkClamAvAvailability(readClamAvConfigFromEnv()),
+  ]);
+  const antivirus: DependencyStatus = {
+    status: antivirusResult.status === "up" ? "up" : "down",
+    latencyMs: null,
+    message: antivirusResult.message,
+  };
   const draining = isRuntimeDraining();
-  const ready = !draining && database.status === "up";
+  const ready = !draining && database.status === "up" && (env.nodeEnv !== "production" || antivirus.status === "up");
 
   return {
     service: buildInfo.appName,
@@ -84,6 +94,7 @@ export async function buildReadinessReport(): Promise<ReadinessReport> {
     build: buildInfo,
     dependencies: {
       database,
+      antivirus,
     },
   };
 }

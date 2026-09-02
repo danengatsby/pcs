@@ -3926,6 +3926,25 @@ export const openApiSpec = {
         type: "object",
         required: ["status"],
         properties: {
+          fullName: {
+            type: "string",
+            minLength: 2,
+            maxLength: 160,
+          },
+          email: {
+            type: "string",
+            format: "email",
+            maxLength: 180,
+          },
+          phone: {
+            type: "string",
+            maxLength: 40,
+          },
+          motivation: {
+            type: "string",
+            minLength: 10,
+            maxLength: 1500,
+          },
           status: {
             $ref: "#/components/schemas/VolunteerWorkflowStatus",
           },

@@ -16,6 +16,10 @@ type UpdateVolunteerWorkflowVariables = {
 }
 
 type VolunteerWorkflowPatch = {
+  fullName?: string
+  email?: string
+  phone?: string
+  motivation?: string
   workflowStatus: VolunteerAdminRow['workflowStatus']
   internalNotes: string
   county?: string
@@ -82,6 +86,10 @@ function applyVolunteerWorkflowPatch(
 ): VolunteerAdminRow {
   return {
     ...current,
+    fullName: patch.fullName ?? current.fullName,
+    email: patch.email ?? current.email,
+    phone: patch.phone ?? current.phone,
+    motivation: patch.motivation ?? current.motivation,
     workflowStatus: patch.workflowStatus,
     internalNotes: patch.internalNotes,
     county: patch.county ?? current.county,
@@ -114,6 +122,10 @@ function applyVolunteerWorkflowPatch(
 
 function buildOptimisticWorkflowPatch(input: VolunteerWorkflowUpdateInput): VolunteerWorkflowPatch {
   return {
+    fullName: input.fullName,
+    email: input.email,
+    phone: input.phone,
+    motivation: input.motivation,
     workflowStatus: input.status,
     internalNotes: input.internalNotes,
     county: input.county,
@@ -143,6 +155,10 @@ function buildOptimisticWorkflowPatch(input: VolunteerWorkflowUpdateInput): Volu
 
 function buildResponseWorkflowPatch(volunteer: VolunteerAdminRow): VolunteerWorkflowPatch {
   return {
+    fullName: volunteer.fullName,
+    email: volunteer.email,
+    phone: volunteer.phone,
+    motivation: volunteer.motivation,
     workflowStatus: volunteer.workflowStatus,
     internalNotes: volunteer.internalNotes,
     county: volunteer.county,

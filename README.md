@@ -2,7 +2,7 @@
 
 Aplicatie full-stack pentru partidul politic PCS, construita cu:
 
-- Node.js API cu adaptoare Express + Fastify
+- Node.js API bazat pe Fastify
 - PostgreSQL (persistenta date)
 - Vite + TypeScript + HTML + CSS (frontend)
 
@@ -40,10 +40,12 @@ Backend-ul urmeaza acum o structura orientata pe domenii:
 - Reguli minime obligatorii: `curly`, `eqeqeq`, `@typescript-eslint/no-explicit-any`.
 - `no-console` este interzis in codul de aplicatie (exceptie scripturi operationale din `server/src/scripts`).
 
+
 Comenzi:
 
 ```bash
 npm run lint
+npm run db:check-schema
 npm run verify
 npm run test:smoke
 ```

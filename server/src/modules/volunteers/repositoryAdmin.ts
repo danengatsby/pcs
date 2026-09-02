@@ -1116,6 +1116,10 @@ export async function readAdminVolunteerRecordById(
 
 export async function updateAdminVolunteerWorkflow(input: {
   volunteerId: number;
+  fullName?: string;
+  email?: string;
+  phone?: string;
+  motivation?: string;
   status: VolunteerWorkflowStatus;
   internalNotes: string;
   statusUpdatedBy: number | null;
@@ -1135,6 +1139,10 @@ export async function updateAdminVolunteerWorkflow(input: {
 }): Promise<VolunteerAdminRow | null> {
   try {
     const data: {
+      fullName?: string;
+      email?: string;
+      phone?: string;
+      motivation?: string;
       workflowStatus: VolunteerWorkflowStatus;
       internalNotes: string;
       statusUpdatedAt: Date;
@@ -1159,6 +1167,18 @@ export async function updateAdminVolunteerWorkflow(input: {
       statusUpdatedBy: input.statusUpdatedBy === null ? null : BigInt(input.statusUpdatedBy),
     };
 
+    if (typeof input.fullName === "string") {
+      data.fullName = input.fullName;
+    }
+    if (typeof input.email === "string") {
+      data.email = input.email;
+    }
+    if (typeof input.phone === "string") {
+      data.phone = input.phone;
+    }
+    if (typeof input.motivation === "string") {
+      data.motivation = input.motivation;
+    }
     if (typeof input.county === "string") {
       const countyRow = await prisma.county.findUnique({
         where: {
@@ -1228,6 +1248,14 @@ export async function updateAdminVolunteerWorkflow(input: {
     }
 
     await prisma.$transaction(async (tx) => {
+      const previousVolunteer = await tx.volunteer.findUniqueOrThrow({
+        where: {
+          id: BigInt(input.volunteerId),
+        },
+        select: {
+          email: true,
+        },
+      });
       const row = await tx.volunteer.update({
         where: {
           id: BigInt(input.volunteerId),
@@ -1237,6 +1265,52 @@ export async function updateAdminVolunteerWorkflow(input: {
           email: true,
         },
       });
+
+      const identityData: { fullName?: string; email?: string } = {};
+      if (typeof input.fullName === "string") {
+        identityData.fullName = input.fullName;
+      }
+      if (typeof input.email === "string") {
+        identityData.email = input.email;
+      }
+      if (Object.keys(identityData).length > 0) {
+        const emailFilter = {
+          equals: previousVolunteer.email,
+          mode: "insensitive" as const,
+        };
+        await tx.user.updateMany({ where: { email: emailFilter }, data: identityData });
+        await tx.membershipRecord.updateMany({ where: { email: emailFilter }, data: identityData });
+        await tx.mobilizationParticipant.updateMany({ where: { email: emailFilter }, data: identityData });
+        await tx.mobilizationResponse.updateMany({ where: { email: emailFilter }, data: identityData });
+      }
+
+      if (Object.keys(identityData).length > 0 || typeof input.phone === "string") {
+        await tx.communicationConsent.updateMany({
+          where: {
+            email: {
+              equals: previousVolunteer.email,
+              mode: "insensitive",
+            },
+          },
+          data: {
+            ...identityData,
+            ...(typeof input.phone === "string" ? { phone: input.phone } : {}),
+          },
+        });
+      }
+      if (typeof input.phone === "string") {
+        await tx.mobilizationResponse.updateMany({
+          where: {
+            email: {
+              equals: input.email ?? previousVolunteer.email,
+              mode: "insensitive",
+            },
+          },
+          data: {
+            phone: input.phone,
+          },
+        });
+      }
 
       await syncMembershipLifecycleForWorkflow({
         runner: tx,

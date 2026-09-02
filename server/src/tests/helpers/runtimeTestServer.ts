@@ -1,32 +1,21 @@
 import type { Server } from "node:http";
-import type express from "express";
-import { createApp } from "../../app.js";
 import { createFastifyServer } from "../../fastifyServer.js";
-import { env } from "../../lib/env.js";
 
 export type RuntimeTestServer = {
-  adapter: "express" | "fastify";
-  target: express.Express | Server;
+  adapter: "fastify";
+  target: Server;
   close: () => Promise<void>;
 };
 
 export async function createRuntimeTestServer(): Promise<RuntimeTestServer> {
-  if (env.httpServerAdapter === "fastify") {
-    const fastify = await createFastifyServer();
-    await fastify.ready();
-
-    return {
-      adapter: "fastify",
-      target: fastify.server,
-      close: async () => {
-        await fastify.close();
-      },
-    };
-  }
+  const fastify = await createFastifyServer();
+  await fastify.ready();
 
   return {
-    adapter: "express",
-    target: createApp(),
-    close: async () => Promise.resolve(),
+    adapter: "fastify",
+    target: fastify.server,
+    close: async () => {
+      await fastify.close();
+    },
   };
 }

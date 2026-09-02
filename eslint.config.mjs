@@ -19,8 +19,6 @@ export default tseslint.config(
       "test-results/**",
       ".pm2/**",
       "server/uploads/**",
-      "client-legacy/**",
-      "client-legacy/**/*",
     ],
   },
   js.configs.recommended,

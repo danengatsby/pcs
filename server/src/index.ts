@@ -4,7 +4,6 @@ import { initTelemetry } from "./lib/telemetry.js";
 // Initialize before anything else
 initTelemetry();
 
-import { createApp } from "./app.js";
 import { createFastifyServer } from "./fastifyServer.js";
 import { closePool } from "./lib/db.js";
 import { env } from "./lib/env.js";
@@ -119,40 +118,6 @@ async function bootstrap(): Promise<void> {
   startNotificationOutboxWorker();
   startAdminAuditOutboxWorker();
 
-  if (env.httpServerAdapter === "express") {
-    const app = createApp();
-    const server = app.listen(env.port, env.bindHost, () => {
-      appLogger.info(
-        {
-          adapter: env.httpServerAdapter,
-          bindHost: env.bindHost,
-          port: env.port,
-          version: buildInfo.appVersion,
-          release: buildInfo.appRelease,
-        },
-        `PCS API ruleaza pe http://localhost:${env.port}`
-      );
-    });
-
-    server.on("error", (error) => {
-      appLogger.fatal({ err: error }, "Server error fatal.");
-      void shutdown("SERVER_ERROR", 1);
-    });
-
-    closeHttpServer = async () => {
-      await new Promise<void>((resolve, reject) => {
-        server.close((error?: Error) => {
-          if (error) {
-            reject(error);
-            return;
-          }
-          resolve();
-        });
-      });
-    };
-    return;
-  }
-
   const fastify = await createFastifyServer();
   await fastify.listen({ port: env.port, host: env.bindHost });
 
@@ -163,7 +128,7 @@ async function bootstrap(): Promise<void> {
 
   appLogger.info(
     {
-      adapter: env.httpServerAdapter,
+      adapter: "fastify",
       bindHost: env.bindHost,
       port: env.port,
       version: buildInfo.appVersion,

@@ -1084,6 +1084,11 @@ export interface components {
             role: components["schemas"]["UserRole"];
         };
         VolunteerWorkflowUpdateInput: {
+            fullName?: string;
+            /** Format: email */
+            email?: string;
+            phone?: string;
+            motivation?: string;
             status: components["schemas"]["VolunteerWorkflowStatus"];
             /** @default  */
             internalNotes: string;
