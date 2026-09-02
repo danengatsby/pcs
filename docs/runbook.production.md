@@ -8,6 +8,7 @@ Preconditii:
 - `server/.env` actualizat pentru mediul tinta
 - `CAPTCHA_MODE=required`, `CAPTCHA_SECRET_KEY` pe server si `VITE_CAPTCHA_SITE_KEY` in mediul buildului frontend
 - `NEWS_MEDIA_CLAMAV_ENABLED=1`, `NEWS_MEDIA_CLAMAV_MODE=clamd` si profilul Docker `production` pornit pentru serviciul ClamAV
+- `server/.env.production.example` copiat ca `server/.env` și completat cu valori reale
 - `TEST_DATABASE_URL` exportat catre o baza dedicata, cu `test` sau `testing` in nume
 - backup/snapshot DB recent daca release-ul contine migrari SQL
 
@@ -47,7 +48,9 @@ Pe host-ul de productie:
 ```bash
 cd /var/www/pcs
 npm ci
+cp server/.env.production.example server/.env # doar la prima configurare; păstrează valorile existente ulterior
 docker compose --profile production up -d clamav
+npm run predeploy
 npm run build
 NODE_ENV=production node server/dist/scripts/migrateDb.js
 pm2 startOrRestart ecosystem.config.cjs
@@ -59,6 +62,7 @@ Ordine importanta:
 - scriptul de migrari este forward-only si executa smoke checks DB dupa aplicare
 - `npm run db:seed` nu se ruleaza in productie
 - `pcs-server`, `pcs-email-outbox-worker` si `pcs-admin-audit-outbox-worker` sunt procese PM2 separate; workerii nu ruleaza in procesul API
+- `npm run predeploy` verifică secretele obligatorii, alinierea PM2/Docker/aplicație și răspunsul `PONG` al `clamd`
 - configuratia PM2 seteaza explicit `NODE_ENV=production`; aplicatia trebuie sa porneasca fail-closed daca lipsesc secretele sau CAPTCHA obligatoriu
 
 ## 4) Smoke test post-deploy

@@ -173,6 +173,7 @@ pm2 save
 Procesul PM2 pentru acest repo este `pcs-server`.
 Aplicatia citeste configuratia din `server/.env`.
 Workerii PM2 separati sunt `pcs-email-outbox-worker` si `pcs-admin-audit-outbox-worker`.
+Pentru configurarea production folosește `server/.env.production.example` și rulează `npm run predeploy` înainte de build/deploy.
 
 ## Runbook productie
 

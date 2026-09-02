@@ -129,6 +129,12 @@ services:
       - production
     ports:
       - "${CLAMAV_PORT:-3310}:3310"
+    healthcheck:
+      test: ["CMD", "clamdscan", "--ping", "1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
     volumes:
       - pcs_clamav_db:/var/lib/clamav
     environment:
