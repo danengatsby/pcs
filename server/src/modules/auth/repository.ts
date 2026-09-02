@@ -35,11 +35,14 @@ function isDuplicateKeyError(error: unknown): boolean {
   return false;
 }
 
-export async function findUserForSignin(email: string): Promise<UserAuthRow | null> {
-  const user = await prisma.user.findFirst({
+export async function findUserForSignin(identifier: string): Promise<UserAuthRow | null> {
+  const normalizedIdentifier = identifier.trim();
+  const users = await prisma.user.findMany({
     where: {
       email: {
-        equals: email,
+        ...(normalizedIdentifier.includes("@")
+          ? { equals: normalizedIdentifier }
+          : { startsWith: `${normalizedIdentifier}@` }),
         mode: "insensitive",
       },
     },
@@ -53,8 +56,15 @@ export async function findUserForSignin(email: string): Promise<UserAuthRow | nu
       role: true,
       passwordHash: true,
     },
+    take: 2,
   });
 
+  // Un nume local folosit de mai multe domenii este ambiguu; cerem emailul complet.
+  if (users.length !== 1) {
+    return null;
+  }
+
+  const user = users[0];
   if (!user) {
     return null;
   }

@@ -25,7 +25,7 @@ test("signin shows an error for invalid credentials", async ({ page, request }) 
     });
 
     await page.goto("/auth/signin");
-    await page.getByLabel("Email").fill(email);
+    await page.getByLabel("Utilizator").fill(email);
     await page.getByLabel("Parolă").fill("ParolaGresita#2026");
 
     const signinResponse = page.waitForResponse((response) => (
@@ -34,11 +34,11 @@ test("signin shows an error for invalid credentials", async ({ page, request }) 
       && response.status() === 401
     ));
 
-    await page.getByRole("button", { name: "Autentificare" }).click();
+    await page.getByRole("button", { name: "Autentificare", exact: true }).click();
     await signinResponse;
 
     await expect(page).toHaveURL(/\/auth\/signin$/);
-    await expect(page.getByText("Email sau parola invalida.")).toBeVisible();
+    await expect(page.getByText("Utilizatorul sau parola sunt invalide.")).toBeVisible();
     await expect(page.getByRole("button", { name: "Deconectare" })).toHaveCount(0);
   } finally {
     await deleteUserByEmail(email);

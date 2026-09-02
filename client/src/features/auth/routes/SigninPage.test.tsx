@@ -84,7 +84,8 @@ describe('SigninPage', () => {
     renderSigninPage({ user: null })
 
     expect(screen.getByRole('heading', { name: 'Autentificare' })).toBeInTheDocument()
-    expect(screen.getByLabelText('User / Email')).toBeInTheDocument()
+    expect(screen.getByLabelText('Utilizator')).toHaveAttribute('type', 'text')
+    expect(screen.getByLabelText('Utilizator')).toHaveAttribute('autocomplete', 'username')
     expect(screen.getByLabelText('Parolă')).toHaveAttribute('type', 'password')
     expect(screen.getByRole('button', { name: 'Autentificare' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Autentificare ca admin' })).toBeInTheDocument()
@@ -95,12 +96,12 @@ describe('SigninPage', () => {
     const signin = vi.fn(async () => signinSuccess('PRESEDINTE'))
     renderSigninPage({ signin })
 
-    await user.type(screen.getByLabelText('User / Email'), 'admin@example.test')
+    await user.type(screen.getByLabelText('Utilizator'), 'admin')
     await user.type(screen.getByLabelText('Parolă'), 'ParolaSigura#2026')
     await user.click(screen.getByRole('button', { name: 'Autentificare ca admin' }))
 
     expect(signin).toHaveBeenCalledWith({
-      email: 'admin@example.test',
+      email: 'admin',
       password: 'ParolaSigura#2026',
     })
     expect(await screen.findByText('Tablou de comandă admin')).toBeInTheDocument()
@@ -111,7 +112,7 @@ describe('SigninPage', () => {
     const signout = vi.fn(async () => {})
     renderSigninPage({ signin: vi.fn(async () => signinSuccess('SUSTINATOR')), signout })
 
-    await user.type(screen.getByLabelText('User / Email'), 'sustinator@example.test')
+    await user.type(screen.getByLabelText('Utilizator'), 'sustinator')
     await user.type(screen.getByLabelText('Parolă'), 'ParolaSigura#2026')
     await user.click(screen.getByRole('button', { name: 'Autentificare ca admin' }))
 

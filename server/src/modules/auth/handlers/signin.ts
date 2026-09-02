@@ -32,13 +32,13 @@ export async function signinHandler(req: Request, res: Response, next: NextFunct
     const user = await findUserForSignin(payload.email);
     if (!user) {
       await consumeDummySigninHash(payload.password);
-      next(new AppError(401, "INVALID_CREDENTIALS", "Email sau parola invalida."));
+      next(new AppError(401, "INVALID_CREDENTIALS", "Utilizatorul sau parola sunt invalide."));
       return;
     }
 
     const isPasswordValid = await verifyPassword(payload.password, user.passwordHash);
     if (!isPasswordValid) {
-      next(new AppError(401, "INVALID_CREDENTIALS", "Email sau parola invalida."));
+      next(new AppError(401, "INVALID_CREDENTIALS", "Utilizatorul sau parola sunt invalide."));
       return;
     }
 

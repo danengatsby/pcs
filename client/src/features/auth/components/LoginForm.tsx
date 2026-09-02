@@ -71,12 +71,13 @@ export function LoginForm(): JSX.Element {
       className="signin-form"
     >
       <h1>Autentificare</h1>
-      <p className="muted">Autentifică-te cu emailul și parola contului tău PCS.</p>
+      <p className="muted">Autentifică-te cu utilizatorul și parola contului tău PCS.</p>
 
       <label className="field">
-        <span>User / Email</span>
-        <Input value={email} onChange={(e) => setEmail(e.target.value)} type="email" autoComplete="email" />
+        <span>Utilizator</span>
+        <Input value={email} onChange={(e) => setEmail(e.target.value)} type="text" autoComplete="username" />
       </label>
+      <p className="muted">Introdu partea dinainte de @.</p>
 
       <label className="field">
         <span>Parolă</span>

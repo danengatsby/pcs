@@ -3252,8 +3252,10 @@ export const openApiSpec = {
         properties: {
           email: {
             type: "string",
-            format: "email",
+            description: "Email complet sau numele de utilizator (partea dinainte de @).",
+            minLength: 1,
             maxLength: 180,
+            example: "admin",
           },
           password: {
             type: "string",

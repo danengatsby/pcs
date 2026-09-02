@@ -84,6 +84,36 @@ test("auth flow should support signup/signin/me/signout with revocation", async 
   }
 });
 
+test("signin should accept the unique part before @ as username", async () => {
+  const email = buildTestEmail("auth-username");
+  const username = email.slice(0, email.indexOf("@"));
+  const password = "ParolaFoarteBuna#2026";
+
+  try {
+    await request(app)
+      .post("/api/auth/signup")
+      .send({
+        fullName: "Utilizator Fara Email",
+        email,
+        password,
+      })
+      .expect(201);
+
+    const signinResponse = await request(app)
+      .post("/api/auth/signin")
+      .send({
+        email: username,
+        password,
+      })
+      .expect(200);
+
+    assert.equal(signinResponse.body.error, null);
+    assert.equal(signinResponse.body.data?.user?.email, email.toLowerCase());
+  } finally {
+    await deleteUserByEmail(email);
+  }
+});
+
 test("signup should return uniform response for both new and existing email", async () => {
   const email = buildTestEmail("auth-signup-uniform");
   const firstPassword = "ParolaFoarteBuna#2026";

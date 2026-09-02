@@ -940,7 +940,7 @@ export interface components {
             password: string;
         };
         AuthSigninInput: {
-            /** Format: email */
+            /** @description Email complet sau numele de utilizator (partea dinainte de @). */
             email: string;
             /** Format: password */
             password: string;
