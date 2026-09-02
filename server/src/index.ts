@@ -12,14 +12,6 @@ import { buildInfo } from "./lib/buildInfo.js";
 import { closePrisma } from "./lib/prisma.js";
 import { closeRedisClient, ensureRedisConnected } from "./lib/redisClient.js";
 import { setRuntimeDraining } from "./lib/runtimeState.js";
-import {
-  startAdminAuditOutboxWorker,
-  stopAdminAuditOutboxWorker,
-} from "./lib/adminAuditOutboxWorker.js";
-import {
-  startNotificationOutboxWorker,
-  stopNotificationOutboxWorker,
-} from "./lib/notificationOutboxWorker.js";
 
 let shutdownStarted = false;
 let forcedExitTimer: ReturnType<typeof setTimeout> | null = null;
@@ -36,8 +28,6 @@ function clearForcedExitTimer(): void {
 
 async function closeResourcesAndExit(code: number): Promise<void> {
   const results = await Promise.allSettled([
-    stopAdminAuditOutboxWorker(),
-    stopNotificationOutboxWorker(),
     closePool(),
     closePrisma(),
     closeRedisClient(),
@@ -114,9 +104,6 @@ async function bootstrap(): Promise<void> {
   if (env.authRefreshEnabled && env.authRefreshStore === "redis") {
     await ensureRedisConnected();
   }
-
-  startNotificationOutboxWorker();
-  startAdminAuditOutboxWorker();
 
   const fastify = await createFastifyServer();
   await fastify.listen({ port: env.port, host: env.bindHost });

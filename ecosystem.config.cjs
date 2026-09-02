@@ -1,3 +1,12 @@
+const productionEnv = {
+  NODE_ENV: "production",
+  AUTH_REFRESH_ENABLED: "true",
+  NEWS_MEDIA_CLAMAV_ENABLED: "1",
+  NEWS_MEDIA_CLAMAV_MODE: "clamd",
+  NEWS_MEDIA_CLAMD_HOST: "127.0.0.1",
+  NEWS_MEDIA_CLAMD_PORT: "3310",
+};
+
 module.exports = {
   apps: [
     {
@@ -13,10 +22,37 @@ module.exports = {
       kill_timeout: 20000,
       max_memory_restart: "512M",
       time: true,
-      env: {
-        NODE_ENV: "production",
-        AUTH_REFRESH_ENABLED: "true",
-      },
+      env: productionEnv,
+    },
+    {
+      name: "pcs-email-outbox-worker",
+      cwd: __dirname,
+      script: "server/dist/scripts/emailOutboxWorker.js",
+      interpreter: "node",
+      exec_mode: "fork",
+      instances: 1,
+      autorestart: true,
+      restart_delay: 5000,
+      min_uptime: "10s",
+      kill_timeout: 20000,
+      max_memory_restart: "256M",
+      time: true,
+      env: productionEnv,
+    },
+    {
+      name: "pcs-admin-audit-outbox-worker",
+      cwd: __dirname,
+      script: "server/dist/scripts/adminAuditOutboxWorker.js",
+      interpreter: "node",
+      exec_mode: "fork",
+      instances: 1,
+      autorestart: true,
+      restart_delay: 5000,
+      min_uptime: "10s",
+      kill_timeout: 20000,
+      max_memory_restart: "256M",
+      time: true,
+      env: productionEnv,
     },
   ],
 };
