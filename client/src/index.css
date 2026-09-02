@@ -310,6 +310,42 @@
   background: color-mix(in srgb, var(--accent-bg) 82%, var(--social-bg));
 }
 
+.signin-page {
+  display: grid;
+  min-height: min(620px, calc(100svh - 170px));
+  padding: clamp(24px, 6vw, 64px) 0;
+  place-items: start center;
+}
+
+.signin-page__card {
+  width: min(100%, 480px);
+}
+
+.signin-form {
+  display: grid;
+  gap: 15px;
+}
+
+.signin-form__actions {
+  display: grid;
+  grid-template-columns: 1fr 1.35fr;
+  gap: 10px;
+}
+
+.signin-form__admin-hint {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  text-align: center;
+}
+
+@media (max-width: 520px) {
+  .signin-form__actions {
+    grid-template-columns: 1fr;
+  }
+}
+
 .nav-dropdown {
   position: relative;
 }

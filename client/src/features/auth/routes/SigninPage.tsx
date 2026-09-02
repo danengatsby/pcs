@@ -14,8 +14,8 @@ export function SigninPage(): JSX.Element {
   }
 
   return (
-    <div style={{ padding: 24 }}>
-      <section className="card contact-card" style={{ maxWidth: 420 }}>
+    <div className="signin-page">
+      <section className="card contact-card signin-page__card">
         <LoginForm />
       </section>
     </div>

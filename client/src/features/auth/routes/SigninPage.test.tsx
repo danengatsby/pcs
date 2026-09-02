@@ -1,8 +1,24 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
-import { AuthContext, type AuthContextValue } from '../context'
+import { AuthContext, type AuthContextValue, type AuthSessionResult } from '../context'
+import type { Role } from '../types'
 import { SigninPage } from './SigninPage'
+
+function signinSuccess(role: Role): AuthSessionResult {
+  return {
+    ok: true,
+    data: {
+      message: 'Autentificare reușită.',
+      user: { id: '1', email: 'user@example.test', fullName: 'Utilizator Test', role },
+      token: 'access-token',
+      tokenType: 'Bearer',
+      expiresInSeconds: 3600,
+      accessTokenExpiresAt: '2026-09-02T20:00:00.000Z',
+    },
+  }
+}
 
 function renderSigninPage(auth: Partial<AuthContextValue>) {
   const value: AuthContextValue = {
@@ -23,6 +39,8 @@ function renderSigninPage(auth: Partial<AuthContextValue>) {
         <Routes>
           <Route path="/auth/signin" element={<SigninPage />} />
           <Route path="/profil" element={<div>Profil utilizator</div>} />
+          <Route path="/admin/dashboard" element={<div>Tablou de comandă admin</div>} />
+          <Route path="/admin/volunteers" element={<div>Administrare voluntari</div>} />
         </Routes>
       </MemoryRouter>
     </AuthContext.Provider>,
@@ -67,7 +85,37 @@ describe('SigninPage', () => {
 
     expect(screen.getByRole('heading', { name: 'Autentificare' })).toBeInTheDocument()
     expect(screen.getByLabelText('User / Email')).toBeInTheDocument()
-    expect(screen.getByLabelText('Parolă')).toHaveAttribute('type', 'text')
+    expect(screen.getByLabelText('Parolă')).toHaveAttribute('type', 'password')
     expect(screen.getByRole('button', { name: 'Autentificare' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Autentificare ca admin' })).toBeInTheDocument()
+  })
+
+  it('authenticates an authorized administrator directly into the executive dashboard', async () => {
+    const user = userEvent.setup()
+    const signin = vi.fn(async () => signinSuccess('PRESEDINTE'))
+    renderSigninPage({ signin })
+
+    await user.type(screen.getByLabelText('User / Email'), 'admin@example.test')
+    await user.type(screen.getByLabelText('Parolă'), 'ParolaSigura#2026')
+    await user.click(screen.getByRole('button', { name: 'Autentificare ca admin' }))
+
+    expect(signin).toHaveBeenCalledWith({
+      email: 'admin@example.test',
+      password: 'ParolaSigura#2026',
+    })
+    expect(await screen.findByText('Tablou de comandă admin')).toBeInTheDocument()
+  })
+
+  it('rejects admin mode for a non-administrative account and clears the session', async () => {
+    const user = userEvent.setup()
+    const signout = vi.fn(async () => {})
+    renderSigninPage({ signin: vi.fn(async () => signinSuccess('SUSTINATOR')), signout })
+
+    await user.type(screen.getByLabelText('User / Email'), 'sustinator@example.test')
+    await user.type(screen.getByLabelText('Parolă'), 'ParolaSigura#2026')
+    await user.click(screen.getByRole('button', { name: 'Autentificare ca admin' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Acest cont nu are drepturi administrative PCS.')
+    expect(signout).toHaveBeenCalledOnce()
   })
 })
