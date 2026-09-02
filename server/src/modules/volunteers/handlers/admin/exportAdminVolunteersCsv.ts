@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
+import { requireAdminAccess } from "../../../../lib/adminAuthorization.js";
 import {
   readVolunteerListFilters,
   volunteerCsvHeader,
@@ -21,6 +22,7 @@ export async function exportAdminVolunteersCsvHandler(
     });
 
     const exportDate = new Date().toISOString().slice(0, 10);
+    const scope = requireAdminAccess(res).scope;
     res.setHeader("Content-Type", "text/csv; charset=utf-8");
     res.setHeader("Content-Disposition", `attachment; filename="pcs-volunteers-${exportDate}.csv"`);
     res.status(200);
@@ -33,6 +35,7 @@ export async function exportAdminVolunteersCsvHandler(
     while (true) {
       const rows = await listAdminVolunteersKeyset({
         filters,
+        scope,
         cursorCreatedAt,
         cursorId,
         limit: pageLimit,

@@ -70,7 +70,7 @@ export async function listPublicVolunteers(limit: number): Promise<VolunteerPubl
 
   return volunteers.map((row) => ({
     id: `v-${row.id.toString()}`,
-    fullName: "Aderent PCS",
+    fullName: "Susținător PCS",
     email: `ascuns+${row.id.toString()}@pcs.invalid`,
     password: "protejata",
     status: toVolunteerWorkflowStatus(row.workflowStatus),
@@ -136,11 +136,17 @@ export async function findUserAuthByEmail(
       },
     },
     select: {
+      id: true,
       passwordHash: true,
     },
   });
 
-  return row ?? null;
+  return row
+    ? {
+      id: Number(row.id),
+      passwordHash: row.passwordHash,
+    }
+    : null;
 }
 
 export async function insertVolunteerUser(input: {
@@ -148,15 +154,17 @@ export async function insertVolunteerUser(input: {
   email: string;
   passwordHash: string;
   runner: QueryRunner;
-}): Promise<void> {
-  await input.runner.user.create({
+}): Promise<number> {
+  const created = await input.runner.user.create({
     data: {
       fullName: input.fullName,
       email: input.email,
       passwordHash: input.passwordHash,
-      role: "ADERENT",
+      role: "SUSTINATOR",
     },
+    select: { id: true },
   });
+  return Number(created.id);
 }
 
 export async function insertVolunteer(input: {
@@ -189,4 +197,47 @@ export async function insertVolunteer(input: {
   });
 
   return Number(created.id);
+}
+
+export async function upsertPendingMembership(input: {
+  userId: number;
+  volunteerId: number;
+  fullName: string;
+  email: string;
+  runner: QueryRunner;
+}): Promise<void> {
+  const membership = await input.runner.membershipRecord.upsert({
+    where: { userId: BigInt(input.userId) },
+    create: {
+      userId: BigInt(input.userId),
+      volunteerId: BigInt(input.volunteerId),
+      fullName: input.fullName,
+      email: input.email,
+      status: "application",
+      applicationAt: new Date(),
+    },
+    update: {
+      volunteerId: BigInt(input.volunteerId),
+      fullName: input.fullName,
+      email: input.email,
+      status: "application",
+      applicationAt: new Date(),
+      updatedAt: new Date(),
+    },
+    select: { id: true, status: true },
+  });
+  const existingEvents = await input.runner.membershipEvent.count({
+    where: { membershipId: membership.id },
+  });
+  if (existingEvents === 0) {
+    await input.runner.membershipEvent.create({
+      data: {
+        membershipId: membership.id,
+        action: "submit",
+        previousStatus: "supporter",
+        nextStatus: membership.status,
+        reason: "Cerere de aderare înregistrată de solicitant",
+      },
+    });
+  }
 }

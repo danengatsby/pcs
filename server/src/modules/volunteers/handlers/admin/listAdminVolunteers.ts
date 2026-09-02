@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import { AppError } from "../../../../lib/errors.js";
+import { requireAdminAccess } from "../../../../lib/adminAuthorization.js";
 import { sendSuccess } from "../../../../lib/http.js";
 import {
   encodeVolunteerCursor,
@@ -31,6 +32,7 @@ export async function listAdminVolunteersHandler(req: Request, res: Response, ne
     const cursorId = cursor?.id ?? Number.MAX_SAFE_INTEGER;
     const rows = await listAdminVolunteersKeyset({
       filters,
+      scope: requireAdminAccess(res).scope,
       cursorCreatedAt,
       cursorId,
       limit: limit + 1,

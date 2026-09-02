@@ -3,6 +3,7 @@ import { expect, test } from "@playwright/test";
 import { fillVolunteerSignupForm } from "./helpers/contact";
 import {
   buildTestEmail,
+  deleteMembershipByEmail,
   deleteUserByEmail,
   deleteVolunteerByEmail,
   query,
@@ -42,8 +43,8 @@ test("visitor can submit the volunteer signup form and create account records", 
     await submitResponse;
 
     await expect(page.getByText("Cererea de înscriere a fost trimisă. Mulțumim!")).toBeVisible();
-    await expect(page.getByLabel("Nume complet")).toHaveValue("");
-    await expect(page.getByLabel("Email")).toHaveValue("");
+    await expect(page.getByRole("heading", { name: "Mulțumim pentru înscriere." })).toBeVisible();
+    await expect(page.getByLabel("Nume complet")).toHaveCount(0);
 
     await expect.poll(async () => {
       const result = await query<{
@@ -72,8 +73,9 @@ test("visitor can submit the volunteer signup form and create account records", 
       return row
         ? `${row.volunteer_status}|${row.volunteer_county}|${row.volunteer_locality}|${row.user_role}`
         : null;
-    }).toBe(`nou|Cluj|${locality}|ADERENT`);
+    }).toBe(`nou|Cluj|${locality}|SUSTINATOR`);
   } finally {
+    await deleteMembershipByEmail(email);
     await deleteVolunteerByEmail(email);
     await deleteUserByEmail(email);
   }

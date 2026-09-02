@@ -35,6 +35,27 @@ type NewsPublishedNotificationInput = {
   publishedAt: string;
 };
 
+type MobilizationResponseNotificationInput = {
+  fullName: string;
+  email: string;
+  actionTitle: string;
+  actionType: string;
+  participationMode: string;
+  commitment: string;
+  county: string;
+  interests: string[];
+  updatesConsent: boolean;
+};
+
+type PoliticalOperationInvitationInput = {
+  fullName: string;
+  email: string;
+  actionTitle: string;
+  actionType: string;
+  startsAt: string | null;
+  dueAt: string | null;
+};
+
 function normalizeBaseUrl(raw: string): string {
   const trimmed = raw.trim();
   if (!trimmed) {
@@ -124,7 +145,7 @@ export async function sendVolunteerSignupNotificationEmail(
 
   await queueNotification("volunteer.signup_email", {
     to: [input.email],
-    subject: "Confirmare inscriere aderent PCS-Partidul Conservator al Seniorilor",
+    subject: "Confirmare primire cerere de aderare PCS-Partidul Conservator al Seniorilor",
     text: messageText,
   });
 }
@@ -138,8 +159,9 @@ export function buildVolunteerSignupNotificationText(
   return [
     `Salut, ${input.fullName}!`,
     "",
-    "Inscrierea dvs. ca aderent in platforma PCS-Partidul Conservator al Seniorilor a fost inregistrata cu succes.",
-    "Veti primi actualizari pe email privind pasii urmatori.",
+    "Cererea dvs. de aderare la PCS-Partidul Conservator al Seniorilor a fost inregistrata cu succes.",
+    "Cererea nu acorda automat calitatea de aderent sau membru. Pana la validarea administrativa, contul dvs. are rolul de sustinator.",
+    "Veti primi actualizari pe email privind validarea si pasii urmatori.",
     "",
     "Va puteti loga cu adresa de email folosita la inscriere si parola setata in formular.",
     `Email: ${input.email}`,
@@ -153,13 +175,71 @@ export function buildVolunteerSignupNotificationText(
     `Arii de interes: ${skills}`,
     `Motivatie: ${input.motivation}`,
     "",
-    "INSCRIEREA NU VA FACE DEVENITI MEMBRU AL PCS, CI ARATA INTERESUL DVS. PENRU ACEST PARTID.",
-    "INSCRIEREA CA MEMBRU DE PARTID SE FACE CU UN FORMULAR SPECIAL TRIMIS PRIN POSTA CARE SE VA COMPLETA SI SE VA TRIMITE INAPOI LA SEDIUL PARTIDULUI PENTRU INREGISTRARE.",
+    "CALITATEA DE ADERENT SE ACORDA NUMAI DUPA VALIDAREA ADMINISTRATIVA A CERERII.",
+    "INSCRIEREA CA MEMBRU DE PARTID URMEAZA PROCEDURA SEPARATA STABILITA DE PCS.",
     "",
     "Multumim pentru interes,",
     "Echipa PCS-Partidul Conservator al Seniorilor",
     "https://pcpens.online/index.html",
   ].join("\n");
+}
+
+export async function sendMobilizationResponseConfirmationEmail(
+  input: MobilizationResponseNotificationInput
+): Promise<void> {
+  await queueNotification("mobilization.response_confirmation", {
+    to: [input.email],
+    subject: `Confirmare implicare PCS: ${input.actionTitle}`,
+    text: buildMobilizationResponseConfirmationText(input),
+  });
+}
+
+export async function sendPoliticalOperationInvitationEmail(
+  input: PoliticalOperationInvitationInput
+): Promise<void> {
+  const timing = input.actionType === "volunteer_task"
+    ? input.dueAt ? `Termen: ${input.dueAt}` : "Termenul este disponibil în portalul de membru."
+    : input.startsAt ? `Data: ${input.startsAt}` : "Detaliile de program sunt disponibile în portal.";
+  await queueNotification("mobilization.operation_invitation", {
+    to: [input.email],
+    subject: `PCS: ${input.actionTitle}`,
+    text: [
+      `Salut, ${input.fullName}!`,
+      "",
+      input.actionType === "volunteer_task"
+        ? "Ți-a fost alocată o sarcină în cadrul activității PCS."
+        : "Ai primit o invitație la o activitate PCS.",
+      `Activitate: ${input.actionTitle}`,
+      timing,
+      "",
+      "Confirmarea, detaliile și raportarea activității sunt disponibile în portalul tău de membru.",
+      "",
+      "Echipa PCS",
+    ].join("\n"),
+  });
+}
+
+export function buildMobilizationResponseConfirmationText(
+  input: MobilizationResponseNotificationInput
+): string {
+  return [
+    `Salut, ${input.fullName}!`,
+    "",
+    "Raspunsul tau a fost inregistrat in Centrul de mobilizare PCS.",
+    `Actiune: ${input.actionTitle}`,
+    `Tip: ${input.actionType}`,
+    `Participare: ${input.participationMode || "detalii transmise ulterior"}`,
+    `Judet: ${input.county}`,
+    `Interese: ${input.interests.join(", ")}`,
+    "",
+    input.commitment,
+    input.updatesConsent
+      ? "Ai ales sa primesti actualizari relevante pentru judetul si interesele selectate."
+      : "Nu ai solicitat actualizari suplimentare; acest mesaj confirma doar raspunsul trimis.",
+    "",
+    "Multumim pentru implicare,",
+    "Echipa PCS-Partidul Conservator al Seniorilor",
+  ].filter(Boolean).join("\n");
 }
 
 export async function sendNewsPublishedNotificationEmail(

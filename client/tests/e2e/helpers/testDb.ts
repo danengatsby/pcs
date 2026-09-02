@@ -56,6 +56,68 @@ export async function deleteVolunteerByEmail(email: string): Promise<void> {
   );
 }
 
+export async function deleteMembershipByEmail(email: string): Promise<void> {
+  await query(
+    `
+      DELETE FROM membership_records
+      WHERE LOWER(email) = LOWER($1)
+    `,
+    [email],
+  );
+}
+
+export async function insertMembershipByEmail(
+  email: string,
+  status: "supporter" | "application" | "verified" | "approved" | "active",
+): Promise<void> {
+  await query(
+    `
+      WITH membership_subject AS (
+        SELECT
+          app_user.id AS user_id,
+          volunteer.id AS volunteer_id,
+          COALESCE(app_user.full_name, volunteer.full_name) AS full_name,
+          LOWER(COALESCE(app_user.email, volunteer.email)) AS email
+        FROM (
+          SELECT id, full_name, email
+          FROM users
+          WHERE LOWER(email) = LOWER($1)
+          LIMIT 1
+        ) app_user
+        FULL OUTER JOIN (
+          SELECT id, full_name, email
+          FROM volunteers
+          WHERE LOWER(email) = LOWER($1)
+          LIMIT 1
+        ) volunteer ON LOWER(volunteer.email) = LOWER(app_user.email)
+      )
+      INSERT INTO membership_records (
+        user_id,
+        volunteer_id,
+        full_name,
+        email,
+        status,
+        application_at,
+        validated_at,
+        approved_at,
+        joined_at
+      )
+      SELECT
+        user_id,
+        volunteer_id,
+        full_name,
+        email,
+        $2::varchar,
+        NOW(),
+        CASE WHEN $2::varchar IN ('verified', 'approved', 'active') THEN NOW() END,
+        CASE WHEN $2::varchar IN ('approved', 'active') THEN NOW() END,
+        CASE WHEN $2::varchar = 'active' THEN NOW() END
+      FROM membership_subject
+    `,
+    [email, status],
+  );
+}
+
 export async function setUserRole(email: string, role: string): Promise<void> {
   await query(
     `

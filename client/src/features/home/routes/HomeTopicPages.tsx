@@ -137,7 +137,7 @@ export function NewsCommunicationPage() {
         {!loading && !error && sourcedNews.length === 0 ? (
           <p>Nu există momentan știri cu sursă publicată.</p>
         ) : null}
-        {sourcedNews.length > 0 ? <NewsPanels items={sourcedNews} /> : null}
+        {sourcedNews.length > 0 ? <NewsPanels items={sourcedNews} section="press" /> : null}
       </section>
     </HomeTopicPage>
   )
@@ -169,7 +169,8 @@ export function VolunteeringPage() {
       ]}
       commitmentTitle="Un rol potrivit pentru fiecare voluntar"
       commitment="După trimiterea cererii, datele și competențele declarate ne ajută să identificăm forma de implicare potrivită și echipa locală relevantă."
-      primaryAction={{ label: 'Trimite cererea de înscriere', to: '/contact' }}
+      primaryAction={{ label: 'Vezi acțiunile deschise', to: '/mobilizare' }}
+      secondaryAction={{ label: 'Aderă la PCS', to: '/contact#aderare' }}
     />
   )
 }

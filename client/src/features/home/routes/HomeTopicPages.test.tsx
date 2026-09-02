@@ -58,7 +58,7 @@ describe('Home topic pages', () => {
 
     expect(screen.getByRole('heading', { name: 'Voluntariat pentru comunitate', level: 1 })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Sprijin comunitar' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Trimite cererea de înscriere' })).toHaveAttribute('href', '/contact')
+    expect(screen.getByRole('link', { name: 'Vezi acțiunile deschise' })).toHaveAttribute('href', '/mobilizare')
   })
 
   it('explains transparency and links to public documents', () => {

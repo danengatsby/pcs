@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import { readAuthUser } from "../../../../lib/authMiddleware.js";
+import { requireAdminAccess } from "../../../../lib/adminAuthorization.js";
 import { recordAdminAudit } from "../../../../lib/adminAudit.js";
 import { AppError } from "../../../../lib/errors.js";
 import { sendSuccess } from "../../../../lib/http.js";
@@ -21,7 +22,7 @@ export async function deleteAdminVolunteerHandler(
   }
 
   try {
-    const existing = await readAdminVolunteerById(volunteerId);
+    const existing = await readAdminVolunteerById(volunteerId, requireAdminAccess(res).scope);
     if (!existing) {
       next(new AppError(404, "VOLUNTEER_NOT_FOUND", "Voluntarul nu a fost gasit."));
       return;

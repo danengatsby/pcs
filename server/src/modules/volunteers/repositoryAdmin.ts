@@ -2,16 +2,20 @@ import { Prisma } from "@prisma/client";
 import { enqueueAdminAuditEntries } from "../../lib/adminAuditOutbox.js";
 import { enqueueNotificationEmails } from "../../lib/notificationOutbox.js";
 import { prisma } from "../../lib/prisma.js";
+import type { AdminTerritoryScope } from "../../lib/adminAuthorization.js";
 import type { PrismaTx } from "../../lib/prismaTransaction.js";
 import { normalizeCountyKey } from "./counties.js";
-import type {
-  VolunteerAdminRow,
-  VolunteerContactChannel,
-  VolunteerOwnerOption,
-  VolunteerPriority,
-  VolunteerPublicRole,
-  VolunteerListFilters,
-  VolunteerWorkflowStatus,
+import {
+  mapVolunteerStatusToAccountRole,
+  volunteerManagedAccountRoles,
+  type VolunteerManagedAccountRole,
+  type VolunteerAdminRow,
+  type VolunteerContactChannel,
+  type VolunteerOwnerOption,
+  type VolunteerPriority,
+  type VolunteerPublicRole,
+  type VolunteerListFilters,
+  type VolunteerWorkflowStatus,
 } from "./types.js";
 
 type VolunteerAdminDbRow = {
@@ -121,7 +125,7 @@ export type BulkDeleteAdminVolunteerResult = {
   enqueuedAuditCount: number;
 };
 
-const adminVolunteerUserRoles = ["ADERENT", "MEMBRU"] as const;
+const adminVolunteerUserRoles = [...volunteerManagedAccountRoles] as const;
 const volunteerOwnerRoles = ["CONSILIER", "SECRETAR", "VICEPRESEDINTE", "PRESEDINTE"] as const;
 type SqlRunner = PrismaTx | typeof prisma;
 
@@ -348,6 +352,51 @@ function buildWhereClause(conditions: Prisma.Sql[]): Prisma.Sql {
   return Prisma.sql`WHERE ${Prisma.join(conditions, " AND ")}`;
 }
 
+function buildVolunteerAdminScopeCondition(scope: AdminTerritoryScope): Prisma.Sql {
+  if (scope.national) {
+    return Prisma.sql`TRUE`;
+  }
+
+  const organizationCondition = scope.organizationIds.length > 0
+    ? Prisma.sql`EXISTS (
+      SELECT 1
+      FROM membership_records scoped_membership
+      WHERE LOWER(scoped_membership.email) = combined.email
+        AND scoped_membership.organization_id IN (${Prisma.join(scope.organizationIds)})
+    )`
+    : Prisma.sql`FALSE`;
+  const geographicConditions: Prisma.Sql[] = [];
+  if (scope.countyNames.length > 0) {
+    geographicConditions.push(
+      Prisma.sql`LOWER(BTRIM(combined.county)) IN (${Prisma.join(
+        scope.countyNames.map((county) => county.trim().toLocaleLowerCase("ro-RO"))
+      )})`
+    );
+  }
+  for (const territory of scope.localities) {
+    geographicConditions.push(Prisma.sql`(
+      LOWER(BTRIM(combined.county)) = ${territory.countyName.trim().toLocaleLowerCase("ro-RO")}
+      AND LOWER(BTRIM(combined.locality)) = ${territory.locality.trim().toLocaleLowerCase("ro-RO")}
+    )`);
+  }
+  const geographicCondition = geographicConditions.length > 0
+    ? Prisma.sql`(${Prisma.join(geographicConditions, " OR ")})`
+    : Prisma.sql`FALSE`;
+
+  return Prisma.sql`(
+    ${organizationCondition}
+    OR (
+      NOT EXISTS (
+        SELECT 1
+        FROM membership_records assigned_membership
+        WHERE LOWER(assigned_membership.email) = combined.email
+          AND assigned_membership.organization_id IS NOT NULL
+      )
+      AND ${geographicCondition}
+    )
+  )`;
+}
+
 function buildVolunteerAdminCombinedCte(): Prisma.Sql {
   return Prisma.sql`
     WITH user_rows AS (
@@ -449,11 +498,13 @@ function buildVolunteerAdminCombinedCte(): Prisma.Sql {
 
 function buildVolunteerAdminListQuery(input: {
   filters: VolunteerListFilters;
+  scope: AdminTerritoryScope;
   extraConditions?: Prisma.Sql[];
   pagination?: Prisma.Sql;
 }): Prisma.Sql {
   const conditions = [
     ...buildVolunteerAdminWhereConditions(input.filters),
+    buildVolunteerAdminScopeCondition(input.scope),
     ...(input.extraConditions ?? []),
   ];
   const whereClause = buildWhereClause(conditions);
@@ -501,6 +552,7 @@ function buildVolunteerAdminListQuery(input: {
 
 export async function listAdminVolunteersKeyset(input: {
   filters: VolunteerListFilters;
+  scope: AdminTerritoryScope;
   cursorCreatedAt: string;
   cursorId: number;
   limit: number;
@@ -508,6 +560,7 @@ export async function listAdminVolunteersKeyset(input: {
   const rows = await prisma.$queryRaw<VolunteerAdminListSqlRow[]>(
     buildVolunteerAdminListQuery({
       filters: input.filters,
+      scope: input.scope,
       extraConditions: [
         Prisma.sql`(
           combined.created_at < ${new Date(input.cursorCreatedAt)}
@@ -524,22 +577,42 @@ export async function listAdminVolunteersKeyset(input: {
   return rows.map((row) => mapVolunteerAdminListRow(row));
 }
 
-export async function listAdminVolunteersForExport(filters: VolunteerListFilters): Promise<VolunteerAdminRow[]> {
+export async function listAdminVolunteersForExport(
+  filters: VolunteerListFilters,
+  scope: AdminTerritoryScope
+): Promise<VolunteerAdminRow[]> {
   const rows = await prisma.$queryRaw<VolunteerAdminListSqlRow[]>(
     buildVolunteerAdminListQuery({
       filters,
+      scope,
     })
   );
 
   return rows.map((row) => mapVolunteerAdminListRow(row));
 }
 
-export async function listAdminVolunteerOwners(): Promise<VolunteerOwnerOption[]> {
+export async function listAdminVolunteerOwners(
+  scope: AdminTerritoryScope
+): Promise<VolunteerOwnerOption[]> {
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
   const rows = await prisma.user.findMany({
     where: {
       role: {
         in: [...volunteerOwnerRoles],
       },
+      ...(!scope.national
+        ? {
+          organizationMandates: {
+            some: {
+              organizationId: { in: scope.organizationIds },
+              status: "active",
+              startedAt: { lte: today },
+              OR: [{ endedAt: null }, { endedAt: { gte: today } }],
+            },
+          },
+        }
+        : {}),
     },
     select: {
       id: true,
@@ -582,10 +655,12 @@ export async function listAdminVolunteerOwners(): Promise<VolunteerOwnerOption[]
 
 export async function listAdminVolunteerIdsForBulkFilters(
   filters: VolunteerListFilters,
+  scope: AdminTerritoryScope,
   runner: SqlRunner = prisma
 ): Promise<number[]> {
   const whereClause = buildWhereClause([
     ...buildVolunteerAdminWhereConditions(filters),
+    buildVolunteerAdminScopeCondition(scope),
     Prisma.sql`combined.volunteer_id IS NOT NULL`,
   ]);
   const rows = await runner.$queryRaw<VolunteerIdSqlRow[]>(
@@ -601,8 +676,122 @@ export async function listAdminVolunteerIdsForBulkFilters(
   return rows.map((row) => Number(row.volunteerId));
 }
 
+export async function listAdminVolunteerIdsForExplicitSelection(
+  volunteerIds: number[],
+  scope: AdminTerritoryScope,
+  runner: SqlRunner = prisma
+): Promise<number[]> {
+  const uniqueIds = dedupeVolunteerIds(volunteerIds);
+  if (uniqueIds.length === 0) {
+    return [];
+  }
+  const rows = await runner.$queryRaw<VolunteerIdSqlRow[]>(Prisma.sql`
+    ${buildVolunteerAdminCombinedCte()}
+    SELECT combined.volunteer_id AS "volunteerId"
+    FROM combined
+    WHERE combined.volunteer_id IN (${Prisma.join(uniqueIds.map((id) => BigInt(id)))})
+      AND ${buildVolunteerAdminScopeCondition(scope)}
+  `);
+  return rows.map((row) => Number(row.volunteerId));
+}
+
 function dedupeVolunteerIds(volunteerIds: number[]): number[] {
   return [...new Set(volunteerIds.filter((value) => Number.isInteger(value) && value > 0))];
+}
+
+async function syncManagedAccountRoles(input: {
+  runner: SqlRunner;
+  emails: string[];
+  role: VolunteerManagedAccountRole;
+}): Promise<number> {
+  const normalizedEmails = [...new Set(
+    input.emails
+      .map((email) => email.trim().toLowerCase())
+      .filter(Boolean)
+  )];
+
+  if (normalizedEmails.length === 0) {
+    return 0;
+  }
+
+  const updatedRows = await input.runner.$queryRaw<Array<{ id: bigint | number }>>(
+    Prisma.sql`
+      WITH desired_roles AS (
+        SELECT
+          u.id,
+          CASE
+            WHEN mr.status = 'active' THEN 'MEMBRU'
+            WHEN mr.status = 'approved' THEN 'ADERENT'
+            WHEN mr.status IN ('supporter', 'application', 'verified', 'suspended', 'terminated') THEN 'SUSTINATOR'
+            ELSE ${input.role}
+          END AS desired_role
+        FROM users u
+        LEFT JOIN membership_records mr ON mr.user_id = u.id
+        WHERE LOWER(u.email) IN (${Prisma.join(normalizedEmails)})
+          AND u.role IN (${Prisma.join([...volunteerManagedAccountRoles])})
+      )
+      UPDATE users u
+      SET role = desired_roles.desired_role
+      FROM desired_roles
+      WHERE u.id = desired_roles.id
+        AND u.role <> desired_roles.desired_role
+      RETURNING u.id
+    `
+  );
+
+  return updatedRows.length;
+}
+
+async function syncMembershipLifecycleForWorkflow(input: {
+  runner: SqlRunner;
+  volunteerIds: number[];
+  status: VolunteerWorkflowStatus;
+  actorUserId: number | null;
+  effectiveAt: Date;
+}): Promise<void> {
+  if (input.status !== "validat" || input.volunteerIds.length === 0) {
+    return;
+  }
+
+  const records = await input.runner.membershipRecord.findMany({
+    where: {
+      volunteerId: { in: input.volunteerIds.map((id) => BigInt(id)) },
+      status: "application",
+    },
+    select: {
+      id: true,
+      status: true,
+      organizationId: true,
+    },
+  });
+
+  for (const record of records) {
+    const nextStatus = "verified";
+    await input.runner.membershipRecord.update({
+      where: { id: record.id },
+      data: {
+        status: nextStatus,
+        validatedAt: input.effectiveAt,
+        statusReason: "",
+        version: { increment: 1 },
+        updatedAt: input.effectiveAt,
+        updatedBy: input.actorUserId === null ? null : BigInt(input.actorUserId),
+      },
+    });
+    await input.runner.membershipEvent.create({
+      data: {
+        membershipId: record.id,
+        action: "verify",
+        previousStatus: record.status,
+        nextStatus,
+        previousOrganizationId: record.organizationId,
+        nextOrganizationId: record.organizationId,
+        reason: "Sincronizare din workflow-ul dosarului",
+        actorUserId: input.actorUserId === null ? null : BigInt(input.actorUserId),
+        effectiveAt: input.effectiveAt,
+      },
+    });
+  }
 }
 
 export async function bulkUpdateAdminVolunteerWorkflow(input: {
@@ -667,6 +856,18 @@ export async function bulkUpdateAdminVolunteerWorkflow(input: {
   const updatedVolunteerIdSet = new Set(updatedRows.map((row) => Number(row.volunteerId)));
   const updatedVolunteerIds = uniqueVolunteerIds.filter((id) => updatedVolunteerIdSet.has(id));
   const updatedSourceRows = updatableRows.filter((row) => updatedVolunteerIdSet.has(Number(row.id)));
+  await syncMembershipLifecycleForWorkflow({
+    runner: input.runner,
+    volunteerIds: updatedVolunteerIds,
+    status: input.status,
+    actorUserId: input.statusUpdatedBy,
+    effectiveAt: now,
+  });
+  await syncManagedAccountRoles({
+    runner: input.runner,
+    emails: existingRows.map((row) => row.email),
+    role: mapVolunteerStatusToAccountRole(input.status),
+  });
   const auditActor = input.actor
     ? {
       userId: null,
@@ -794,10 +995,53 @@ export async function bulkDeleteAdminVolunteers(input: {
   };
 }
 
-export async function readAdminVolunteerById(volunteerId: number): Promise<VolunteerAdminRow | null> {
-  const row = await prisma.volunteer.findUnique({
+export async function readAdminVolunteerById(
+  volunteerId: number,
+  scope: AdminTerritoryScope
+): Promise<VolunteerAdminRow | null> {
+  const row = await prisma.volunteer.findFirst({
     where: {
       id: BigInt(volunteerId),
+      ...(scope.national
+        ? {}
+        : {
+          OR: [
+            {
+              membershipRecord: {
+                is: { organizationId: { in: scope.organizationIds } },
+              },
+            },
+            {
+              AND: [
+                {
+                  OR: [
+                    { membershipRecord: { is: null } },
+                    { membershipRecord: { is: { organizationId: null } } },
+                  ],
+                },
+                {
+                  OR: [
+                    ...(scope.countyIds.length > 0 ? [{ countyId: { in: scope.countyIds } }] : []),
+                    ...scope.countyNames.map((county) => ({
+                      county: { equals: county, mode: "insensitive" as const },
+                    })),
+                    ...scope.localities.map((territory) => ({
+                      AND: [
+                        { locality: { equals: territory.locality, mode: "insensitive" as const } },
+                        {
+                          OR: [
+                            { countyId: territory.countyId },
+                            { county: { equals: territory.countyName, mode: "insensitive" as const } },
+                          ],
+                        },
+                      ],
+                    })),
+                  ],
+                },
+              ],
+            },
+          ],
+        }),
     },
     select: {
       id: true,
@@ -847,7 +1091,10 @@ export async function readAdminVolunteerById(volunteerId: number): Promise<Volun
   return mapVolunteerAdminRow(row as VolunteerAdminDbRow);
 }
 
-export async function readAdminVolunteerRecordById(recordId: number): Promise<VolunteerAdminRow | null> {
+export async function readAdminVolunteerRecordById(
+  recordId: number,
+  scope: AdminTerritoryScope
+): Promise<VolunteerAdminRow | null> {
   const rows = await prisma.$queryRaw<VolunteerAdminListSqlRow[]>(
     buildVolunteerAdminListQuery({
       filters: {
@@ -857,6 +1104,7 @@ export async function readAdminVolunteerRecordById(recordId: number): Promise<Vo
         localityValue: null,
         skillsValue: null,
       },
+      scope,
       extraConditions: [Prisma.sql`combined.combined_id = ${recordId}`],
       pagination: Prisma.sql`LIMIT 1`,
     })
@@ -883,6 +1131,7 @@ export async function updateAdminVolunteerWorkflow(input: {
   rejectionReason?: string;
   tags?: string[];
   skillTags?: string[];
+  scope: AdminTerritoryScope;
 }): Promise<VolunteerAdminRow | null> {
   try {
     const data: {
@@ -978,53 +1227,32 @@ export async function updateAdminVolunteerWorkflow(input: {
       data.skillTags = input.skillTags;
     }
 
-    const row = await prisma.volunteer.update({
-      where: {
-        id: BigInt(input.volunteerId),
-      },
-      data,
-      select: {
-        id: true,
-        fullName: true,
-        email: true,
-        phone: true,
-        county: true,
-        locality: true,
-        skills: true,
-        motivation: true,
-        workflowStatus: true,
-        internalNotes: true,
-        createdAt: true,
-        statusUpdatedAt: true,
-        statusUpdatedBy: true,
-        statusUpdatedByRef: {
-          select: {
-            id: true,
-            fullName: true,
-            email: true,
-          },
+    await prisma.$transaction(async (tx) => {
+      const row = await tx.volunteer.update({
+        where: {
+          id: BigInt(input.volunteerId),
         },
-        ownerUserId: true,
-        ownerUserRef: {
-          select: {
-            id: true,
-            fullName: true,
-            email: true,
-            role: true,
-          },
+        data,
+        select: {
+          email: true,
         },
-        followUpAt: true,
-        reminderAt: true,
-        lastContactAt: true,
-        contactChannel: true,
-        crmPriority: true,
-        rejectionReason: true,
-        crmTags: true,
-        skillTags: true,
-      },
+      });
+
+      await syncMembershipLifecycleForWorkflow({
+        runner: tx,
+        volunteerIds: [input.volunteerId],
+        status: input.status,
+        actorUserId: input.statusUpdatedBy,
+        effectiveAt: data.statusUpdatedAt,
+      });
+      await syncManagedAccountRoles({
+        runner: tx,
+        emails: [row.email],
+        role: mapVolunteerStatusToAccountRole(input.status),
+      });
     });
 
-    return mapVolunteerAdminRow(row as VolunteerAdminDbRow);
+    return readAdminVolunteerRecordById(input.volunteerId, input.scope);
   } catch (error) {
     if (
       typeof error === "object"

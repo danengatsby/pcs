@@ -238,10 +238,12 @@ const contactChannelOptions = [
 
 export function VolunteerWorkflowForm({
   volunteer,
+  canPromote,
   onSubmit,
   submitting,
 }: {
   volunteer: VolunteerAdminRow
+  canPromote?: boolean
   submitting: boolean
   onSubmit: (values: VolunteerWorkflowFormValues) => void | Promise<void>
 }) {
@@ -259,6 +261,9 @@ export function VolunteerWorkflowForm({
     ...effectiveDraftValues,
   }
   const isDirty = !areFormStatesEqual(formValues, syncedValues)
+  const effectiveStatusOptions = (canPromote ?? true)
+    ? statusOptions
+    : statusOptions.filter((option) => option.value !== 'activ')
 
   const countyOptions = (() => {
     const seen = new Set<string>()
@@ -391,7 +396,7 @@ export function VolunteerWorkflowForm({
         label="Status"
         value={formValues.status}
         onChange={(event) => updateDraftValue('status', event.target.value as VolunteerWorkflowStatus)}
-        options={statusOptions}
+        options={effectiveStatusOptions}
       />
 
       <Select

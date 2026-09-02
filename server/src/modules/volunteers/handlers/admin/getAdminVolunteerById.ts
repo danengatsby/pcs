@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import { AppError } from "../../../../lib/errors.js";
+import { requireAdminAccess } from "../../../../lib/adminAuthorization.js";
 import { sendSuccess } from "../../../../lib/http.js";
 import { parseAdminVolunteerRecordId } from "../../parsing.js";
 import { readAdminVolunteerRecordById } from "../../repository.js";
@@ -16,7 +17,10 @@ export async function getAdminVolunteerByIdHandler(
   }
 
   try {
-    const volunteer = await readAdminVolunteerRecordById(volunteerRecordId);
+    const volunteer = await readAdminVolunteerRecordById(
+      volunteerRecordId,
+      requireAdminAccess(res).scope
+    );
     if (!volunteer) {
       next(new AppError(404, "VOLUNTEER_NOT_FOUND", "Voluntarul nu a fost gasit."));
       return;

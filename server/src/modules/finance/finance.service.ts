@@ -1,5 +1,6 @@
 import { listFinanceRepository } from "./finance.repository.js";
 import type { ListFinanceQuery } from "./finance.schema.js";
+import { readRegulatedModuleGate } from "../governance/regulatedModules.repository.js";
 
 export async function listFinanceService(filters: ListFinanceQuery): Promise<{
   rows: Awaited<ReturnType<typeof listFinanceRepository>>["rows"];
@@ -9,7 +10,12 @@ export async function listFinanceService(filters: ListFinanceQuery): Promise<{
     expense: number;
     balance: number;
   };
+  governance: Awaited<ReturnType<typeof readRegulatedModuleGate>>;
 }> {
+  const governance = await readRegulatedModuleGate("financial_transparency");
+  if (!governance.enabled) {
+    return { rows: [], total: 0, totals: { income: 0, expense: 0, balance: 0 }, governance };
+  }
   const result = await listFinanceRepository(filters);
 
   let income = 0;
@@ -30,5 +36,6 @@ export async function listFinanceService(filters: ListFinanceQuery): Promise<{
       expense,
       balance: income - expense,
     },
+    governance,
   };
 }

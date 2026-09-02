@@ -3,6 +3,8 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, useLocation } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useCounties } from '@features/contact/hooks/useCounties'
+import { AuthContext, type AuthContextValue } from '@features/auth/context'
+import type { Role } from '@features/auth/types'
 import { exportAdminVolunteersCsv } from '../api/exportAdminVolunteersCsv'
 import { useAdminVolunteerAudit } from '../hooks/useAdminVolunteerAudit'
 import { useVolunteerOwners } from '../hooks/useVolunteerOwners'
@@ -396,14 +398,49 @@ describe('VolunteersAdminPage', () => {
         skills: undefined,
       }))
   })
+
+  it('keeps the adviser interface read-only', async () => {
+    const user = userEvent.setup()
+    mockAdminVolunteers()
+
+    renderPage('/admin/volunteers', 'CONSILIER')
+
+    expect(screen.queryByRole('button', { name: 'Export CSV' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Tablou de comandă' })).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Selectează Ana Pop')).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /Ana Pop/i }))
+    expect(screen.getByText(/consultarea dosarului, nu modificarea workflow-ului/i)).toBeInTheDocument()
+  })
+
+  it('lets the secretary manage CRM without promotion or deletion controls', async () => {
+    const user = userEvent.setup()
+    mockAdminVolunteers()
+
+    renderPage('/admin/volunteers', 'SECRETAR')
+
+    expect(screen.getByRole('button', { name: 'Export CSV' })).toBeInTheDocument()
+    await user.click(screen.getByLabelText('Selectează Ana Pop'))
+    expect(screen.queryByRole('option', { name: 'activ' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Șterge formularele' })).not.toBeInTheDocument()
+  })
 })
 
-function renderPage(initialEntry = '/admin/volunteers') {
+function renderPage(initialEntry = '/admin/volunteers', role: Role = 'PRESEDINTE') {
+  const auth: AuthContextValue = {
+    user: { id: '1', fullName: 'Admin Test', email: 'admin@example.test', role },
+    loading: false,
+    signin: vi.fn(),
+    reload: vi.fn(),
+    signout: vi.fn(),
+  }
   return render(
-    <MemoryRouter initialEntries={[initialEntry]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <LocationSearch />
-      <VolunteersAdminPage />
-    </MemoryRouter>,
+    <AuthContext.Provider value={auth}>
+      <MemoryRouter initialEntries={[initialEntry]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <LocationSearch />
+        <VolunteersAdminPage />
+      </MemoryRouter>
+    </AuthContext.Provider>,
   )
 }
 

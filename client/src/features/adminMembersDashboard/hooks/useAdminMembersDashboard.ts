@@ -1,51 +1,17 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { readQueryError } from '@lib/queryClient'
 import {
+  applyMembershipAction,
   getAdminMembersDashboard,
   type AdminMembersDashboardQuery,
 } from '../api/getAdminMembersDashboard'
 import { adminMembersDashboardQueryKeys } from '../queryKeys'
-import type { AdminMembersDashboardResponse } from '../types'
-
-function buildEmptyGroup(label: string) {
-  return {
-    label,
-    count: 0,
-    rows: [],
-  }
-}
-
-function normalizeDashboardResponse(
-  value: AdminMembersDashboardResponse | null | undefined,
-  query: AdminMembersDashboardQuery,
-): AdminMembersDashboardResponse {
-  return {
-    summary: {
-      total: value?.summary?.total ?? 0,
-      aderenti: value?.summary?.aderenti ?? 0,
-      membri: value?.summary?.membri ?? 0,
-      organizatori: value?.summary?.organizatori ?? 0,
-    },
-    groups: {
-      aderenti: value?.groups?.aderenti ?? buildEmptyGroup('Aderenți'),
-      membri: value?.groups?.membri ?? buildEmptyGroup('Membri'),
-      organizatori: value?.groups?.organizatori ?? buildEmptyGroup('Organizatori'),
-    },
-    filters: {
-      search: value?.filters?.search ?? query.search ?? '',
-      limit: value?.filters?.limit ?? query.limit ?? 10,
-    },
-  }
-}
+import type { MembershipActionInput } from '../types'
 
 async function fetchAdminMembersDashboard(query: AdminMembersDashboardQuery) {
   const response = await getAdminMembersDashboard(query)
-
-  if (!response.ok) {
-    throw new Error(response.error.message)
-  }
-
-  return normalizeDashboardResponse(response.data, query)
+  if (!response.ok) throw new Error(response.error.message)
+  return response.data
 }
 
 export function useAdminMembersDashboard(query: AdminMembersDashboardQuery) {
@@ -58,7 +24,28 @@ export function useAdminMembersDashboard(query: AdminMembersDashboardQuery) {
   return {
     dashboard: queryResult.data ?? null,
     loading: queryResult.isPending || queryResult.isFetching,
-    error: queryResult.error ? readQueryError(queryResult.error, 'Eroare la încărcarea dashboard-ului.') : null,
+    error: queryResult.error ? readQueryError(queryResult.error, 'Eroare la încărcarea registrului de membri.') : null,
     reload: () => void queryResult.refetch(),
+  }
+}
+
+export function useMembershipAction() {
+  const queryClient = useQueryClient()
+  const mutation = useMutation({
+    mutationFn: async (input: { membershipId: string; payload: MembershipActionInput }) => {
+      const response = await applyMembershipAction(input.membershipId, input.payload)
+      if (!response.ok) throw new Error(response.error.message)
+      return response.data
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: adminMembersDashboardQueryKeys.all })
+    },
+  })
+
+  return {
+    execute: mutation.mutateAsync,
+    saving: mutation.isPending,
+    error: mutation.error ? readQueryError(mutation.error, 'Decizia nu a putut fi înregistrată.') : null,
+    reset: mutation.reset,
   }
 }

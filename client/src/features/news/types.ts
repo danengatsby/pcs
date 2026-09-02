@@ -7,4 +7,5 @@ export type NewsItem = {
   content?: string
   sourceName?: string
   sourceUrl?: string
+  tags?: string[]
 }

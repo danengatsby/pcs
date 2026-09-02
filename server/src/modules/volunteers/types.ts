@@ -16,6 +16,17 @@ export type VolunteerWorkflowStatus = (typeof volunteerStatusValues)[number];
 export type VolunteerContactChannel = (typeof volunteerContactChannelValues)[number];
 export type VolunteerPriority = (typeof volunteerPriorityValues)[number];
 
+export const volunteerManagedAccountRoles = ["SUSTINATOR", "ADERENT", "MEMBRU"] as const;
+export type VolunteerManagedAccountRole = (typeof volunteerManagedAccountRoles)[number];
+
+export function mapVolunteerStatusToAccountRole(
+  _status: VolunteerWorkflowStatus
+): VolunteerManagedAccountRole {
+  // Workflow-ul CRM descrie activitatea voluntarului, nu calitatea politică.
+  // Rolurile ADERENT/MEMBRU sunt acordate exclusiv prin registrul de membri.
+  return "SUSTINATOR";
+}
+
 export type VolunteerPublicRole =
   | "SUSTINATOR"
   | "ADERENT"
@@ -35,6 +46,7 @@ export type ExistingVolunteerRow = {
 };
 
 export type ExistingUserAuthRow = {
+  id: number;
   passwordHash: string;
 };
 
@@ -112,6 +124,8 @@ export type VolunteerListFilters = {
 export type QueryRunner = {
   volunteer: PrismaTx["volunteer"];
   user: PrismaTx["user"];
+  membershipRecord: PrismaTx["membershipRecord"];
+  membershipEvent: PrismaTx["membershipEvent"];
 };
 
 export type CaptchaVerifyResponse = {

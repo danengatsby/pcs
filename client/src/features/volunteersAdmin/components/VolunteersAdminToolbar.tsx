@@ -45,6 +45,11 @@ function resolveTextFilterDraftValues(
 }
 
 type VolunteersAdminToolbarProps = {
+  canManage?: boolean
+  canPromote?: boolean
+  canDelete?: boolean
+  canExport?: boolean
+  canViewExecutive?: boolean
   loading: boolean
   exporting: boolean
   bulkUpdating: boolean
@@ -65,6 +70,11 @@ type VolunteersAdminToolbarProps = {
 }
 
 export function VolunteersAdminToolbar({
+  canManage = true,
+  canPromote = true,
+  canDelete = true,
+  canExport = true,
+  canViewExecutive = true,
   loading,
   exporting,
   bulkUpdating,
@@ -95,8 +105,10 @@ export function VolunteersAdminToolbar({
     [counties],
   )
   const statusOptions = useMemo(
-    () => volunteerWorkflowStatusValues.map((status) => ({ value: status, label: status })),
-    [],
+    () => volunteerWorkflowStatusValues
+      .filter((status) => canPromote || status !== 'activ')
+      .map((status) => ({ value: status, label: status })),
+    [canPromote],
   )
   const bulkBusy = bulkUpdating || bulkDeleting
 
@@ -216,7 +228,7 @@ export function VolunteersAdminToolbar({
       </div>
 
       <div className="volunteer-admin__actions">
-        {bulkSelectionCount > 0 ? (
+        {canManage && bulkSelectionCount > 0 ? (
           <div className="volunteer-admin__bulk-actions">
             <span className="muted">
               {bulkSelectionAllFiltered ? 'Selectate: toate rezultatele filtrate' : `Selectate: ${bulkSelectionCount}`}
@@ -237,25 +249,28 @@ export function VolunteersAdminToolbar({
             >
               Aplică status
             </Button>
-            <Button
+            {canDelete ? <Button
               className="volunteer-admin__bulk-delete"
               loading={bulkDeleting}
               disabled={bulkUpdating}
               onClick={onBulkDelete}
             >
               Șterge formularele
-            </Button>
+            </Button> : null}
             <Button disabled={bulkBusy} onClick={onClearSelection}>
               Anulează selecția
             </Button>
           </div>
         ) : null}
+        {canViewExecutive ? <Link className="btn" to="/admin/dashboard">
+          Tablou de comandă
+        </Link> : null}
         <Link className="btn" to="/admin/members">
           Dashboard membri
         </Link>
-        <Button onClick={onExport} loading={exporting}>
+        {canExport ? <Button onClick={onExport} loading={exporting}>
           Export CSV
-        </Button>
+        </Button> : null}
         <Button onClick={handleResetFilters}>
           Resetează filtrele
         </Button>

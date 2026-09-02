@@ -2,253 +2,266 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { test } from "node:test";
 import request from "supertest";
-import { query } from "../../lib/db.js";
 import { createApp } from "../../app.js";
+import { query } from "../../lib/db.js";
 import { deleteUserByEmail, deleteVolunteerByEmail } from "../helpers/dbTestUtils.js";
 
 const app = createApp();
+const password = "ParolaFoarteBuna#2026";
 
-async function setUserRole(email: string, role: string): Promise<void> {
-  await query(
-    `
-      UPDATE users
-      SET role = $2
-      WHERE LOWER(email) = LOWER($1)
-    `,
-    [email, role]
-  );
+async function createUser(email: string, fullName: string, role: string): Promise<string> {
+  await request(app).post("/api/auth/signup").send({ fullName, email, password }).expect(201);
+  await query("UPDATE users SET role = $2 WHERE LOWER(email) = LOWER($1)", [email, role]);
+  const signin = await request(app).post("/api/auth/signin").send({ email, password }).expect(200);
+  const token = signin.body?.data?.token as string | undefined;
+  assert.ok(token);
+  return token;
 }
 
-async function insertVolunteerWithoutUser(input: {
-  fullName: string;
-  email: string;
-  county: string;
-  locality: string;
-  workflowStatus: "nou" | "validat" | "contactat" | "activ";
-}): Promise<void> {
-  await query(
-    `
-      INSERT INTO volunteers (
-        full_name,
-        email,
-        phone,
-        county,
-        county_id,
-        locality,
-        skills,
-        motivation,
-        workflow_status,
-        internal_notes
-      )
-      VALUES ($1, $2, $3, $4, NULL, $5, $6, $7, $8, '')
-    `,
-    [
-      input.fullName,
-      input.email,
-      "0712345678",
-      input.county,
-      input.locality,
-      "organizare",
-      "Implicare locala.",
-      input.workflowStatus,
-    ]
-  );
+async function createApplication(email: string, fullName: string): Promise<void> {
+  await request(app)
+    .post("/api/volunteers")
+    .send({
+      fullName,
+      email,
+      password,
+      phone: "0712345678",
+      county: "Cluj",
+      locality: "Cluj-Napoca",
+      skills: "organizare",
+      motivation: "Doresc să particip la activitatea organizației locale.",
+      website: "",
+    })
+    .expect(201);
 }
 
-test("admin members dashboard should group adherents, members and organizers", async () => {
+test("membership registry should paginate and execute the complete governed lifecycle", async () => {
   const suffix = randomUUID().replaceAll("-", "").slice(0, 12);
-  const searchToken = `dashboard-members.${suffix}`;
-  const password = "ParolaFoarteBuna#2026";
-
-  const adminEmail = `${searchToken}.admin@example.test`;
-  const aderentEmail = `${searchToken}.aderent@example.test`;
-  const membruEmail = `${searchToken}.membru@example.test`;
-  const consilierEmail = `${searchToken}.consilier@example.test`;
-
-  const users = [
-    { fullName: "Admin Dashboard", email: adminEmail },
-    { fullName: "Aderent Dashboard", email: aderentEmail },
-    { fullName: "Membru Dashboard", email: membruEmail },
-    { fullName: "Consilier Dashboard", email: consilierEmail },
-  ];
+  const presidentEmail = `membership.${suffix}.president@example.test`;
+  const secretaryEmail = `membership.${suffix}.secretary@example.test`;
+  const adviserEmail = `membership.${suffix}.adviser@example.test`;
+  const memberEmail = `membership.${suffix}.member@example.test`;
+  const secondEmail = `membership.${suffix}.second@example.test`;
+  const organizationOne = `org-membership-${suffix}-one`;
+  const organizationTwo = `org-membership-${suffix}-two`;
 
   try {
-    for (const user of users) {
-      await request(app)
-        .post("/api/auth/signup")
-        .send({
-          fullName: user.fullName,
-          email: user.email,
-          password,
-        })
-        .expect(201);
-    }
+    const presidentToken = await createUser(presidentEmail, "Președinte Registru", "PRESEDINTE");
+    const secretaryToken = await createUser(secretaryEmail, "Secretar Registru", "SECRETAR");
+    const adviserToken = await createUser(adviserEmail, "Consilier Registru", "CONSILIER");
 
-    await setUserRole(adminEmail, "PRESEDINTE");
-    await setUserRole(membruEmail, "MEMBRU");
-    await setUserRole(consilierEmail, "CONSILIER");
+    await query(
+      `INSERT INTO organizations (id, code, level, name, county, members_count, status, founded_at)
+       VALUES
+         ($1, $2, 'county', 'Filiala Test Unu', 'Cluj', 0, 'active', CURRENT_DATE),
+         ($3, $4, 'county', 'Filiala Test Doi', 'Alba', 0, 'active', CURRENT_DATE)`,
+      [organizationOne, `MEM-${suffix}-1`, organizationTwo, `MEM-${suffix}-2`]
+    );
+    await query(
+      `INSERT INTO organization_territories (organization_id, territory_type, county_id, locality)
+       SELECT $1, 'county', id, '' FROM counties WHERE name = 'Cluj'
+       UNION ALL
+       SELECT $2, 'county', id, '' FROM counties WHERE name = 'Alba'`,
+      [organizationOne, organizationTwo]
+    );
+    await query(
+      `INSERT INTO organization_leadership_mandates (
+         organization_id, user_id, full_name, position_title, started_at, status
+       )
+       SELECT organization_id, u.id, u.full_name, 'Secretar teritorial', CURRENT_DATE, 'active'
+       FROM users u
+       CROSS JOIN (VALUES ($2::varchar), ($3::varchar)) AS scoped(organization_id)
+       WHERE LOWER(u.email) = LOWER($1)`,
+      [secretaryEmail, organizationOne, organizationTwo]
+    );
 
-    const signinResponse = await request(app)
-      .post("/api/auth/signin")
-      .send({
-        email: adminEmail,
-        password,
-      })
+    await createApplication(memberEmail, "Membru Flux Complet");
+    await createApplication(secondEmail, "Membru Paginare");
+
+    const firstPage = await request(app)
+      .get(`/api/admin/members/dashboard?search=${encodeURIComponent(`membership.${suffix}`)}&limit=1&offset=0`)
+      .set("Authorization", `Bearer ${presidentToken}`)
       .expect(200);
+    assert.equal(firstPage.body?.data?.pagination?.total, 2);
+    assert.equal(firstPage.body?.data?.rows?.length, 1);
+    assert.equal(firstPage.body?.data?.pagination?.hasNext, true);
 
-    const token = signinResponse.body?.data?.token as string | undefined;
-    assert.equal(typeof token, "string");
-
-    const response = await request(app)
-      .get(`/api/admin/members/dashboard?search=${encodeURIComponent(searchToken)}&limit=5`)
-      .set("Authorization", `Bearer ${token}`)
+    const secondPage = await request(app)
+      .get(`/api/admin/members/dashboard?search=${encodeURIComponent(`membership.${suffix}`)}&limit=1&offset=1`)
+      .set("Authorization", `Bearer ${presidentToken}`)
       .expect(200);
+    assert.equal(secondPage.body?.data?.pagination?.hasPrevious, true);
 
-    const data = response.body?.data as {
-      summary: {
-        total: number;
-        aderenti: number;
-        membri: number;
-        organizatori: number;
-      };
-      groups: {
-        aderenti: { rows: Array<{ email: string; role: string }> };
-        membri: { rows: Array<{ email: string; role: string }> };
-        organizatori: { rows: Array<{ email: string; role: string }> };
-      };
+    const registry = await request(app)
+      .get(`/api/admin/members/dashboard?search=${encodeURIComponent(memberEmail)}&limit=25`)
+      .set("Authorization", `Bearer ${presidentToken}`)
+      .expect(200);
+    const application = registry.body?.data?.rows?.[0] as {
+      id: string;
+      membershipStatus: string;
+      role: string;
+      memberNumber: string | null;
+      version: number;
+      availableActions: string[];
     };
-
-    assert.equal(data.summary.aderenti, 1);
-    assert.equal(data.summary.membri, 1);
-    assert.equal(data.summary.organizatori, 2);
-    assert.equal(data.summary.total, 4);
-
-    assert.deepEqual(
-      data.groups.aderenti.rows.map((row) => row.email).sort(),
-      [aderentEmail]
+    assert.equal(application.membershipStatus, "application");
+    assert.equal(application.role, "SUSTINATOR");
+    assert.equal(application.memberNumber, null);
+    assert.equal(application.version, 1);
+    assert.ok(application.availableActions.includes("verify"));
+    const submittedEvent = await query<{ previous_status: string; next_status: string }>(
+      `SELECT previous_status, next_status
+       FROM membership_events
+       WHERE membership_id = $1
+       ORDER BY id ASC
+       LIMIT 1`,
+      [application.id]
     );
-    assert.deepEqual(
-      data.groups.membri.rows.map((row) => row.email).sort(),
-      [membruEmail]
-    );
-    assert.deepEqual(
-      data.groups.organizatori.rows.map((row) => row.role).sort(),
-      ["CONSILIER", "PRESEDINTE"]
-    );
-  } finally {
-    for (const user of users) {
-      await deleteUserByEmail(user.email);
-    }
-  }
-});
+    assert.equal(submittedEvent.rows[0]?.previous_status, "supporter");
+    assert.equal(submittedEvent.rows[0]?.next_status, "application");
 
-test("admin members dashboard should include adherents derived from volunteer workflow even without auth account", async () => {
-  const suffix = randomUUID().replaceAll("-", "").slice(0, 12);
-  const searchToken = `dashboard-members.volunteer.${suffix}`;
-  const password = "ParolaFoarteBuna#2026";
-
-  const adminEmail = `${searchToken}.admin@example.test`;
-  const volunteerEmail = `${searchToken}.aderent@example.test`;
-
-  try {
     await request(app)
-      .post("/api/auth/signup")
-      .send({
-        fullName: "Admin Dashboard Volunteer",
-        email: adminEmail,
-        password,
-      })
-      .expect(201);
-
-    await setUserRole(adminEmail, "PRESEDINTE");
-
-    await insertVolunteerWithoutUser({
-      fullName: "Aderent Fara Cont",
-      email: volunteerEmail,
-      county: "Bucuresti",
-      locality: "Sector 3",
-      workflowStatus: "contactat",
-    });
-
-    const signinResponse = await request(app)
-      .post("/api/auth/signin")
-      .send({
-        email: adminEmail,
-        password,
-      })
-      .expect(200);
-
-    const token = signinResponse.body?.data?.token as string | undefined;
-    assert.equal(typeof token, "string");
-
-    const response = await request(app)
-      .get(`/api/admin/members/dashboard?search=${encodeURIComponent(searchToken)}&limit=5`)
-      .set("Authorization", `Bearer ${token}`)
-      .expect(200);
-
-    const data = response.body?.data as {
-      summary: {
-        total: number;
-        aderenti: number;
-        membri: number;
-        organizatori: number;
-      };
-      groups: {
-        aderenti: { rows: Array<{ email: string; role: string }> };
-        organizatori: { rows: Array<{ email: string; role: string }> };
-      };
-    };
-
-    assert.equal(data.summary.aderenti, 1);
-    assert.equal(data.summary.membri, 0);
-    assert.equal(data.summary.organizatori, 1);
-    assert.equal(data.summary.total, 2);
-    assert.deepEqual(
-      data.groups.aderenti.rows.map((row) => [row.email, row.role]),
-      [[volunteerEmail, "ADERENT"]]
-    );
-    assert.deepEqual(
-      data.groups.organizatori.rows.map((row) => [row.email, row.role]),
-      [[adminEmail, "PRESEDINTE"]]
-    );
-  } finally {
-    await deleteVolunteerByEmail(volunteerEmail);
-    await deleteUserByEmail(adminEmail);
-  }
-});
-
-test("admin members dashboard should reject non-admin users", async () => {
-  const email = `dashboard-members.nonadmin.${randomUUID().replaceAll("-", "")}@example.test`;
-  const password = "ParolaFoarteBuna#2026";
-
-  try {
-    await request(app)
-      .post("/api/auth/signup")
-      .send({
-        fullName: "Non Admin Dashboard",
-        email,
-        password,
-      })
-      .expect(201);
-
-    const signinResponse = await request(app)
-      .post("/api/auth/signin")
-      .send({
-        email,
-        password,
-      })
-      .expect(200);
-
-    const token = signinResponse.body?.data?.token as string | undefined;
-    assert.equal(typeof token, "string");
-
-    const response = await request(app)
-      .get("/api/admin/members/dashboard")
-      .set("Authorization", `Bearer ${token}`)
+      .post(`/api/admin/members/${application.id}/actions`)
+      .set("Authorization", `Bearer ${adviserToken}`)
+      .send({ action: "verify", expectedVersion: 1 })
       .expect(403);
 
-    assert.equal(response.body?.error?.code, "AUTH_FORBIDDEN");
+    const verifiedResponse = await request(app)
+      .post(`/api/admin/members/${application.id}/actions`)
+      .set("Authorization", `Bearer ${secretaryToken}`)
+      .send({ action: "verify", expectedVersion: 1 })
+      .expect(200);
+    assert.equal(verifiedResponse.body?.data?.membership?.membershipStatus, "verified");
+    assert.equal(verifiedResponse.body?.data?.membership?.role, "SUSTINATOR");
+    assert.equal(verifiedResponse.body?.data?.membership?.version, 2);
+
+    await request(app)
+      .post(`/api/admin/members/${application.id}/actions`)
+      .set("Authorization", `Bearer ${secretaryToken}`)
+      .send({ action: "approve", approvalOrganizationId: organizationOne, expectedVersion: 2 })
+      .expect(403);
+
+    const approvedResponse = await request(app)
+      .post(`/api/admin/members/${application.id}/actions`)
+      .set("Authorization", `Bearer ${presidentToken}`)
+      .send({ action: "approve", approvalOrganizationId: organizationOne, expectedVersion: 2 })
+      .expect(200);
+    assert.equal(approvedResponse.body?.data?.membership?.membershipStatus, "approved");
+    assert.equal(approvedResponse.body?.data?.membership?.role, "ADERENT");
+    assert.equal(approvedResponse.body?.data?.membership?.approvalOrganization?.id, organizationOne);
+    assert.equal(approvedResponse.body?.data?.membership?.memberNumber, null);
+
+    const activatedResponse = await request(app)
+      .post(`/api/admin/members/${application.id}/actions`)
+      .set("Authorization", `Bearer ${presidentToken}`)
+      .send({ action: "activate", expectedVersion: 3 })
+      .expect(200);
+    assert.equal(activatedResponse.body?.data?.membership?.membershipStatus, "active");
+    assert.equal(activatedResponse.body?.data?.membership?.role, "MEMBRU");
+    assert.match(activatedResponse.body?.data?.membership?.memberNumber as string, /^PCS-\d{4}-\d{6}$/);
+
+    const transferredResponse = await request(app)
+      .post(`/api/admin/members/${application.id}/actions`)
+      .set("Authorization", `Bearer ${secretaryToken}`)
+      .send({
+        action: "transfer",
+        organizationId: organizationTwo,
+        reason: "Repartizare conform domiciliului",
+        expectedVersion: 4,
+      })
+      .expect(200);
+    assert.equal(transferredResponse.body?.data?.membership?.organization?.id, organizationTwo);
+
+    const suspendedResponse = await request(app)
+      .post(`/api/admin/members/${application.id}/actions`)
+      .set("Authorization", `Bearer ${presidentToken}`)
+      .send({ action: "suspend", reason: "Suspendare aprobată de conducere", expectedVersion: 5 })
+      .expect(200);
+    assert.equal(suspendedResponse.body?.data?.membership?.membershipStatus, "suspended");
+    assert.equal(suspendedResponse.body?.data?.membership?.role, "SUSTINATOR");
+
+    const conflict = await request(app)
+      .post(`/api/admin/members/${application.id}/actions`)
+      .set("Authorization", `Bearer ${presidentToken}`)
+      .send({ action: "reactivate", expectedVersion: 5 })
+      .expect(409);
+    assert.equal(conflict.body?.error?.code, "MEMBERSHIP_VERSION_CONFLICT");
+
+    const reactivatedResponse = await request(app)
+      .post(`/api/admin/members/${application.id}/actions`)
+      .set("Authorization", `Bearer ${presidentToken}`)
+      .send({ action: "reactivate", expectedVersion: 6 })
+      .expect(200);
+    assert.equal(reactivatedResponse.body?.data?.membership?.membershipStatus, "active");
+    assert.equal(reactivatedResponse.body?.data?.membership?.role, "MEMBRU");
+
+    const secondTransfer = await request(app)
+      .post(`/api/admin/members/${application.id}/actions`)
+      .set("Authorization", `Bearer ${secretaryToken}`)
+      .send({ action: "transfer", organizationId: organizationOne, expectedVersion: 7 })
+      .expect(200);
+    assert.equal(secondTransfer.body?.data?.membership?.organization?.id, organizationOne);
+
+    const terminatedResponse = await request(app)
+      .post(`/api/admin/members/${application.id}/actions`)
+      .set("Authorization", `Bearer ${presidentToken}`)
+      .send({ action: "terminate", reason: "Cerere scrisă de retragere", expectedVersion: 8 })
+      .expect(200);
+    assert.equal(terminatedResponse.body?.data?.membership?.membershipStatus, "terminated");
+    assert.equal(terminatedResponse.body?.data?.membership?.role, "SUSTINATOR");
+    assert.equal(terminatedResponse.body?.data?.membership?.availableActions?.length, 0);
+    assert.ok(terminatedResponse.body?.data?.membership?.history?.length > 0);
+
+    const persisted = await query<{
+      status: string;
+      role: string;
+      workflow_status: string;
+      organization_id: string;
+      approval_organization_id: string;
+      member_number: string;
+      event_count: string;
+      audit_count: string;
+    }>(
+      `SELECT
+         mr.status,
+         u.role,
+         v.workflow_status,
+         mr.organization_id,
+         mr.approval_organization_id,
+         mr.member_number,
+         (SELECT COUNT(*)::text FROM membership_events me WHERE me.membership_id = mr.id) AS event_count,
+         (SELECT COUNT(*)::text FROM admin_audit_log aal WHERE aal.target_type = 'membership' AND aal.target_id = mr.id::text) AS audit_count
+       FROM membership_records mr
+       JOIN users u ON u.id = mr.user_id
+       JOIN volunteers v ON v.id = mr.volunteer_id
+       WHERE LOWER(mr.email) = LOWER($1)`,
+      [memberEmail]
+    );
+    assert.equal(persisted.rows[0]?.status, "terminated");
+    assert.equal(persisted.rows[0]?.role, "SUSTINATOR");
+    assert.equal(persisted.rows[0]?.workflow_status, "activ");
+    assert.equal(persisted.rows[0]?.organization_id, organizationOne);
+    assert.equal(persisted.rows[0]?.approval_organization_id, organizationOne);
+    assert.match(persisted.rows[0]?.member_number ?? "", /^PCS-\d{4}-\d{6}$/);
+    assert.equal(Number(persisted.rows[0]?.event_count), 9);
+    assert.equal(Number(persisted.rows[0]?.audit_count), 8);
+
+    const memberSignin = await request(app)
+      .post("/api/auth/signin")
+      .send({ email: memberEmail, password })
+      .expect(200);
+    await request(app)
+      .get("/api/admin/members/dashboard")
+      .set("Authorization", `Bearer ${memberSignin.body?.data?.token as string}`)
+      .expect(403);
   } finally {
-    await deleteUserByEmail(email);
+    await deleteVolunteerByEmail(memberEmail);
+    await deleteVolunteerByEmail(secondEmail);
+    await deleteUserByEmail(memberEmail);
+    await deleteUserByEmail(secondEmail);
+    await deleteUserByEmail(adviserEmail);
+    await deleteUserByEmail(secretaryEmail);
+    await deleteUserByEmail(presidentEmail);
+    await query("DELETE FROM organizations WHERE id IN ($1, $2)", [organizationOne, organizationTwo]);
   }
 });

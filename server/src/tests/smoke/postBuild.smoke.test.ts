@@ -135,7 +135,7 @@ test("post-build smoke should cover auth basic, members, and volunteers admin fl
 
     assert.ok(member);
     assert.equal(member?.status, "nou");
-    assert.equal(member?.role, "ADERENT");
+    assert.equal(member?.role, "SUSTINATOR");
 
     const adminVolunteersResponse = await request(runtimeServer!.target)
       .get(`/api/admin/volunteers?search=${encodeURIComponent(volunteerEmail)}`)

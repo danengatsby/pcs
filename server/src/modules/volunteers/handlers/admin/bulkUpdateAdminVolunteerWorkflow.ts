@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import { readAuthUser } from "../../../../lib/authMiddleware.js";
+import { requireAdminAccess } from "../../../../lib/adminAuthorization.js";
 import { recordAdminAudit } from "../../../../lib/adminAudit.js";
 import { triggerAdminAuditOutboxWorker } from "../../../../lib/adminAuditOutboxWorker.js";
 import { AppError } from "../../../../lib/errors.js";
@@ -10,6 +11,7 @@ import { readVolunteerListFilters } from "../../parsing.js";
 import {
   bulkUpdateAdminVolunteerWorkflow,
   listAdminVolunteerIdsForBulkFilters,
+  listAdminVolunteerIdsForExplicitSelection,
 } from "../../repository.js";
 import { bulkWorkflowUpdateSchema } from "../../schema.js";
 
@@ -27,6 +29,15 @@ export async function bulkUpdateAdminVolunteerWorkflowHandler(
 
   try {
     const authUser = readAuthUser(res);
+    const scope = requireAdminAccess(res).scope;
+    if (
+      parsed.data.status === "activ"
+      && authUser?.role !== "PRESEDINTE"
+      && authUser?.role !== "VICEPRESEDINTE"
+    ) {
+      next(new AppError(403, "AUTH_FORBIDDEN", "Doar conducerea poate promova persoane ca membri."));
+      return;
+    }
     const statusUpdatedBy = authUser ? Number(authUser.id) : null;
     const updatedByLabel = authUser?.fullName || authUser?.email || "administrator PCS";
     const requestedVolunteerIds = parsed.data.target.type === "ids"
@@ -37,8 +48,11 @@ export async function bulkUpdateAdminVolunteerWorkflowHandler(
       : null;
     const result = await withPrismaTransaction(async (tx) => {
       const uniqueVolunteerIds = resolvedFilters
-        ? await listAdminVolunteerIdsForBulkFilters(resolvedFilters, tx)
-        : [...new Set(requestedVolunteerIds)];
+        ? await listAdminVolunteerIdsForBulkFilters(resolvedFilters, scope, tx)
+        : await listAdminVolunteerIdsForExplicitSelection(requestedVolunteerIds, scope, tx);
+      if (!resolvedFilters && uniqueVolunteerIds.length !== new Set(requestedVolunteerIds).size) {
+        throw new AppError(403, "ADMIN_TERRITORY_FORBIDDEN", "Selecția conține dosare din afara teritoriului tău.");
+      }
       const bulkResult = await bulkUpdateAdminVolunteerWorkflow({
         runner: tx,
         volunteerIds: uniqueVolunteerIds,

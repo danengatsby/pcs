@@ -3,6 +3,7 @@ import type { VolunteerAdminRow } from '../types'
 
 function formatRoleLabel(role: VolunteerAdminRow['accountRole']): string {
   if (!role) return 'fără cont'
+  if (role === 'SUSTINATOR') return 'Susținător'
   if (role === 'VICEPRESEDINTE') return 'Vicepreședinte'
   return role.charAt(0) + role.slice(1).toLowerCase()
 }
@@ -14,6 +15,7 @@ function formatSourceLabel(source: VolunteerAdminRow['recordSource']): string {
 }
 
 type VolunteerListPanelProps = {
+  canSelect?: boolean
   rows: VolunteerAdminRow[]
   loading: boolean
   loadingMore: boolean
@@ -30,6 +32,7 @@ type VolunteerListPanelProps = {
 }
 
 export function VolunteerListPanel({
+  canSelect = true,
   rows,
   loading,
   loadingMore,
@@ -51,7 +54,7 @@ export function VolunteerListPanel({
     <section className="panel volunteer-admin__panel">
       <div className="panel__header">
         <div className="panel__title">Înregistrări ({rows.length})</div>
-        <div className="volunteer-admin__list-actions">
+        {canSelect ? <div className="volunteer-admin__list-actions">
           <Button disabled={selectableRows.length === 0 || bulkSelectionAllFiltered} onClick={onSelectAllFiltered}>
             Selectează tot filtrul
           </Button>
@@ -61,7 +64,7 @@ export function VolunteerListPanel({
           <Button disabled={selectedRecordIds.length === 0 && !bulkSelectionAllFiltered} onClick={onClearSelection}>
             Golește selecția
           </Button>
-        </div>
+        </div> : null}
       </div>
 
       <div className="panel__scroll volunteer-admin__results">
@@ -70,7 +73,7 @@ export function VolunteerListPanel({
             key={volunteer.id}
             className={`volunteer-admin__result ${volunteer.id === selectedId ? 'is-active' : ''}`}
           >
-            <label className="volunteer-admin__result-check">
+            {canSelect ? <label className="volunteer-admin__result-check">
               <input
                 type="checkbox"
                 checked={selectedRecordIds.includes(volunteer.id)}
@@ -78,7 +81,7 @@ export function VolunteerListPanel({
                 onChange={() => onToggleBulkSelection(volunteer.id)}
                 aria-label={`Selectează ${volunteer.fullName}`}
               />
-            </label>
+            </label> : null}
             <button
               type="button"
               onClick={() => onSelect(volunteer.id)}

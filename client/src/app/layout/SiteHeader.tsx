@@ -9,11 +9,13 @@ export function SiteHeader() {
   const navigate = useNavigate()
   const { user, signout } = useAuth()
   const [signingOut, setSigningOut] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [documentsOpen, setDocumentsOpen] = useState(false)
   const [documents, setDocuments] = useState<DocumentItem[] | null>(null)
   const [documentsLoading, setDocumentsLoading] = useState(false)
   const documentsMenuRef = useRef<HTMLDivElement | null>(null)
   const documentsLoadRef = useRef<Promise<DocumentItem[]> | null>(null)
+  const headerRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
     if (!documentsOpen) {
@@ -32,6 +34,31 @@ export function SiteHeader() {
       document.removeEventListener('mousedown', handlePointerDown)
     }
   }, [documentsOpen])
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return
+
+    function handlePointerDown(event: MouseEvent) {
+      if (!headerRef.current?.contains(event.target as Node)) {
+        setMobileMenuOpen(false)
+        setDocumentsOpen(false)
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setMobileMenuOpen(false)
+        setDocumentsOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handlePointerDown)
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [mobileMenuOpen])
 
   async function handleSignout() {
     setSigningOut(true)
@@ -85,29 +112,63 @@ export function SiteHeader() {
 
   function handleNavigation() {
     setDocumentsOpen(false)
+    setMobileMenuOpen(false)
+  }
+
+  function handleMobileMenuToggle() {
+    setMobileMenuOpen((current) => {
+      if (current) setDocumentsOpen(false)
+      return !current
+    })
   }
 
   const userLabel = user?.fullName.trim() || user?.email || ''
+  const adminLanding = user?.role === 'VICEPRESEDINTE' || user?.role === 'PRESEDINTE'
+    ? '/admin/dashboard'
+    : '/admin/volunteers'
 
   return (
-    <header className="site-header">
+    <header className="site-header" ref={headerRef}>
       <a className="skip-link" href="#main-content">
         Sari la conținut
       </a>
       <div className="container header-inner">
         <Link className="brand" to="/" onClick={handleNavigation}>
-          PCS - PARTIDUL SENIORILOR !
+          <span className="brand-mark">PCS</span>
+          <span className="brand-name">Partidul Conservator al Seniorilor</span>
         </Link>
 
-        <nav className="nav" aria-label="Meniu principal">
-          <Link className="nav-link" to="/" onClick={handleNavigation}>
-            Acasă
+        <button
+          className="mobile-menu-toggle"
+          type="button"
+          aria-expanded={mobileMenuOpen}
+          aria-controls="primary-navigation"
+          onClick={handleMobileMenuToggle}
+        >
+          <span className="mobile-menu-toggle__icon" aria-hidden="true">
+            <i />
+            <i />
+            <i />
+          </span>
+          <span>{mobileMenuOpen ? 'Închide' : 'Meniu'}</span>
+        </button>
+
+        <nav
+          className={`nav${mobileMenuOpen ? ' is-mobile-open' : ''}`}
+          id="primary-navigation"
+          aria-label="Meniu principal"
+        >
+          <Link className="nav-link" to="/documente/program-politic" onClick={handleNavigation}>
+            Program politic
           </Link>
           <Link className="nav-link" to="/manifest" onClick={handleNavigation}>
             Manifest
           </Link>
           <Link className="nav-link" to="/news" onClick={handleNavigation}>
             Știri
+          </Link>
+          <Link className="nav-link nav-link--mobilize" to="/mobilizare" onClick={handleNavigation}>
+            Implică-te
           </Link>
           <div className={`nav-dropdown${documentsOpen ? ' is-open' : ''}`} ref={documentsMenuRef}>
             <button
@@ -141,14 +202,14 @@ export function SiteHeader() {
             </div>
           </div>
           {!user ? (
-            <Link className="nav-link" to="/contact" onClick={handleNavigation}>
-              INSCRIERE
+            <Link className="btn primary nav-join" to="/contact#aderare" onClick={handleNavigation}>
+              Aderă la PCS
             </Link>
           ) : null}
           {hasAdminAccess(user?.role) ? (
             <Link
               className="nav-link"
-              to="/admin/members"
+              to={adminLanding}
               onMouseEnter={handleAdminIntent}
               onFocus={handleAdminIntent}
               onClick={handleNavigation}

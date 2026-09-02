@@ -1,5 +1,9 @@
 import type { NextFunction, Request, Response } from "express";
 import { readAuthUser } from "../../../../lib/authMiddleware.js";
+import {
+  isGeographyInScope,
+  requireAdminAccess,
+} from "../../../../lib/adminAuthorization.js";
 import { recordAdminAudit } from "../../../../lib/adminAudit.js";
 import { AppError } from "../../../../lib/errors.js";
 import { sendSuccess } from "../../../../lib/http.js";
@@ -7,6 +11,7 @@ import { sendVolunteerStatusChangedEmail } from "../../../../lib/notificationEma
 import { parseVolunteerId } from "../../parsing.js";
 import {
   readAdminVolunteerById,
+  listAdminVolunteerOwners,
   updateAdminVolunteerWorkflow,
 } from "../../repository.js";
 import { workflowUpdateSchema } from "../../schema.js";
@@ -46,14 +51,45 @@ export async function updateAdminVolunteerWorkflowHandler(
   }
 
   try {
-    const existing = await readAdminVolunteerById(volunteerId);
+    const scope = requireAdminAccess(res).scope;
+    const existing = await readAdminVolunteerById(volunteerId, scope);
     if (!existing) {
       next(new AppError(404, "VOLUNTEER_NOT_FOUND", "Voluntarul nu a fost gasit."));
       return;
     }
 
     const authUser = readAuthUser(res);
+    if (
+      parsed.data.status === "activ"
+      && authUser?.role !== "PRESEDINTE"
+      && authUser?.role !== "VICEPRESEDINTE"
+    ) {
+      next(new AppError(403, "AUTH_FORBIDDEN", "Doar conducerea poate promova o persoană ca membru."));
+      return;
+    }
     const statusUpdatedBy = authUser ? Number(authUser.id) : null;
+    if (
+      (parsed.data.county !== undefined || parsed.data.locality !== undefined)
+      && !isGeographyInScope(
+        scope,
+        parsed.data.county ?? existing.county,
+        parsed.data.locality ?? existing.locality
+      )
+    ) {
+      next(new AppError(
+        403,
+        "ADMIN_TERRITORY_FORBIDDEN",
+        "Dosarul nu poate fi mutat geografic în afara teritoriului tău."
+      ));
+      return;
+    }
+    if (parsed.data.ownerUserId) {
+      const allowedOwners = await listAdminVolunteerOwners(scope);
+      if (!allowedOwners.some((owner) => Number(owner.id) === parsed.data.ownerUserId)) {
+        next(new AppError(403, "ADMIN_TERRITORY_FORBIDDEN", "Responsabilul selectat este în afara teritoriului tău."));
+        return;
+      }
+    }
 
     const updated = await updateAdminVolunteerWorkflow({
       volunteerId,
@@ -72,6 +108,7 @@ export async function updateAdminVolunteerWorkflowHandler(
       rejectionReason: parsed.data.rejectionReason,
       tags: parsed.data.tags,
       skillTags: parsed.data.skillTags,
+      scope,
     });
 
     if (!updated) {

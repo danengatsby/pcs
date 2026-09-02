@@ -1,9 +1,9 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { NewsListPage } from './NewsListPage'
 import { useNews } from '../hooks/useNews'
-import { buildNewsItems } from '@test/testUtils'
+import { buildNewsItem, buildNewsItems } from '@test/testUtils'
 
 vi.mock('../hooks/useNews', () => ({
   useNews: vi.fn(),
@@ -28,7 +28,7 @@ describe('NewsListPage', () => {
       </MemoryRouter>
     )
 
-    expect(screen.getByText('Știri')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Vocea PCS, distinctă de informația din presă.' })).toBeInTheDocument()
     expect(screen.getByText('News Item 1')).toBeInTheDocument()
     expect(screen.getByText('News Item 2')).toBeInTheDocument()
   })
@@ -46,7 +46,7 @@ describe('NewsListPage', () => {
       </MemoryRouter>
     )
 
-    expect(screen.getByText('Se încarcă…')).toBeInTheDocument()
+    expect(screen.getByText('Se încarcă publicațiile…')).toBeInTheDocument()
   })
 
   it('displays error message when fetch fails', () => {
@@ -63,7 +63,7 @@ describe('NewsListPage', () => {
       </MemoryRouter>
     )
 
-    expect(screen.getByText(`Eroare: ${errorMessage}`)).toBeInTheDocument()
+    expect(screen.getByText(`Publicațiile nu au putut fi încărcate: ${errorMessage}`)).toBeInTheDocument()
   })
 
   it('displays empty state when no news items', () => {
@@ -79,7 +79,7 @@ describe('NewsListPage', () => {
       </MemoryRouter>
     )
 
-    expect(screen.getByText('Nu există știri.')).toBeInTheDocument()
+    expect(screen.getByText('Nu există publicații disponibile momentan.')).toBeInTheDocument()
   })
 
   it('links to news detail pages', () => {
@@ -150,8 +150,8 @@ describe('NewsListPage', () => {
       </MemoryRouter>
     )
 
-    expect(screen.getByText('Știri și comunicate')).toBeInTheDocument()
-    expect(screen.getByText('Informații recente și utile pentru seniori, verificate din surse publice.')).toBeInTheDocument()
+    expect(screen.getByText('Centrul editorial PCS')).toBeInTheDocument()
+    expect(screen.getByText(/Aici separăm conținutul asumat de partid/)).toBeInTheDocument()
   })
 
   it('handles multiple news items', () => {
@@ -171,5 +171,26 @@ describe('NewsListPage', () => {
     items.forEach((item) => {
       expect(screen.getByText(`News Item ${item.id}`)).toBeInTheDocument()
     })
+  })
+
+  it('separates PCS positions, local activity, releases and external press', () => {
+    const items = [
+      buildNewsItem({ id: 1, title: 'Poziția partidului', category: 'Poziție PCS', sourceName: '', sourceUrl: '' }),
+      buildNewsItem({ id: 2, title: 'Activitate în Cluj', category: 'Activitate locală', sourceName: '', sourceUrl: '' }),
+      buildNewsItem({ id: 3, title: 'Anunț oficial', category: 'Comunicat', sourceName: '', sourceUrl: '' }),
+      buildNewsItem({ id: 4, title: 'Articol extern', category: 'Pensii', sourceName: 'AGERPRES', sourceUrl: 'https://example.test/presa' }),
+    ]
+    vi.mocked(useNews).mockReturnValue({ items, loading: false, error: null })
+
+    render(
+      <MemoryRouter>
+        <NewsListPage />
+      </MemoryRouter>,
+    )
+
+    expect(within(screen.getByRole('region', { name: 'Poziții PCS' })).getByText('Poziția partidului')).toBeInTheDocument()
+    expect(within(screen.getByRole('region', { name: 'Activitate locală' })).getByText('Activitate în Cluj')).toBeInTheDocument()
+    expect(within(screen.getByRole('region', { name: 'Comunicate' })).getByText('Anunț oficial')).toBeInTheDocument()
+    expect(within(screen.getByRole('region', { name: 'Informații din presă' })).getByText('Articol extern')).toBeInTheDocument()
   })
 })

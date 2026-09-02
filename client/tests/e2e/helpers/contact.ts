@@ -17,11 +17,13 @@ export async function fillVolunteerSignupForm(
 ): Promise<void> {
   await page.getByLabel("Nume complet").fill(input.fullName);
   await page.getByLabel("Email").fill(input.email);
-  await page.getByLabel("Parolă (pentru cont)").fill(input.password);
-  await page.getByLabel("Telefon").fill(input.phone);
-  await page.getByLabel("Județ").selectOption(input.county);
+  await page.getByLabel("Telefon (opțional)").fill(input.phone);
+  await page.getByRole("combobox", { name: /^Județ/ }).selectOption(input.county);
   await page.getByLabel("Localitate").fill(input.locality);
+
+  await page.getByRole("button", { name: "Continuă" }).click();
+  await page.getByLabel("Parolă pentru cont").fill(input.password);
   await page.getByLabel("Competențe (opțional)").fill(input.skills);
-  await page.getByLabel("Motivație").fill(input.motivation);
+  await page.getByLabel("De ce vrei să te implici?").fill(input.motivation);
   await page.getByRole("checkbox").check();
 }

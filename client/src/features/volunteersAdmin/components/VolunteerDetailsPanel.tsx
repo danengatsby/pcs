@@ -6,6 +6,7 @@ import VolunteerWorkflowForm, { type VolunteerWorkflowFormValues } from './Volun
 
 function formatRoleLabel(role: VolunteerAdminRow['accountRole']): string {
   if (!role) return 'fără cont sincronizat'
+  if (role === 'SUSTINATOR') return 'Susținător'
   if (role === 'VICEPRESEDINTE') return 'Vicepreședinte'
   return role.charAt(0) + role.slice(1).toLowerCase()
 }
@@ -145,11 +146,14 @@ function formatAuditActionLabel(action: string): string {
 
 type VolunteerDetailsPanelProps = {
   volunteer: VolunteerAdminRow | null
+  canManage?: boolean
+  canPromote?: boolean
+  canViewAudit?: boolean
   loading?: boolean
   error?: string | null
 }
 
-export function VolunteerDetailsPanel({ volunteer, loading = false, error: detailError = null }: VolunteerDetailsPanelProps) {
+export function VolunteerDetailsPanel({ volunteer, canManage = true, canPromote = true, canViewAudit = true, loading = false, error: detailError = null }: VolunteerDetailsPanelProps) {
   const { submit, submitting, error: workflowError, reset } = useUpdateVolunteerWorkflow()
   const {
     entries: auditEntries,
@@ -158,7 +162,7 @@ export function VolunteerDetailsPanel({ volunteer, loading = false, error: detai
     canLoadMore: canLoadMoreAudit,
     loadMore: loadMoreAudit,
     error: auditError,
-  } = useAdminVolunteerAudit(volunteer?.id ?? null)
+  } = useAdminVolunteerAudit(canViewAudit ? volunteer?.id ?? null : null)
 
   if (loading) {
     return (
@@ -181,7 +185,7 @@ export function VolunteerDetailsPanel({ volunteer, loading = false, error: detai
     )
   }
 
-  const canManageWorkflow = volunteer.volunteerId !== null
+  const canManageWorkflow = canManage && volunteer.volunteerId !== null
   const statusUpdatedByLabel = formatStatusUpdatedByLabel(volunteer)
   const ownerLabel = formatOwnerLabel(volunteer)
 
@@ -255,6 +259,7 @@ export function VolunteerDetailsPanel({ volunteer, loading = false, error: detai
               {workflowError ? <div className="alert error">{workflowError}</div> : null}
               <VolunteerWorkflowForm
                 volunteer={volunteer}
+                canPromote={canPromote}
                 submitting={submitting}
                 onSubmit={async (values: VolunteerWorkflowFormValues) => {
                   if (volunteer.volunteerId === null) {
@@ -273,14 +278,14 @@ export function VolunteerDetailsPanel({ volunteer, loading = false, error: detai
                 }}
               />
             </>
-          ) : (
+          ) : canManage ? (
             <div className="muted">
               Acest cont există doar în tabela de utilizatori. Workflow-ul poate fi editat doar pentru înregistrări care au și formular de voluntar.
             </div>
-          )}
+          ) : <div className="muted">Funcția ta permite consultarea dosarului, nu modificarea workflow-ului.</div>}
         </div>
 
-        <div className="volunteer-admin__workflow">
+        {canViewAudit ? <div className="volunteer-admin__workflow">
           <h3 className="volunteer-admin__workflow-title">Istoric workflow</h3>
           {auditError ? <div className="alert error">{auditError}</div> : null}
           {auditLoading ? <div className="muted">Se încarcă istoricul.</div> : null}
@@ -320,7 +325,7 @@ export function VolunteerDetailsPanel({ volunteer, loading = false, error: detai
               </Button>
             </div>
           ) : null}
-        </div>
+        </div> : null}
       </div>
     </section>
   )

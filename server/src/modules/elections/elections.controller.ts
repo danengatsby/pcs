@@ -22,6 +22,7 @@ export const listElectionsController: RequestHandler = async (req, res, next) =>
         offset: parsed.data.offset,
         year: parsed.data.year ?? null,
         type: parsed.data.type ?? null,
+        governance: payload.governance,
       },
     });
   } catch (error) {

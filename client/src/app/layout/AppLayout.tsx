@@ -20,7 +20,7 @@ export function AppLayout() {
           <div className="footer-left">
             <strong>PCS</strong>
             <div className="muted">
-              Platformă civică și informare publică
+              Partidul Conservator al Seniorilor · Respect, demnitate și solidaritate
               {user ? ` · Conectat ca ${user.fullName}` : ''}
             </div>
           </div>

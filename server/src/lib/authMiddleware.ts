@@ -8,6 +8,11 @@ import {
 import { isTokenRevoked } from "./authTokenRevocation.js";
 import { AppError } from "./errors.js";
 import { prisma } from "./prisma.js";
+import {
+  buildAdminAccessContext,
+  setAdminAccess,
+  type AdminCapability,
+} from "./adminAuthorization.js";
 
 export type AuthenticatedUser = {
   id: string;
@@ -140,5 +145,23 @@ export function requireRole(...roles: UserRole[]): RequestHandler {
     }
 
     next();
+  };
+}
+
+export function requireAdminCapability(capability: AdminCapability): RequestHandler {
+  return async (_req, res, next) => {
+    const user = readAuthUser(res);
+    if (!user) {
+      next(new AppError(401, "AUTH_UNAUTHORIZED", "Token lipsa sau invalid."));
+      return;
+    }
+
+    try {
+      const access = await buildAdminAccessContext(user, capability);
+      setAdminAccess(res, access);
+      next();
+    } catch (error) {
+      next(error);
+    }
   };
 }

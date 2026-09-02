@@ -4,6 +4,7 @@ import { signupUser } from "./helpers/auth";
 import { fillVolunteerSignupForm } from "./helpers/contact";
 import {
   buildTestEmail,
+  deleteMembershipByEmail,
   deleteUserByEmail,
   deleteVolunteerByEmail,
   insertVolunteerWithoutUser,
@@ -86,7 +87,7 @@ test("volunteer signup shows a friendly error when the email already exists", as
     await signupResponse;
 
     await expect(page.getByText("Există deja o cerere/înscriere cu acest email.")).toBeVisible();
-    await expect(page.getByLabel("Email")).toHaveValue(email);
+    await expect(page.locator(".join-form__identity-summary")).toContainText(email);
 
     await expect.poll(async () => {
       const result = await query<{ volunteer_count: number; user_count: number }>(
@@ -102,6 +103,7 @@ test("volunteer signup shows a friendly error when the email already exists", as
       return row ? `${row.volunteer_count}|${row.user_count}` : null;
     }).toBe("1|0");
   } finally {
+    await deleteMembershipByEmail(email);
     await deleteVolunteerByEmail(email);
     await deleteUserByEmail(email);
   }

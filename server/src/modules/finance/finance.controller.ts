@@ -23,6 +23,7 @@ export const listFinanceController: RequestHandler = async (req, res, next) => {
         year: parsed.data.year ?? null,
         type: parsed.data.type ?? null,
         totals: payload.totals,
+        governance: payload.governance,
       },
     });
   } catch (error) {

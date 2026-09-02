@@ -9,12 +9,16 @@ import {
   loadAuthPolicyPage,
   loadContactPage,
   loadDocumentPage,
+  loadExecutiveDashboardPage,
   loadHomePage,
   loadHomeTopicPages,
   loadManifestPage,
+  loadMobilizationPage,
+  loadPoliticalOperationsPage,
   loadNewsDetailPage,
   loadNewsListPage,
   loadSigninPage,
+  loadTerritorialOrganizationsPage,
   loadUserProfilePage,
   loadVolunteersAdminPage,
 } from './routeModules'
@@ -49,7 +53,6 @@ function lazyNamed<TProps>(
 
 const HomePage = lazyNamed(loadHomePage, 'HomePage')
 const NewsCommunicationPage = lazyNamed(loadHomeTopicPages, 'NewsCommunicationPage')
-const VolunteeringPage = lazyNamed(loadHomeTopicPages, 'VolunteeringPage')
 const TransparencyPage = lazyNamed(loadHomeTopicPages, 'TransparencyPage')
 const NewsListPage = lazyNamed(loadNewsListPage, 'NewsListPage')
 const NewsDetailPage = lazyNamed(loadNewsDetailPage, 'NewsDetailPage')
@@ -57,10 +60,14 @@ const AuthPolicyPage = lazyNamed(loadAuthPolicyPage, 'AuthPolicyPage')
 const SigninPage = lazyNamed(loadSigninPage, 'SigninPage')
 const UserProfilePage = lazyNamed(loadUserProfilePage, 'UserProfilePage')
 const ContactPage = lazyNamed(loadContactPage, 'ContactPage')
+const ExecutiveDashboardPage = lazyNamed(loadExecutiveDashboardPage, 'ExecutiveDashboardPage')
+const TerritorialOrganizationsPage = lazyNamed(loadTerritorialOrganizationsPage, 'TerritorialOrganizationsPage')
 const AdminMembersDashboardPage = lazyNamed(loadAdminMembersDashboardPage, 'AdminMembersDashboardPage')
 const VolunteersAdminPage = lazyNamed(loadVolunteersAdminPage, 'VolunteersAdminPage')
 const DocumentPage = lazyNamed(loadDocumentPage, 'DocumentPage')
 const ManifestPage = lazyNamed(loadManifestPage, 'ManifestPage')
+const MobilizationPage = lazyNamed(loadMobilizationPage, 'MobilizationPage')
+const PoliticalOperationsPage = lazyNamed(loadPoliticalOperationsPage, 'PoliticalOperationsPage')
 
 export const router = createBrowserRouter([
   {
@@ -74,7 +81,8 @@ export const router = createBrowserRouter([
     children: [
       { path: '/', element: renderRoute(<HomePage />) },
       { path: '/initiative/stiri-si-comunicare', element: renderRoute(<NewsCommunicationPage />) },
-      { path: '/initiative/voluntariat', element: renderRoute(<VolunteeringPage />) },
+      { path: '/initiative/voluntariat', element: renderRoute(<MobilizationPage />) },
+      { path: '/mobilizare', element: renderRoute(<MobilizationPage />) },
       { path: '/initiative/transparenta', element: renderRoute(<TransparencyPage />) },
       { path: '/news', element: renderRoute(<NewsListPage />) },
       { path: '/news/:id', element: renderRoute(<NewsDetailPage />) },
@@ -87,6 +95,30 @@ export const router = createBrowserRouter([
           <RequireAuth>
             <UserProfilePage />
           </RequireAuth>
+        ),
+      },
+      {
+        path: '/admin/dashboard',
+        element: renderRoute(
+          <RequireAdmin roles={['VICEPRESEDINTE', 'PRESEDINTE']}>
+            <ExecutiveDashboardPage />
+          </RequireAdmin>
+        ),
+      },
+      {
+        path: '/admin/mobilization',
+        element: renderRoute(
+          <RequireAdmin roles={['SECRETAR', 'VICEPRESEDINTE', 'PRESEDINTE']}>
+            <PoliticalOperationsPage />
+          </RequireAdmin>
+        ),
+      },
+      {
+        path: '/admin/organizations',
+        element: renderRoute(
+          <RequireAdmin>
+            <TerritorialOrganizationsPage />
+          </RequireAdmin>
         ),
       },
       {

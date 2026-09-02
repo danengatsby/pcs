@@ -1,12 +1,17 @@
 import type { NextFunction, Request, Response } from "express";
 import { readAuthUser } from "../../../../lib/authMiddleware.js";
+import { requireAdminAccess } from "../../../../lib/adminAuthorization.js";
 import { recordAdminAudit } from "../../../../lib/adminAudit.js";
 import { triggerAdminAuditOutboxWorker } from "../../../../lib/adminAuditOutboxWorker.js";
 import { AppError } from "../../../../lib/errors.js";
 import { sendSuccess } from "../../../../lib/http.js";
 import { withPrismaTransaction } from "../../../../lib/prismaTransaction.js";
 import { readVolunteerListFilters } from "../../parsing.js";
-import { bulkDeleteAdminVolunteers, listAdminVolunteerIdsForBulkFilters } from "../../repository.js";
+import {
+  bulkDeleteAdminVolunteers,
+  listAdminVolunteerIdsForBulkFilters,
+  listAdminVolunteerIdsForExplicitSelection,
+} from "../../repository.js";
 import { bulkDeleteVolunteerSchema } from "../../schema.js";
 
 export async function bulkDeleteAdminVolunteerHandler(
@@ -29,6 +34,7 @@ export async function bulkDeleteAdminVolunteerHandler(
 
   try {
     const authUser = readAuthUser(res);
+    const scope = requireAdminAccess(res).scope;
     const requestedVolunteerIds = parsed.data.target.type === "ids"
       ? parsed.data.target.volunteerIds
       : [];
@@ -37,8 +43,11 @@ export async function bulkDeleteAdminVolunteerHandler(
       : null;
     const result = await withPrismaTransaction(async (tx) => {
       const uniqueVolunteerIds = resolvedFilters
-        ? await listAdminVolunteerIdsForBulkFilters(resolvedFilters, tx)
-        : [...new Set(requestedVolunteerIds)];
+        ? await listAdminVolunteerIdsForBulkFilters(resolvedFilters, scope, tx)
+        : await listAdminVolunteerIdsForExplicitSelection(requestedVolunteerIds, scope, tx);
+      if (!resolvedFilters && uniqueVolunteerIds.length !== new Set(requestedVolunteerIds).size) {
+        throw new AppError(403, "ADMIN_TERRITORY_FORBIDDEN", "Selecția conține dosare din afara teritoriului tău.");
+      }
       const bulkResult = await bulkDeleteAdminVolunteers({
         runner: tx,
         volunteerIds: uniqueVolunteerIds,

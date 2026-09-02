@@ -15,7 +15,7 @@ function isUserRole(value: string): value is UserRole {
 }
 
 function normalizeRole(rawRole: string): UserRole {
-  return isUserRole(rawRole) ? rawRole : "ADERENT";
+  return isUserRole(rawRole) ? rawRole : "SUSTINATOR";
 }
 
 function isDuplicateKeyError(error: unknown): boolean {
@@ -79,7 +79,7 @@ export async function insertSignupUser(input: {
         fullName: input.fullName,
         email: input.email,
         passwordHash: input.passwordHash,
-        role: "ADERENT",
+        role: "SUSTINATOR",
       },
       select: {
         id: true,

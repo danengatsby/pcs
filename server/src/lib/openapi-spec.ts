@@ -53,6 +53,22 @@ const newsMediaAssetIdParameter = {
   schema: positiveIntegerSchema,
 } as const;
 
+const organizationIdParameter = {
+  name: "id",
+  in: "path",
+  required: true,
+  description: "Organization identifier",
+  schema: { type: "string", minLength: 1, maxLength: 80 },
+} as const;
+
+const organizationChildIdParameter = {
+  name: "childId",
+  in: "path",
+  required: true,
+  description: "Mandate or objective identifier",
+  schema: positiveIntegerSchema,
+} as const;
+
 const newsWriteRequestSchema = {
   $ref: "#/components/schemas/NewsWriteInput",
 } as const;
@@ -1526,6 +1542,263 @@ export const openApiSpec = {
         },
       },
     },
+    "/mobilization/actions": {
+      get: {
+        tags: ["Mobilization"],
+        summary: "List open mobilization actions",
+        operationId: "listMobilizationActions",
+        parameters: [],
+        responses: {
+          "200": {
+            description: "Open events, campaigns, volunteer tasks, petitions and consultations",
+            content: {
+              "application/json": {
+                schema: createSuccessResponseSchema({
+                  type: "array",
+                  items: { $ref: "#/components/schemas/MobilizationAction" },
+                }),
+              },
+            },
+          },
+        },
+      },
+    },
+    "/mobilization/actions/{slug}/responses": {
+      post: {
+        tags: ["Mobilization"],
+        summary: "Respond to a mobilization action",
+        operationId: "createMobilizationResponse",
+        parameters: [
+          {
+            name: "slug",
+            in: "path",
+            required: true,
+            schema: { type: "string", minLength: 3, maxLength: 120 },
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/MobilizationResponseInput" },
+            },
+          },
+        },
+        responses: {
+          "201": {
+            description: "Participation response recorded",
+            content: {
+              "application/json": {
+                schema: createSuccessResponseSchema({
+                  $ref: "#/components/schemas/MobilizationResponseData",
+                }),
+              },
+            },
+          },
+          "400": {
+            description: "Invalid response",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/ApiErrorResponse" } } },
+          },
+          "404": {
+            description: "Action unavailable",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/ApiErrorResponse" } } },
+          },
+          "409": {
+            description: "Response already exists for this email",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/ApiErrorResponse" } } },
+          },
+          "429": {
+            description: "Too many responses",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/ApiErrorResponse" } } },
+          },
+        },
+      },
+    },
+    "/member-portal": {
+      get: {
+        tags: ["Member Portal"],
+        summary: "Read the authenticated member workspace",
+        operationId: "getMemberPortal",
+        security: [{ BearerAuth: [] }],
+        parameters: [],
+        responses: {
+          "200": { description: "Membership, branch, activities, documents, dues and communication preferences", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiSuccessResponse" } } } },
+          "401": { description: "Unauthorized" },
+        },
+      },
+    },
+    "/member-portal/events/{id}/response": {
+      post: {
+        tags: ["Member Portal"],
+        summary: "Confirm or decline an event invitation owned by the member",
+        operationId: "respondToMemberEvent",
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: "id", in: "path", required: true, schema: positiveIntegerSchema }],
+        requestBody: { required: true, content: { "application/json": { schema: { $ref: "#/components/schemas/MemberEventResponseInput" } } } },
+        responses: {
+          "200": { description: "Response recorded", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiSuccessResponse" } } } },
+          "401": { description: "Unauthorized" },
+          "403": { description: "Invitation does not belong to the member" },
+        },
+      },
+    },
+    "/member-portal/tasks/{id}": {
+      patch: {
+        tags: ["Member Portal"],
+        summary: "Report progress or completion details for an assigned task",
+        operationId: "reportMemberTask",
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: "id", in: "path", required: true, schema: positiveIntegerSchema }],
+        requestBody: { required: true, content: { "application/json": { schema: { $ref: "#/components/schemas/MemberTaskReportInput" } } } },
+        responses: {
+          "200": { description: "Report recorded", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiSuccessResponse" } } } },
+          "401": { description: "Unauthorized" },
+          "403": { description: "Task does not belong to the member" },
+        },
+      },
+    },
+    "/member-portal/consents": {
+      patch: {
+        tags: ["Member Portal"],
+        summary: "Update channel-specific communication consent",
+        operationId: "updateMemberCommunicationConsent",
+        security: [{ BearerAuth: [] }],
+        parameters: [],
+        requestBody: { required: true, content: { "application/json": { schema: { $ref: "#/components/schemas/MemberConsentInput" } } } },
+        responses: {
+          "200": { description: "Preferences updated", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiSuccessResponse" } } } },
+          "400": { description: "Invalid preferences" },
+          "401": { description: "Unauthorized" },
+        },
+      },
+    },
+    "/admin/access": {
+      get: {
+        tags: ["Admin Access"],
+        summary: "Read effective administrative permissions and territorial scope",
+        operationId: "getAdminAccess",
+        security: [{ BearerAuth: [] }],
+        parameters: [],
+        responses: {
+          "200": {
+            description: "Effective function capabilities and territorial mandate scope",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiSuccessResponse" },
+              },
+            },
+          },
+          "401": { description: "Unauthorized" },
+          "403": { description: "Missing function permission or active territorial mandate" },
+        },
+      },
+    },
+    "/admin/mobilization": {
+      get: {
+        tags: ["Admin Mobilization"],
+        summary: "List territorial events, campaigns and volunteer tasks",
+        operationId: "listPoliticalOperations",
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          { name: "type", in: "query", schema: { type: "string", enum: ["event", "campaign", "volunteer_task"] } },
+          { name: "status", in: "query", schema: { type: "string", enum: ["draft", "open", "closed", "archived"] } },
+          { name: "limit", in: "query", schema: { type: "integer", minimum: 1, maximum: 100, default: 50 } },
+        ],
+        responses: {
+          "200": { description: "Territorially scoped operations workspace", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiSuccessResponse" } } } },
+          "401": { description: "Unauthorized" },
+          "403": { description: "Missing mobilization permission or mandate" },
+        },
+      },
+    },
+    "/admin/mobilization/actions": {
+      post: {
+        tags: ["Admin Mobilization"],
+        summary: "Create a territorial political operation",
+        operationId: "createPoliticalOperation",
+        security: [{ BearerAuth: [] }],
+        parameters: [],
+        requestBody: { required: true, content: { "application/json": { schema: { $ref: "#/components/schemas/PoliticalOperationInput" } } } },
+        responses: {
+          "201": { description: "Operation created", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiSuccessResponse" } } } },
+          "400": { description: "Invalid operation" },
+          "403": { description: "Territory outside mandate" },
+        },
+      },
+    },
+    "/admin/mobilization/actions/{id}": {
+      patch: {
+        tags: ["Admin Mobilization"],
+        summary: "Update results or lifecycle of an operation",
+        operationId: "updatePoliticalOperation",
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: "id", in: "path", required: true, schema: positiveIntegerSchema }],
+        requestBody: { required: true, content: { "application/json": { schema: { $ref: "#/components/schemas/PoliticalOperationUpdateInput" } } } },
+        responses: {
+          "200": { description: "Operation updated", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiSuccessResponse" } } } },
+          "404": { description: "Operation not found in authorized scope" },
+          "409": { description: "Optimistic concurrency conflict" },
+        },
+      },
+    },
+    "/admin/mobilization/actions/{id}/participants": {
+      post: {
+        tags: ["Admin Mobilization"],
+        summary: "Invite a member or assign a volunteer",
+        operationId: "addPoliticalParticipant",
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: "id", in: "path", required: true, schema: positiveIntegerSchema }],
+        requestBody: { required: true, content: { "application/json": { schema: { $ref: "#/components/schemas/PoliticalParticipantInput" } } } },
+        responses: {
+          "201": { description: "Participant assigned; email is queued only with explicit consent", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiSuccessResponse" } } } },
+          "400": { description: "Invalid participant" },
+          "403": { description: "Outside authorized territory" },
+        },
+      },
+    },
+    "/admin/mobilization/participants/{id}": {
+      patch: {
+        tags: ["Admin Mobilization"],
+        summary: "Record attendance or review activity",
+        operationId: "updatePoliticalParticipant",
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: "id", in: "path", required: true, schema: positiveIntegerSchema }],
+        requestBody: { required: true, content: { "application/json": { schema: { $ref: "#/components/schemas/PoliticalParticipantUpdateInput" } } } },
+        responses: {
+          "200": { description: "Participant updated", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiSuccessResponse" } } } },
+          "404": { description: "Participant not found in authorized scope" },
+        },
+      },
+    },
+    "/admin/communications/preview": {
+      post: {
+        tags: ["Admin Communications"],
+        summary: "Preview consent-eligible audience as aggregate counts",
+        operationId: "previewCommunicationAudience",
+        security: [{ BearerAuth: [] }],
+        parameters: [],
+        requestBody: { required: true, content: { "application/json": { schema: { $ref: "#/components/schemas/CommunicationAudienceInput" } } } },
+        responses: {
+          "200": { description: "Aggregate eligible audience; no personal data returned", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiSuccessResponse" } } } },
+          "403": { description: "Audience outside authorized territory" },
+        },
+      },
+    },
+    "/admin/communications/dispatches": {
+      post: {
+        tags: ["Admin Communications"],
+        summary: "Create a draft or consent-controlled dispatch",
+        operationId: "createCommunicationDispatch",
+        security: [{ BearerAuth: [] }],
+        parameters: [],
+        requestBody: { required: true, content: { "application/json": { schema: { $ref: "#/components/schemas/CommunicationDispatchInput" } } } },
+        responses: {
+          "201": { description: "Dispatch materialized from current explicit consents", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiSuccessResponse" } } } },
+          "400": { description: "Invalid or empty audience" },
+          "403": { description: "Actual delivery requires national authorization" },
+        },
+      },
+    },
     "/admin/volunteers": {
       get: {
         tags: ["Admin Volunteers"],
@@ -2022,7 +2295,7 @@ export const openApiSpec = {
       get: {
         tags: ["Organizations"],
         summary: "List organizations",
-        description: "Retrieve list of partner or affiliated organizations",
+        description: "Retrieve active party organizations from the territorial registry",
         operationId: "listOrganizations",
         responses: {
           "200": {
@@ -2035,6 +2308,144 @@ export const openApiSpec = {
               },
             },
           },
+        },
+      },
+    },
+    "/admin/organizations": {
+      get: {
+        tags: ["Territorial Organizations"],
+        summary: "List territorial organizations",
+        operationId: "listAdminOrganizations",
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          { name: "search", in: "query", schema: { type: "string", maxLength: 120 } },
+          { name: "level", in: "query", schema: { $ref: "#/components/schemas/OrganizationLevel" } },
+          { name: "status", in: "query", schema: { $ref: "#/components/schemas/OrganizationStatus" } },
+          { name: "limit", in: "query", schema: { type: "integer", minimum: 1, maximum: 200, default: 50 } },
+          { name: "offset", in: "query", schema: { type: "integer", minimum: 0, maximum: 10000, default: 0 } },
+        ],
+        responses: {
+          "200": { description: "Territorial registry", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiSuccessResponse" } } } },
+          "401": { description: "Unauthorized" },
+          "403": { description: "Insufficient permissions" },
+        },
+      },
+      post: {
+        tags: ["Territorial Organizations"],
+        summary: "Create a real organization or branch",
+        operationId: "createAdminOrganization",
+        security: [{ BearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: { "application/json": { schema: { $ref: "#/components/schemas/OrganizationWriteInput" } } },
+        },
+        responses: {
+          "201": { description: "Organization created", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiSuccessResponse" } } } },
+          "400": { description: "Invalid organization" },
+          "403": { description: "Insufficient permissions" },
+          "409": { description: "Organization conflict" },
+        },
+      },
+    },
+    "/admin/organizations/{id}": {
+      get: {
+        tags: ["Territorial Organizations"],
+        summary: "Get organization, territories, mandates and objectives",
+        operationId: "getAdminOrganization",
+        security: [{ BearerAuth: [] }],
+        parameters: [organizationIdParameter],
+        responses: {
+          "200": { description: "Organization detail", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiSuccessResponse" } } } },
+          "404": { description: "Organization not found" },
+        },
+      },
+      patch: {
+        tags: ["Territorial Organizations"],
+        summary: "Update organization identity, hierarchy and territories",
+        operationId: "updateAdminOrganization",
+        security: [{ BearerAuth: [] }],
+        parameters: [organizationIdParameter],
+        requestBody: {
+          required: true,
+          content: { "application/json": { schema: { $ref: "#/components/schemas/OrganizationPatchInput" } } },
+        },
+        responses: {
+          "200": { description: "Organization updated", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiSuccessResponse" } } } },
+          "400": { description: "Invalid organization" },
+          "404": { description: "Organization not found" },
+          "409": { description: "Organization conflict" },
+        },
+      },
+    },
+    "/admin/organizations/{id}/mandates": {
+      post: {
+        tags: ["Territorial Organizations"],
+        summary: "Register a leadership mandate",
+        operationId: "createOrganizationMandate",
+        security: [{ BearerAuth: [] }],
+        parameters: [organizationIdParameter],
+        requestBody: {
+          required: true,
+          content: { "application/json": { schema: { $ref: "#/components/schemas/OrganizationMandateInput" } } },
+        },
+        responses: {
+          "201": { description: "Mandate registered", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiSuccessResponse" } } } },
+          "400": { description: "Invalid mandate" },
+          "404": { description: "Organization not found" },
+        },
+      },
+    },
+    "/admin/organizations/{id}/mandates/{childId}": {
+      patch: {
+        tags: ["Territorial Organizations"],
+        summary: "Update or close a leadership mandate",
+        operationId: "updateOrganizationMandate",
+        security: [{ BearerAuth: [] }],
+        parameters: [organizationIdParameter, organizationChildIdParameter],
+        requestBody: {
+          required: true,
+          content: { "application/json": { schema: { $ref: "#/components/schemas/OrganizationMandatePatchInput" } } },
+        },
+        responses: {
+          "200": { description: "Mandate updated", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiSuccessResponse" } } } },
+          "400": { description: "Invalid mandate" },
+          "404": { description: "Mandate not found" },
+        },
+      },
+    },
+    "/admin/organizations/{id}/objectives": {
+      post: {
+        tags: ["Territorial Organizations"],
+        summary: "Register an organization objective",
+        operationId: "createOrganizationObjective",
+        security: [{ BearerAuth: [] }],
+        parameters: [organizationIdParameter],
+        requestBody: {
+          required: true,
+          content: { "application/json": { schema: { $ref: "#/components/schemas/OrganizationObjectiveInput" } } },
+        },
+        responses: {
+          "201": { description: "Objective registered", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiSuccessResponse" } } } },
+          "400": { description: "Invalid objective" },
+          "404": { description: "Organization not found" },
+        },
+      },
+    },
+    "/admin/organizations/{id}/objectives/{childId}": {
+      patch: {
+        tags: ["Territorial Organizations"],
+        summary: "Update organization objective progress",
+        operationId: "updateOrganizationObjective",
+        security: [{ BearerAuth: [] }],
+        parameters: [organizationIdParameter, organizationChildIdParameter],
+        requestBody: {
+          required: true,
+          content: { "application/json": { schema: { $ref: "#/components/schemas/OrganizationObjectivePatchInput" } } },
+        },
+        responses: {
+          "200": { description: "Objective updated", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiSuccessResponse" } } } },
+          "400": { description: "Invalid objective" },
+          "404": { description: "Objective not found" },
         },
       },
     },
@@ -2098,6 +2509,80 @@ export const openApiSpec = {
         },
       },
     },
+    "/admin/executive-dashboard": {
+      get: {
+        tags: ["Executive Dashboard"],
+        summary: "Get the executive dashboard",
+        description: "Retrieve operational trends, county distribution, conversion, overdue cases, organizations and objectives.",
+        operationId: "getExecutiveDashboard",
+        security: [{ BearerAuth: [] }],
+        responses: {
+          "200": {
+            description: "Executive dashboard data",
+            content: {
+              "application/json": {
+                schema: createSuccessResponseSchema({
+                  $ref: "#/components/schemas/ExecutiveDashboardData",
+                }),
+              },
+            },
+          },
+          "401": { description: "Unauthorized" },
+          "403": { description: "Insufficient permissions" },
+        },
+      },
+    },
+    "/admin/executive-dashboard/targets/{key}": {
+      patch: {
+        tags: ["Executive Dashboard"],
+        summary: "Update an executive target",
+        description: "Update an operational target (president and vice-president only).",
+        operationId: "updateExecutiveTarget",
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          {
+            name: "key",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+              enum: [
+                "contact_rate",
+                "member_conversion_rate",
+                "overdue_cases",
+                "active_organizations",
+              ],
+            },
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                $ref: "#/components/schemas/ExecutiveTargetUpdateInput",
+              },
+            },
+          },
+        },
+        responses: {
+          "200": {
+            description: "Executive target updated",
+            content: {
+              "application/json": {
+                schema: createSuccessResponseSchema({
+                  $ref: "#/components/schemas/ExecutiveTargetUpdateResponseData",
+                }),
+              },
+            },
+          },
+          "400": { description: "Invalid target" },
+          "401": { description: "Unauthorized" },
+          "403": { description: "Insufficient permissions" },
+          "404": { description: "Target not found" },
+        },
+      },
+    },
     "/admin/members/dashboard": {
       get: {
         tags: ["Admin Members"],
@@ -2120,13 +2605,33 @@ export const openApiSpec = {
             },
           },
           {
+            name: "status",
+            in: "query",
+            schema: { $ref: "#/components/schemas/MembershipStatus" },
+          },
+          {
+            name: "organizationId",
+            in: "query",
+            schema: { type: "string", maxLength: 80 },
+          },
+          {
             name: "limit",
             in: "query",
             schema: {
               type: "integer",
               minimum: 1,
-              maximum: 50,
-              default: 12,
+              maximum: 100,
+              default: 25,
+            },
+          },
+          {
+            name: "offset",
+            in: "query",
+            schema: {
+              type: "integer",
+              minimum: 0,
+              maximum: 100000,
+              default: 0,
             },
           },
         ],
@@ -2147,6 +2652,46 @@ export const openApiSpec = {
           "403": {
             description: "Insufficient permissions",
           },
+        },
+      },
+    },
+    "/admin/members/{id}/actions": {
+      post: {
+        tags: ["Admin Members"],
+        summary: "Apply a membership decision",
+        description: "Verify, approve, activate, suspend, reactivate, transfer or terminate a membership with history and audit",
+        operationId: "applyMembershipAction",
+        security: [{ BearerAuth: [] }],
+        parameters: [{
+          name: "id",
+          in: "path",
+          required: true,
+          schema: { type: "integer", minimum: 1 },
+        }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/MembershipActionInput" },
+            },
+          },
+        },
+        responses: {
+          "200": {
+            description: "Membership decision recorded",
+            content: {
+              "application/json": {
+                schema: createSuccessResponseSchema({
+                  $ref: "#/components/schemas/MembershipActionResponseData",
+                }),
+              },
+            },
+          },
+          "400": { description: "Invalid decision" },
+          "401": { description: "Unauthorized" },
+          "403": { description: "Insufficient permissions" },
+          "404": { description: "Membership not found" },
+          "409": { description: "Invalid or concurrent transition" },
         },
       },
     },
@@ -2991,6 +3536,195 @@ export const openApiSpec = {
         },
         additionalProperties: false,
       },
+      MobilizationAction: {
+        type: "object",
+        required: [
+          "id", "slug", "type", "title", "summary", "description", "scope", "county", "locality",
+          "startsAt", "endsAt", "participationMode", "commitment", "capacity", "responseCount",
+        ],
+        properties: {
+          id: { type: "string" },
+          slug: { type: "string" },
+          type: { type: "string", enum: ["event", "campaign", "volunteer_task", "petition", "consultation"] },
+          title: { type: "string" },
+          summary: { type: "string" },
+          description: { type: "string" },
+          scope: { type: "string", enum: ["national", "local", "online"] },
+          county: { type: "string" },
+          locality: { type: "string" },
+          startsAt: { type: "string", format: "date-time", nullable: true },
+          endsAt: { type: "string", format: "date-time", nullable: true },
+          participationMode: { type: "string" },
+          commitment: { type: "string" },
+          capacity: { type: "integer", minimum: 1, nullable: true },
+          responseCount: { type: "integer", minimum: 0 },
+        },
+        additionalProperties: false,
+      },
+      MobilizationResponseInput: {
+        type: "object",
+        required: ["fullName", "email", "county", "interests", "privacyConsent"],
+        properties: {
+          fullName: { type: "string", minLength: 2, maxLength: 160 },
+          email: { type: "string", format: "email", maxLength: 180 },
+          phone: { type: "string", maxLength: 40, default: "" },
+          county: { type: "string", minLength: 2, maxLength: 120 },
+          locality: { type: "string", maxLength: 120, default: "" },
+          interests: {
+            type: "array",
+            minItems: 1,
+            maxItems: 6,
+            items: {
+              type: "string",
+              enum: ["pensii", "sanatate", "servicii_locale", "combaterea_izolarii", "comunicare", "organizare"],
+            },
+          },
+          availability: {
+            type: "string",
+            enum: ["", "dimineata", "dupa_amiaza", "seara", "weekend", "flexibil"],
+            default: "",
+          },
+          message: { type: "string", maxLength: 1200, default: "" },
+          updatesConsent: { type: "boolean", default: false },
+          emailConsent: { type: "boolean", default: false },
+          smsConsent: { type: "boolean", default: false },
+          whatsappConsent: { type: "boolean", default: false },
+          consentVersion: { type: "string", enum: ["mobilizare-v2"], default: "mobilizare-v2" },
+          privacyConsent: { type: "boolean", enum: [true] },
+          website: { type: "string", maxLength: 2048, default: "" },
+        },
+        additionalProperties: false,
+      },
+      MobilizationResponseData: {
+        type: "object",
+        required: ["accepted", "id"],
+        properties: {
+          accepted: { type: "boolean" },
+          id: { type: "string", nullable: true },
+        },
+        additionalProperties: false,
+      },
+      MemberEventResponseInput: {
+        type: "object",
+        required: ["response"],
+        properties: {
+          response: { type: "string", enum: ["confirmed", "declined"] },
+        },
+        additionalProperties: false,
+      },
+      MemberTaskReportInput: {
+        type: "object",
+        required: ["status", "report", "hours"],
+        properties: {
+          status: { type: "string", enum: ["in_progress", "reported"] },
+          report: { type: "string", minLength: 5, maxLength: 5000 },
+          result: { type: "string", maxLength: 2000, default: "" },
+          hours: { type: "number", minimum: 0, maximum: 10000 },
+        },
+        additionalProperties: false,
+      },
+      MemberConsentInput: {
+        type: "object",
+        required: ["emailConsent", "smsConsent", "whatsappConsent"],
+        properties: {
+          emailConsent: { type: "boolean" },
+          smsConsent: { type: "boolean" },
+          whatsappConsent: { type: "boolean" },
+          phone: { type: "string", maxLength: 40, default: "" },
+          interests: {
+            type: "array",
+            maxItems: 6,
+            default: [],
+            items: { type: "string", enum: ["pensii", "sanatate", "servicii_locale", "combaterea_izolarii", "comunicare", "organizare"] },
+          },
+          consentVersion: { type: "string", enum: ["portal-membru-v1"], default: "portal-membru-v1" },
+        },
+        additionalProperties: false,
+      },
+      PoliticalOperationInput: {
+        type: "object",
+        required: ["type", "title", "summary", "objective"],
+        properties: {
+          type: { type: "string", enum: ["event", "campaign", "volunteer_task"] },
+          title: { type: "string", minLength: 3, maxLength: 180 },
+          summary: { type: "string", minLength: 10, maxLength: 360 },
+          description: { type: "string", maxLength: 5000, default: "" },
+          objective: { type: "string", minLength: 5, maxLength: 2000 },
+          status: { type: "string", enum: ["draft", "open", "closed", "archived"], default: "draft" },
+          visibility: { type: "string", enum: ["public", "members", "internal"], default: "members" },
+          organizationId: { type: "string", maxLength: 80, nullable: true },
+          coordinatorUserId: { type: "string", pattern: "^[1-9]\\d*$", nullable: true },
+          countyIds: { type: "array", maxItems: 42, default: [], items: positiveIntegerSchema },
+          startsAt: { type: "string", format: "date-time", nullable: true },
+          endsAt: { type: "string", format: "date-time", nullable: true },
+          participationMode: { type: "string", maxLength: 120, default: "" },
+          commitment: { type: "string", maxLength: 220, default: "" },
+          capacity: { type: "integer", minimum: 1, maximum: 1000000, nullable: true },
+          targetMetric: { type: "string", maxLength: 120, default: "" },
+          targetValue: { type: "number", minimum: 0, maximum: 1000000000, nullable: true },
+        },
+        additionalProperties: false,
+      },
+      PoliticalOperationUpdateInput: {
+        type: "object",
+        required: ["expectedVersion"],
+        properties: {
+          status: { type: "string", enum: ["draft", "open", "closed", "archived"] },
+          resultValue: { type: "number", minimum: 0, maximum: 1000000000, nullable: true },
+          resultSummary: { type: "string", maxLength: 5000 },
+          expectedVersion: positiveIntegerSchema,
+        },
+        additionalProperties: false,
+      },
+      PoliticalParticipantInput: {
+        type: "object",
+        required: ["email"],
+        properties: {
+          email: { type: "string", format: "email", maxLength: 180 },
+          dueAt: { type: "string", format: "date-time", nullable: true },
+          notes: { type: "string", maxLength: 1200, default: "" },
+        },
+        additionalProperties: false,
+      },
+      PoliticalParticipantUpdateInput: {
+        type: "object",
+        properties: {
+          status: { type: "string", enum: ["invited", "confirmed", "declined", "active", "in_progress", "reported", "completed", "cancelled"] },
+          attendanceStatus: { type: "string", enum: ["not_applicable", "pending", "present", "absent", "excused"] },
+          report: { type: "string", maxLength: 5000 },
+          result: { type: "string", maxLength: 3000 },
+          hours: { type: "number", minimum: 0, maximum: 10000 },
+        },
+        additionalProperties: false,
+      },
+      CommunicationAudienceInput: {
+        type: "object",
+        required: ["channel"],
+        properties: {
+          channel: { type: "string", enum: ["email", "sms", "whatsapp"] },
+          organizationId: { type: "string", maxLength: 80, nullable: true },
+          countyIds: { type: "array", maxItems: 42, default: [], items: positiveIntegerSchema },
+          roles: { type: "array", maxItems: 7, default: [], items: { $ref: "#/components/schemas/UserRole" } },
+          interests: { type: "array", maxItems: 6, default: [], items: { type: "string", enum: ["pensii", "sanatate", "servicii_locale", "combaterea_izolarii", "comunicare", "organizare"] } },
+        },
+        additionalProperties: false,
+      },
+      CommunicationDispatchInput: {
+        type: "object",
+        required: ["channel", "title", "message"],
+        properties: {
+          channel: { type: "string", enum: ["email", "sms", "whatsapp"] },
+          organizationId: { type: "string", maxLength: 80, nullable: true },
+          countyIds: { type: "array", maxItems: 42, default: [], items: positiveIntegerSchema },
+          roles: { type: "array", maxItems: 7, default: [], items: { $ref: "#/components/schemas/UserRole" } },
+          interests: { type: "array", maxItems: 6, default: [], items: { type: "string", enum: ["pensii", "sanatate", "servicii_locale", "combaterea_izolarii", "comunicare", "organizare"] } },
+          title: { type: "string", minLength: 3, maxLength: 180 },
+          message: { type: "string", minLength: 10, maxLength: 10000 },
+          mode: { type: "string", enum: ["draft", "send"], default: "draft" },
+          confirmConsentSelection: { type: "boolean", default: false },
+        },
+        additionalProperties: false,
+      },
       VolunteerAdminRecordSource: {
         type: "string",
         enum: ["volunteer", "user", "both"],
@@ -3483,113 +4217,433 @@ export const openApiSpec = {
         },
         additionalProperties: false,
       },
-      AdminDashboardMember: {
+      OrganizationLevel: {
+        type: "string",
+        enum: ["national", "county", "local"],
+      },
+      OrganizationStatus: {
+        type: "string",
+        enum: ["forming", "active", "inactive", "dissolved"],
+      },
+      OrganizationTerritoryInput: {
         type: "object",
-        required: ["id", "fullName", "email", "role", "createdAt"],
+        required: ["type"],
         properties: {
-          id: {
-            type: "string",
-          },
-          fullName: {
-            type: "string",
-          },
-          email: {
-            type: "string",
-            format: "email",
-          },
-          role: {
-            $ref: "#/components/schemas/UserRole",
-          },
-          createdAt: {
-            type: "string",
-            format: "date-time",
+          type: { type: "string", enum: ["national", "county", "locality"] },
+          countyId: { type: "integer", minimum: 1, nullable: true },
+          locality: { type: "string", maxLength: 160, default: "" },
+        },
+        additionalProperties: false,
+      },
+      OrganizationWriteInput: {
+        type: "object",
+        required: ["code", "name", "level", "status", "territories"],
+        properties: {
+          code: { type: "string", minLength: 2, maxLength: 80 },
+          name: { type: "string", minLength: 3, maxLength: 180 },
+          level: { $ref: "#/components/schemas/OrganizationLevel" },
+          status: { $ref: "#/components/schemas/OrganizationStatus" },
+          parentId: { type: "string", maxLength: 80, nullable: true },
+          membersCount: { type: "integer", minimum: 0, default: 0 },
+          officialEmail: { type: "string", format: "email", maxLength: 180 },
+          phone: { type: "string", maxLength: 40 },
+          headquarters: { type: "string", maxLength: 260 },
+          foundedAt: { type: "string", format: "date", nullable: true },
+          territories: {
+            type: "array",
+            minItems: 1,
+            maxItems: 50,
+            items: { $ref: "#/components/schemas/OrganizationTerritoryInput" },
           },
         },
         additionalProperties: false,
       },
-      AdminDashboardGroup: {
+      OrganizationPatchInput: {
         type: "object",
-        required: ["label", "count", "rows"],
+        minProperties: 1,
         properties: {
-          label: {
-            type: "string",
-          },
-          count: {
-            type: "integer",
-            minimum: 0,
-          },
-          rows: {
+          code: { type: "string", minLength: 2, maxLength: 80 },
+          name: { type: "string", minLength: 3, maxLength: 180 },
+          level: { $ref: "#/components/schemas/OrganizationLevel" },
+          status: { $ref: "#/components/schemas/OrganizationStatus" },
+          parentId: { type: "string", maxLength: 80, nullable: true },
+          membersCount: { type: "integer", minimum: 0 },
+          officialEmail: { type: "string", format: "email", maxLength: 180 },
+          phone: { type: "string", maxLength: 40 },
+          headquarters: { type: "string", maxLength: 260 },
+          foundedAt: { type: "string", format: "date", nullable: true },
+          territories: {
             type: "array",
-            items: {
-              $ref: "#/components/schemas/AdminDashboardMember",
-            },
+            minItems: 1,
+            maxItems: 50,
+            items: { $ref: "#/components/schemas/OrganizationTerritoryInput" },
           },
+        },
+        additionalProperties: false,
+      },
+      OrganizationMandateInput: {
+        type: "object",
+        required: ["fullName", "positionTitle", "startedAt"],
+        properties: {
+          userId: { type: "integer", minimum: 1, nullable: true },
+          fullName: { type: "string", minLength: 3, maxLength: 160 },
+          positionTitle: { type: "string", minLength: 2, maxLength: 120 },
+          startedAt: { type: "string", format: "date" },
+          endedAt: { type: "string", format: "date", nullable: true },
+          status: { type: "string", enum: ["planned", "active", "completed", "suspended"], default: "active" },
+        },
+        additionalProperties: false,
+      },
+      OrganizationMandatePatchInput: {
+        type: "object",
+        minProperties: 1,
+        properties: {
+          userId: { type: "integer", minimum: 1, nullable: true },
+          fullName: { type: "string", minLength: 3, maxLength: 160 },
+          positionTitle: { type: "string", minLength: 2, maxLength: 120 },
+          startedAt: { type: "string", format: "date" },
+          endedAt: { type: "string", format: "date", nullable: true },
+          status: { type: "string", enum: ["planned", "active", "completed", "suspended"] },
+        },
+        additionalProperties: false,
+      },
+      OrganizationObjectiveInput: {
+        type: "object",
+        required: ["title", "targetValue", "dueDate"],
+        properties: {
+          title: { type: "string", minLength: 3, maxLength: 180 },
+          description: { type: "string", maxLength: 3000 },
+          metricName: { type: "string", maxLength: 120 },
+          targetValue: { type: "number", minimum: 0 },
+          currentValue: { type: "number", minimum: 0, default: 0 },
+          unit: { type: "string", minLength: 1, maxLength: 40, default: "număr" },
+          dueDate: { type: "string", format: "date" },
+          status: { type: "string", enum: ["planned", "in_progress", "achieved", "at_risk", "cancelled"], default: "planned" },
+        },
+        additionalProperties: false,
+      },
+      OrganizationObjectivePatchInput: {
+        type: "object",
+        minProperties: 1,
+        properties: {
+          title: { type: "string", minLength: 3, maxLength: 180 },
+          description: { type: "string", maxLength: 3000 },
+          metricName: { type: "string", maxLength: 120 },
+          targetValue: { type: "number", minimum: 0 },
+          currentValue: { type: "number", minimum: 0 },
+          unit: { type: "string", minLength: 1, maxLength: 40 },
+          dueDate: { type: "string", format: "date" },
+          status: { type: "string", enum: ["planned", "in_progress", "achieved", "at_risk", "cancelled"] },
+        },
+        additionalProperties: false,
+      },
+      ExecutiveDashboardSummary: {
+        type: "object",
+        required: [
+          "applicationsTotal",
+          "applicationsLast30Days",
+          "contactedTotal",
+          "uncontactedCases",
+          "membersTotal",
+          "contactRate",
+          "memberConversionRate",
+          "overdueCases",
+          "activeOrganizations",
+          "countiesWithoutResponsible",
+        ],
+        properties: {
+          applicationsTotal: { type: "integer", minimum: 0 },
+          applicationsLast30Days: { type: "integer", minimum: 0 },
+          contactedTotal: { type: "integer", minimum: 0 },
+          uncontactedCases: { type: "integer", minimum: 0 },
+          membersTotal: { type: "integer", minimum: 0 },
+          contactRate: { type: "number", minimum: 0, maximum: 100 },
+          memberConversionRate: { type: "number", minimum: 0, maximum: 100 },
+          overdueCases: { type: "integer", minimum: 0 },
+          activeOrganizations: { type: "integer", minimum: 0 },
+          countiesWithoutResponsible: { type: "integer", minimum: 0 },
+        },
+        additionalProperties: false,
+      },
+      ExecutiveDashboardTrend: {
+        type: "object",
+        required: ["month", "applications", "contacted", "members"],
+        properties: {
+          month: { type: "string", format: "date" },
+          applications: { type: "integer", minimum: 0 },
+          contacted: { type: "integer", minimum: 0 },
+          members: { type: "integer", minimum: 0 },
+        },
+        additionalProperties: false,
+      },
+      ExecutiveDashboardCounty: {
+        type: "object",
+        required: ["county", "applications", "contacted", "members", "organizers", "overdue", "hasResponsible"],
+        properties: {
+          county: { type: "string" },
+          applications: { type: "integer", minimum: 0 },
+          contacted: { type: "integer", minimum: 0 },
+          members: { type: "integer", minimum: 0 },
+          organizers: { type: "integer", minimum: 0 },
+          overdue: { type: "integer", minimum: 0 },
+          hasResponsible: { type: "boolean" },
+        },
+        additionalProperties: false,
+      },
+      ExecutiveDashboardWorkflow: {
+        type: "object",
+        required: ["status", "count"],
+        properties: {
+          status: { $ref: "#/components/schemas/VolunteerWorkflowStatus" },
+          count: { type: "integer", minimum: 0 },
+        },
+        additionalProperties: false,
+      },
+      ExecutiveDashboardObjective: {
+        type: "object",
+        required: [
+          "key",
+          "label",
+          "targetValue",
+          "currentValue",
+          "unit",
+          "direction",
+          "status",
+          "progressPercent",
+          "updatedAt",
+        ],
+        properties: {
+          key: {
+            type: "string",
+            enum: ["contact_rate", "member_conversion_rate", "overdue_cases", "active_organizations"],
+          },
+          label: { type: "string" },
+          targetValue: { type: "number", minimum: 0 },
+          currentValue: { type: "number", minimum: 0 },
+          unit: { type: "string", enum: ["percent", "count"] },
+          direction: { type: "string", enum: ["at_least", "at_most"] },
+          status: { type: "string", enum: ["achieved", "on_track", "at_risk"] },
+          progressPercent: { type: "number", minimum: 0, maximum: 100 },
+          updatedAt: { type: "string", format: "date-time" },
+        },
+        additionalProperties: false,
+      },
+      ExecutiveDashboardDefinitions: {
+        type: "object",
+        required: ["contactRate", "memberConversionRate", "overdueCases", "activeOrganizations", "uncontactedCases", "countiesWithoutResponsible", "trends"],
+        properties: {
+          contactRate: { type: "string" },
+          memberConversionRate: { type: "string" },
+          overdueCases: { type: "string" },
+          activeOrganizations: { type: "string" },
+          uncontactedCases: { type: "string" },
+          countiesWithoutResponsible: { type: "string" },
+          trends: { type: "string" },
+        },
+        additionalProperties: false,
+      },
+      ExecutiveDashboardData: {
+        type: "object",
+        required: ["generatedAt", "summary", "trends", "counties", "workflow", "objectives", "countiesWithoutResponsible", "definitions"],
+        properties: {
+          generatedAt: { type: "string", format: "date-time" },
+          summary: { $ref: "#/components/schemas/ExecutiveDashboardSummary" },
+          trends: {
+            type: "array",
+            items: { $ref: "#/components/schemas/ExecutiveDashboardTrend" },
+          },
+          counties: {
+            type: "array",
+            items: { $ref: "#/components/schemas/ExecutiveDashboardCounty" },
+          },
+          workflow: {
+            type: "array",
+            items: { $ref: "#/components/schemas/ExecutiveDashboardWorkflow" },
+          },
+          countiesWithoutResponsible: {
+            type: "array",
+            items: { type: "string" },
+          },
+          objectives: {
+            type: "array",
+            items: { $ref: "#/components/schemas/ExecutiveDashboardObjective" },
+          },
+          definitions: { $ref: "#/components/schemas/ExecutiveDashboardDefinitions" },
+        },
+        additionalProperties: false,
+      },
+      ExecutiveTargetUpdateInput: {
+        type: "object",
+        required: ["targetValue"],
+        properties: {
+          targetValue: { type: "number", minimum: 0, maximum: 100000 },
+        },
+        additionalProperties: false,
+      },
+      ExecutiveTarget: {
+        type: "object",
+        required: ["key", "label", "targetValue", "unit", "direction", "updatedAt"],
+        properties: {
+          key: {
+            type: "string",
+            enum: ["contact_rate", "member_conversion_rate", "overdue_cases", "active_organizations"],
+          },
+          label: { type: "string" },
+          targetValue: { type: "number", minimum: 0 },
+          unit: { type: "string", enum: ["percent", "count"] },
+          direction: { type: "string", enum: ["at_least", "at_most"] },
+          updatedAt: { type: "string", format: "date-time" },
+        },
+        additionalProperties: false,
+      },
+      ExecutiveTargetUpdateResponseData: {
+        type: "object",
+        required: ["message", "target"],
+        properties: {
+          message: { type: "string" },
+          target: { $ref: "#/components/schemas/ExecutiveTarget" },
+        },
+        additionalProperties: false,
+      },
+      MembershipStatus: {
+        type: "string",
+        enum: ["supporter", "application", "verified", "approved", "active", "suspended", "terminated"],
+      },
+      MembershipAction: {
+        type: "string",
+        enum: ["verify", "approve", "activate", "suspend", "reactivate", "transfer", "terminate"],
+      },
+      MembershipOrganization: {
+        type: "object",
+        required: ["id", "code", "name", "level", "status"],
+        properties: {
+          id: { type: "string" },
+          code: { type: "string" },
+          name: { type: "string" },
+          level: { type: "string" },
+          status: { type: "string" },
+        },
+        additionalProperties: false,
+      },
+      MembershipEvent: {
+        type: "object",
+        required: ["id", "action", "previousStatus", "nextStatus", "previousOrganizationId", "nextOrganizationId", "reason", "effectiveAt", "actorName"],
+        properties: {
+          id: { type: "string" },
+          action: { type: "string" },
+          previousStatus: { allOf: [{ $ref: "#/components/schemas/MembershipStatus" }], nullable: true },
+          nextStatus: { $ref: "#/components/schemas/MembershipStatus" },
+          previousOrganizationId: { type: "string", nullable: true },
+          nextOrganizationId: { type: "string", nullable: true },
+          reason: { type: "string" },
+          effectiveAt: { type: "string", format: "date-time" },
+          actorName: { type: "string", nullable: true },
+        },
+        additionalProperties: false,
+      },
+      AdminMembershipRow: {
+        type: "object",
+        required: ["id", "userId", "volunteerId", "fullName", "email", "role", "membershipStatus", "memberNumber", "organization", "approvalOrganization", "county", "locality", "applicationAt", "verifiedAt", "approvedAt", "activatedAt", "approvalBody", "suspendedAt", "endedAt", "statusReason", "version", "createdAt", "updatedAt", "history", "availableActions"],
+        properties: {
+          id: { type: "string" },
+          userId: { type: "string", nullable: true },
+          volunteerId: { type: "string", nullable: true },
+          fullName: { type: "string" },
+          email: { type: "string", format: "email" },
+          role: { $ref: "#/components/schemas/UserRole" },
+          membershipStatus: { $ref: "#/components/schemas/MembershipStatus" },
+          memberNumber: { type: "string", nullable: true },
+          organization: { allOf: [{ $ref: "#/components/schemas/MembershipOrganization" }], nullable: true },
+          approvalOrganization: { allOf: [{ $ref: "#/components/schemas/MembershipOrganization" }], nullable: true },
+          county: { type: "string" },
+          locality: { type: "string" },
+          applicationAt: { type: "string", format: "date-time" },
+          verifiedAt: { type: "string", format: "date-time", nullable: true },
+          approvedAt: { type: "string", format: "date-time", nullable: true },
+          activatedAt: { type: "string", format: "date-time", nullable: true },
+          approvalBody: { type: "string" },
+          suspendedAt: { type: "string", format: "date-time", nullable: true },
+          endedAt: { type: "string", format: "date-time", nullable: true },
+          statusReason: { type: "string" },
+          version: { type: "integer", minimum: 1 },
+          createdAt: { type: "string", format: "date-time" },
+          updatedAt: { type: "string", format: "date-time" },
+          history: { type: "array", items: { $ref: "#/components/schemas/MembershipEvent" } },
+          availableActions: { type: "array", items: { $ref: "#/components/schemas/MembershipAction" } },
         },
         additionalProperties: false,
       },
       AdminMembersDashboardSummary: {
         type: "object",
-        required: ["total", "aderenti", "membri", "organizatori"],
+        required: ["total", "supporters", "applications", "verified", "approved", "active", "suspended", "terminated", "organizers", "unassigned"],
         properties: {
-          total: {
-            type: "integer",
-            minimum: 0,
-          },
-          aderenti: {
-            type: "integer",
-            minimum: 0,
-          },
-          membri: {
-            type: "integer",
-            minimum: 0,
-          },
-          organizatori: {
-            type: "integer",
-            minimum: 0,
-          },
+          total: { type: "integer", minimum: 0 },
+          supporters: { type: "integer", minimum: 0 },
+          applications: { type: "integer", minimum: 0 },
+          verified: { type: "integer", minimum: 0 },
+          approved: { type: "integer", minimum: 0 },
+          active: { type: "integer", minimum: 0 },
+          suspended: { type: "integer", minimum: 0 },
+          terminated: { type: "integer", minimum: 0 },
+          organizers: { type: "integer", minimum: 0 },
+          unassigned: { type: "integer", minimum: 0 },
         },
         additionalProperties: false,
       },
       AdminMembersDashboardFilters: {
         type: "object",
-        required: ["search", "limit"],
+        required: ["search", "status", "organizationId"],
         properties: {
-          search: {
-            type: "string",
-          },
-          limit: {
-            type: "integer",
-            minimum: 1,
-          },
+          search: { type: "string" },
+          status: { allOf: [{ $ref: "#/components/schemas/MembershipStatus" }], nullable: true },
+          organizationId: { type: "string", nullable: true },
+        },
+        additionalProperties: false,
+      },
+      AdminMembersDashboardPagination: {
+        type: "object",
+        required: ["total", "limit", "offset", "hasPrevious", "hasNext"],
+        properties: {
+          total: { type: "integer", minimum: 0 },
+          limit: { type: "integer", minimum: 1 },
+          offset: { type: "integer", minimum: 0 },
+          hasPrevious: { type: "boolean" },
+          hasNext: { type: "boolean" },
         },
         additionalProperties: false,
       },
       AdminMembersDashboardData: {
         type: "object",
-        required: ["summary", "groups", "filters"],
+        required: ["generatedAt", "summary", "rows", "organizations", "pagination", "filters"],
         properties: {
-          summary: {
-            $ref: "#/components/schemas/AdminMembersDashboardSummary",
-          },
-          groups: {
-            type: "object",
-            required: ["aderenti", "membri", "organizatori"],
-            properties: {
-              aderenti: {
-                $ref: "#/components/schemas/AdminDashboardGroup",
-              },
-              membri: {
-                $ref: "#/components/schemas/AdminDashboardGroup",
-              },
-              organizatori: {
-                $ref: "#/components/schemas/AdminDashboardGroup",
-              },
-            },
-            additionalProperties: false,
-          },
-          filters: {
-            $ref: "#/components/schemas/AdminMembersDashboardFilters",
-          },
+          generatedAt: { type: "string", format: "date-time" },
+          summary: { $ref: "#/components/schemas/AdminMembersDashboardSummary" },
+          rows: { type: "array", items: { $ref: "#/components/schemas/AdminMembershipRow" } },
+          organizations: { type: "array", items: { $ref: "#/components/schemas/MembershipOrganization" } },
+          pagination: { $ref: "#/components/schemas/AdminMembersDashboardPagination" },
+          filters: { $ref: "#/components/schemas/AdminMembersDashboardFilters" },
+        },
+        additionalProperties: false,
+      },
+      MembershipActionInput: {
+        type: "object",
+        required: ["action", "expectedVersion"],
+        properties: {
+          action: { $ref: "#/components/schemas/MembershipAction" },
+          organizationId: { type: "string", minLength: 1, maxLength: 80 },
+          approvalOrganizationId: { type: "string", minLength: 1, maxLength: 80 },
+          reason: { type: "string", maxLength: 1200, default: "" },
+          effectiveAt: { type: "string", format: "date-time" },
+          expectedVersion: { type: "integer", minimum: 1 },
+        },
+        additionalProperties: false,
+      },
+      MembershipActionResponseData: {
+        type: "object",
+        required: ["message", "membership"],
+        properties: {
+          message: { type: "string" },
+          membership: { $ref: "#/components/schemas/AdminMembershipRow" },
         },
         additionalProperties: false,
       },
@@ -3760,6 +4814,10 @@ export const openApiSpec = {
       description: "Public volunteer listing and registration",
     },
     {
+      name: "Mobilization",
+      description: "Public events, campaigns, tasks, petitions, consultations and participation responses",
+    },
+    {
       name: "Admin Volunteers",
       description: "Administrator functions for volunteer management",
     },
@@ -3769,7 +4827,11 @@ export const openApiSpec = {
     },
     {
       name: "Organizations",
-      description: "Partner and affiliated organizations",
+      description: "Public territorial organization registry",
+    },
+    {
+      name: "Territorial Organizations",
+      description: "Administrative registry for branches, territories, leadership mandates and objectives",
     },
     {
       name: "Finance",

@@ -15,6 +15,7 @@ import {
   findVolunteerByEmail,
   insertVolunteer,
   insertVolunteerUser,
+  upsertPendingMembership,
 } from "../../repository.js";
 
 function readHoneypot(body: unknown): string {
@@ -72,7 +73,7 @@ export async function createVolunteerHandler(req: Request, res: Response, next: 
       {
         accepted: true,
         ignored: true,
-        message: "Inscriere ADERENT inregistrata.",
+        message: "Cerere de aderare inregistrata.",
       },
       { status: 202 }
     );
@@ -115,6 +116,7 @@ export async function createVolunteerHandler(req: Request, res: Response, next: 
       }
 
       const existingUser = await findUserAuthByEmail(normalizedEmail, tx);
+      let userId: number;
 
       if (existingUser) {
         const passwordMatches = await verifyPassword(payload.password, existingUser.passwordHash);
@@ -125,9 +127,10 @@ export async function createVolunteerHandler(req: Request, res: Response, next: 
             "Exista deja un cont pentru acest email. Foloseste parola contului existent pentru autentificare."
           );
         }
+        userId = existingUser.id;
       } else {
         const passwordHash = await hashPassword(payload.password);
-        await insertVolunteerUser({
+        userId = await insertVolunteerUser({
           fullName: payload.fullName,
           email: normalizedEmail,
           passwordHash,
@@ -135,7 +138,7 @@ export async function createVolunteerHandler(req: Request, res: Response, next: 
         });
       }
 
-      return insertVolunteer({
+      const volunteerId = await insertVolunteer({
         fullName: payload.fullName,
         email: normalizedEmail,
         phone: payload.phone,
@@ -146,12 +149,20 @@ export async function createVolunteerHandler(req: Request, res: Response, next: 
         motivation: payload.motivation,
         runner: tx,
       });
+      await upsertPendingMembership({
+        userId,
+        volunteerId,
+        fullName: payload.fullName,
+        email: normalizedEmail,
+        runner: tx,
+      });
+      return volunteerId;
     });
 
     sendSuccess(
       res,
       {
-        message: "Inscriere ADERENT inregistrata.",
+        message: "Cerere de aderare inregistrata.",
         id: createdVolunteerId,
       },
       { status: 201 }

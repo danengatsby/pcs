@@ -21,6 +21,13 @@ export function buildTestNewsTitle(prefix: string): string {
 export async function deleteUserByEmail(email: string): Promise<void> {
   await query(
     `
+      DELETE FROM membership_records
+      WHERE LOWER(email) = LOWER($1)
+    `,
+    [email]
+  );
+  await query(
+    `
       DELETE FROM users
       WHERE LOWER(email) = LOWER($1)
     `,
@@ -29,6 +36,13 @@ export async function deleteUserByEmail(email: string): Promise<void> {
 }
 
 export async function deleteVolunteerByEmail(email: string): Promise<void> {
+  await query(
+    `
+      DELETE FROM membership_records
+      WHERE LOWER(email) = LOWER($1)
+    `,
+    [email]
+  );
   await query(
     `
       DELETE FROM volunteers

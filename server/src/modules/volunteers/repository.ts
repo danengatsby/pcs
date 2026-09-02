@@ -3,6 +3,7 @@ export {
   findVolunteerByEmail,
   insertVolunteer,
   insertVolunteerUser,
+  upsertPendingMembership,
   listVolunteerCountsByCounty,
   listPublicVolunteers,
 } from "./repositoryPublic.js";
@@ -13,6 +14,7 @@ export {
   deleteAdminVolunteer,
   listAdminVolunteerOwners,
   listAdminVolunteerIdsForBulkFilters,
+  listAdminVolunteerIdsForExplicitSelection,
   listAdminVolunteersForExport,
   listAdminVolunteersKeyset,
   readAdminVolunteerById,

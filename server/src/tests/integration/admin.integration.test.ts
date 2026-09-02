@@ -190,6 +190,7 @@ test("admin endpoints should update volunteer workflow, export csv and expose au
       lastContactAt?: string | null;
       tags?: string[];
       skillTags?: string[];
+      accountRole?: string | null;
     } | undefined;
     assert.equal(updatedVolunteer?.statusUpdatedByUserId, adminUserId);
     assert.equal(updatedVolunteer?.statusUpdatedByName, "Admin Workflow");
@@ -203,8 +204,10 @@ test("admin endpoints should update volunteer workflow, export csv and expose au
     assert.equal(updatedVolunteer?.lastContactAt, "2026-04-03T07:15:00.000Z");
     assert.deepEqual(updatedVolunteer?.tags, ["student", "organizator"]);
     assert.deepEqual(updatedVolunteer?.skillTags, ["telefonic", "teren"]);
+    // CRM contact tracking must not grant a political membership role.
+    assert.equal(updatedVolunteer?.accountRole, "SUSTINATOR");
 
-    await request(app)
+    const activeWorkflowResponse = await request(app)
       .patch(`/api/admin/volunteers/${volunteer!.id}/workflow`)
       .set("Authorization", `Bearer ${token}`)
       .send({
@@ -221,6 +224,8 @@ test("admin endpoints should update volunteer workflow, export csv and expose au
         skillTags: ["door-to-door", "fundraising"],
       })
       .expect(200);
+
+    assert.equal(activeWorkflowResponse.body?.data?.volunteer?.accountRole, "SUSTINATOR");
 
     const csvResponse = await request(app)
       .get(`/api/admin/volunteers/export.csv?search=${encodeURIComponent(volunteerEmail)}`)
@@ -324,6 +329,15 @@ test("admin volunteers should include aderent users even without volunteer form 
         password,
       })
       .expect(201);
+
+    await query(
+      `
+        UPDATE users
+        SET role = 'ADERENT'
+        WHERE LOWER(email) = LOWER($1)
+      `,
+      [aderentEmail]
+    );
 
     const signinResponse = await request(app)
       .post("/api/auth/signin")
@@ -491,9 +505,11 @@ test("admin should bulk update volunteer workflow for multiple records", async (
     const updatedVolunteers = updatedVolunteersResponse.body?.data as Array<{
       email: string;
       workflowStatus: string;
+      accountRole: string | null;
     }> | undefined;
     assert.ok(Array.isArray(updatedVolunteers));
     assert.equal(updatedVolunteers?.every((item) => item.workflowStatus === "activ"), true);
+    assert.equal(updatedVolunteers?.every((item) => item.accountRole === "SUSTINATOR"), true);
 
     const auditResponse = await request(app)
       .get("/api/admin/audit?limit=50&action=volunteer.workflow_bulk_update&targetType=volunteer")
@@ -566,6 +582,19 @@ test("admin should bulk update volunteer workflow for multiple records", async (
         && row.details?.nextStatus === "contactat"
     );
     assert.equal(filteredMatchingAuditRows.length, 2);
+
+    const contactedVolunteersResponse = await request(app)
+      .get(`/api/admin/volunteers?search=${encodeURIComponent("admin-bulk-volunteer")}`)
+      .set("Authorization", `Bearer ${token}`)
+      .expect(200);
+
+    const contactedVolunteers = contactedVolunteersResponse.body?.data as Array<{
+      workflowStatus: string;
+      accountRole: string | null;
+    }> | undefined;
+    assert.equal(contactedVolunteers?.every((item) => item.workflowStatus === "contactat"), true);
+    // CRM workflow changes remain separate from political membership decisions.
+    assert.equal(contactedVolunteers?.every((item) => item.accountRole === "SUSTINATOR"), true);
   } finally {
     await deleteVolunteerByEmail(volunteerEmailOne);
     await deleteVolunteerByEmail(volunteerEmailTwo);
@@ -690,7 +719,7 @@ test("admin should bulk delete volunteer records for multiple selections", async
     assert.equal(remainingMatches.length, 2);
     assert.equal(remainingMatches.every((item) => item.volunteerId === null), true);
     assert.equal(remainingMatches.every((item) => item.recordSource === "user"), true);
-    assert.equal(remainingMatches.every((item) => item.workflowStatus === "validat"), true);
+    assert.equal(remainingMatches.every((item) => item.workflowStatus === "nou"), true);
 
     const auditResponse = await request(app)
       .get("/api/admin/audit?limit=50&action=volunteer.delete&targetType=volunteer")

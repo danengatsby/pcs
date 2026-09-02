@@ -3,8 +3,10 @@ import { expect, test } from "@playwright/test";
 import { signInThroughUi, signupUser } from "./helpers/auth";
 import {
   buildTestEmail,
+  deleteMembershipByEmail,
   deleteUserByEmail,
   deleteVolunteerByEmail,
+  insertMembershipByEmail,
   insertVolunteerWithoutUser,
   setUserRole,
 } from "./helpers/testDb";
@@ -45,6 +47,10 @@ test("admin can browse the members dashboard with filtered results", async ({ pa
       internalNotes: `Inițial ${token}`,
     });
 
+    await insertMembershipByEmail(adminEmail, "active");
+    await insertMembershipByEmail(memberEmail, "active");
+    await insertMembershipByEmail(volunteerEmail, "application");
+
     await signInThroughUi(page, {
       email: adminEmail,
       password,
@@ -55,19 +61,18 @@ test("admin can browse the members dashboard with filtered results", async ({ pa
     await page.goto("/admin/members");
     await expect(page).toHaveURL(/\/admin\/members$/);
 
-    await page.getByLabel("Caută după nume sau email").fill(token);
-    await expect(page.getByText(new RegExp(`Filtru activ: “${escapeRegex(token)}”\\.`))).toBeVisible();
+    await page.getByLabel("Caută nume, email, județ sau organizație").fill(token);
+    await expect(page.getByText("3 rezultate · pagina 1")).toBeVisible();
 
     await expect(page.getByRole("heading", { name: adminName })).toBeVisible();
     await expect(page.getByRole("heading", { name: memberName })).toBeVisible();
     await expect(page.getByRole("heading", { name: volunteerName })).toBeVisible();
   } finally {
+    await deleteMembershipByEmail(volunteerEmail);
+    await deleteMembershipByEmail(memberEmail);
+    await deleteMembershipByEmail(adminEmail);
     await deleteVolunteerByEmail(volunteerEmail);
     await deleteUserByEmail(memberEmail);
     await deleteUserByEmail(adminEmail);
   }
 });
-
-function escapeRegex(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}

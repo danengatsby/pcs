@@ -1,35 +1,101 @@
 import type { Role } from '@features/auth/types'
 
-export type AdminDashboardMemberRole = Role
+export type MembershipStatus = 'supporter' | 'application' | 'verified' | 'approved' | 'active' | 'suspended' | 'terminated'
+export type MembershipAction = 'verify' | 'approve' | 'activate' | 'suspend' | 'reactivate' | 'transfer' | 'terminate'
 
-export type AdminDashboardMember = {
+export type MembershipOrganization = {
   id: string
-  fullName: string
-  email: string
-  role: AdminDashboardMemberRole
-  createdAt: string
+  code: string
+  name: string
+  level: string
+  status: string
 }
 
-export type AdminDashboardGroup = {
-  label: string
-  count: number
-  rows: AdminDashboardMember[]
+export type MembershipEvent = {
+  id: string
+  action: string
+  previousStatus: MembershipStatus | null
+  nextStatus: MembershipStatus
+  previousOrganizationId: string | null
+  nextOrganizationId: string | null
+  reason: string
+  effectiveAt: string
+  actorName: string | null
+}
+
+export type AdminMembershipRow = {
+  id: string
+  userId: string | null
+  volunteerId: string | null
+  fullName: string
+  email: string
+  role: Role
+  membershipStatus: MembershipStatus
+  memberNumber: string | null
+  organization: MembershipOrganization | null
+  approvalOrganization: MembershipOrganization | null
+  county: string
+  locality: string
+  applicationAt: string
+  verifiedAt: string | null
+  approvedAt: string | null
+  activatedAt: string | null
+  approvalBody: string
+  suspendedAt: string | null
+  endedAt: string | null
+  statusReason: string
+  version: number
+  createdAt: string
+  updatedAt: string
+  history: MembershipEvent[]
+  availableActions: MembershipAction[]
 }
 
 export type AdminMembersDashboardResponse = {
+  generatedAt: string
   summary: {
     total: number
-    aderenti: number
-    membri: number
-    organizatori: number
+    supporters: number
+    applications: number
+    verified: number
+    approved: number
+    active: number
+    suspended: number
+    terminated: number
+    organizers: number
+    unassigned: number
   }
-  groups: {
-    aderenti: AdminDashboardGroup
-    membri: AdminDashboardGroup
-    organizatori: AdminDashboardGroup
+  rows: AdminMembershipRow[]
+  organizations: MembershipOrganization[]
+  pagination: {
+    total: number
+    limit: number
+    offset: number
+    hasPrevious: boolean
+    hasNext: boolean
   }
   filters: {
     search: string
-    limit: number
+    status: MembershipStatus | null
+    organizationId: string | null
   }
+  access?: {
+    capabilities: string[]
+    scope: string
+    national: boolean
+  }
+}
+
+export type MembershipActionInput = {
+  action: MembershipAction
+  organizationId?: string
+  approvalOrganizationId?: string
+  reason?: string
+  effectiveAt?: string
+  expectedVersion: number
+}
+
+export type MembershipActionResponse = {
+  message: string
+  membership: AdminMembershipRow
 }

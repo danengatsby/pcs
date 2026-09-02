@@ -1,5 +1,6 @@
 import { startTransition, useCallback, useMemo, useState, type SetStateAction } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { useAuth } from '@features/auth/context'
 import type { VolunteerAdminFilters, VolunteerWorkflowStatus } from '../types'
 import { volunteerWorkflowStatusValues } from '../types'
 import { useBulkDeleteVolunteer } from '../hooks/useBulkDeleteVolunteer'
@@ -33,6 +34,11 @@ function hasActiveFilters(query: ListAdminVolunteersQuery): boolean {
 }
 
 export function VolunteersAdminPage() {
+  const { user } = useAuth()
+  const canManage = user?.role === 'SECRETAR' || user?.role === 'VICEPRESEDINTE' || user?.role === 'PRESEDINTE'
+  const canPromote = user?.role === 'VICEPRESEDINTE' || user?.role === 'PRESEDINTE'
+  const canDelete = canPromote
+  const canExport = user?.role === 'SECRETAR' || canPromote
   const [searchParams, setSearchParams] = useSearchParams()
   const [exportError, setExportError] = useState<string | null>(null)
   const [bulkMessage, setBulkMessage] = useState<string | null>(null)
@@ -262,6 +268,11 @@ export function VolunteersAdminPage() {
   return (
     <div className="volunteer-admin">
       <VolunteersAdminToolbar
+        canManage={canManage}
+        canPromote={canPromote}
+        canDelete={canDelete}
+        canExport={canExport}
+        canViewExecutive={canPromote}
         loading={loading}
         exporting={exporting}
         bulkUpdating={bulkUpdating}
@@ -293,6 +304,7 @@ export function VolunteersAdminPage() {
 
       <div className="volunteer-admin__content">
         <VolunteerListPanel
+          canSelect={canManage}
           rows={rows}
           loading={loading}
           loadingMore={loadingMore}
@@ -308,6 +320,9 @@ export function VolunteersAdminPage() {
           onLoadMore={loadMore}
         />
         <VolunteerDetailsPanel
+          canManage={canManage}
+          canPromote={canPromote}
+          canViewAudit={user?.role === 'PRESEDINTE'}
           volunteer={selectedVolunteer}
           loading={selectedId !== null && selectedVolunteer === null && selectedLoading}
           error={selectedError}

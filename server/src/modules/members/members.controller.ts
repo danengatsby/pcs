@@ -1,5 +1,6 @@
 import type { RequestHandler } from "express";
 import { AppError } from "../../lib/errors.js";
+import { requireAdminAccess } from "../../lib/adminAuthorization.js";
 import { sendSuccess } from "../../lib/http.js";
 import { listMembersQuerySchema } from "./members.schema.js";
 import { listMembersService } from "./members.service.js";
@@ -13,7 +14,7 @@ export const listMembersController: RequestHandler = async (req, res, next) => {
   }
 
   try {
-    const payload = await listMembersService(parsed.data);
+    const payload = await listMembersService(parsed.data, requireAdminAccess(res).scope);
     sendSuccess(res, payload.rows, {
       meta: {
         total: payload.total,

@@ -75,7 +75,7 @@ test("members route should list enrolled members with status and role", async ()
     const found = rows.find((row) => row.email === email.toLowerCase());
     assert.ok(found);
     assert.equal(found?.status, "nou");
-    assert.equal(found?.role, "ADERENT");
+    assert.equal(found?.role, "SUSTINATOR");
   } finally {
     await deleteVolunteerByEmail(email);
     await deleteUserByEmail(email);

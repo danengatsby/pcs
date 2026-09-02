@@ -8,6 +8,36 @@ import { emailTestSchema } from "../../modules/admin/admin.shared.js";
 import { refreshCsrfHeaderName } from "../../modules/auth/types.js";
 import { signinSchema, signupSchema } from "../../modules/auth/validation.js";
 import { memberWorkflowStatuses } from "../../modules/members/members.schema.js";
+import {
+  membershipActionSchema,
+  membershipActions,
+  membershipStatuses,
+} from "../../modules/members/adminDashboard.schema.js";
+import { updateExecutiveTargetSchema } from "../../modules/executiveDashboard/executiveDashboard.schema.js";
+import { mobilizationResponseSchema } from "../../modules/mobilization/mobilization.schema.js";
+import {
+  memberConsentSchema,
+  memberEventResponseSchema,
+  memberTaskReportSchema,
+} from "../../modules/memberPortal/memberPortal.schema.js";
+import {
+  addPoliticalParticipantSchema,
+  createPoliticalOperationSchema,
+  updatePoliticalOperationSchema,
+  updatePoliticalParticipantSchema,
+} from "../../modules/politicalOperations/politicalOperations.schema.js";
+import {
+  communicationAudienceSchema,
+  createCommunicationDispatchSchema,
+} from "../../modules/communications/communications.schema.js";
+import {
+  createOrganizationMandateSchema,
+  createOrganizationObjectiveSchema,
+  createOrganizationSchema,
+  updateOrganizationMandateSchema,
+  updateOrganizationObjectiveSchema,
+  updateOrganizationSchema,
+} from "../../modules/organizations/organizations.schema.js";
 import { newsWriteSchema } from "../../modules/news/schema.js";
 import { newsMediaKindValues, newsStatusValues } from "../../modules/news/types.js";
 import { volunteerSchema, workflowUpdateSchema } from "../../modules/volunteers/schema.js";
@@ -167,6 +197,41 @@ test("openapi contract: volunteer and admin write schemas should match live zod 
   assert.deepEqual(schemas.VolunteerPriority.enum, [...volunteerPriorityValues]);
 });
 
+test("openapi contract: mobilization response schema and endpoints match the public API", () => {
+  assertComponentMatchesZodObject("MobilizationResponseInput", mobilizationResponseSchema);
+  assertParameterNames("/mobilization/actions", "get", []);
+  assertParameterNames("/mobilization/actions/{slug}/responses", "post", ["slug"]);
+  assertRequestBodyRef(
+    "/mobilization/actions/{slug}/responses",
+    "post",
+    "#/components/schemas/MobilizationResponseInput"
+  );
+});
+
+test("openapi contract: political operations, member portal and consent schemas match runtime", () => {
+  assertComponentMatchesZodObject("MemberEventResponseInput", memberEventResponseSchema);
+  assertComponentMatchesZodObject("MemberTaskReportInput", memberTaskReportSchema);
+  assertComponentMatchesZodObject("MemberConsentInput", memberConsentSchema);
+  assertComponentMatchesZodObject("PoliticalOperationInput", createPoliticalOperationSchema);
+  assertComponentMatchesZodObject("PoliticalOperationUpdateInput", updatePoliticalOperationSchema);
+  assertComponentMatchesZodObject("PoliticalParticipantInput", addPoliticalParticipantSchema);
+  assertComponentMatchesZodObject("PoliticalParticipantUpdateInput", updatePoliticalParticipantSchema);
+  assertComponentMatchesZodObject("CommunicationAudienceInput", communicationAudienceSchema);
+  assertComponentMatchesZodObject("CommunicationDispatchInput", createCommunicationDispatchSchema);
+
+  assertParameterNames("/member-portal", "get", []);
+  assertPositiveIntegerPathParameter("/member-portal/events/{id}/response", "post");
+  assertPositiveIntegerPathParameter("/member-portal/tasks/{id}", "patch");
+  assertParameterNames("/member-portal/consents", "patch", []);
+  assertParameterNames("/admin/mobilization", "get", ["type", "status", "limit"]);
+  assertParameterNames("/admin/mobilization/actions", "post", []);
+  assertPositiveIntegerPathParameter("/admin/mobilization/actions/{id}", "patch");
+  assertPositiveIntegerPathParameter("/admin/mobilization/actions/{id}/participants", "post");
+  assertPositiveIntegerPathParameter("/admin/mobilization/participants/{id}", "patch");
+  assertParameterNames("/admin/communications/preview", "post", []);
+  assertParameterNames("/admin/communications/dispatches", "post", []);
+});
+
 test("openapi contract: auth endpoints should expose implemented parameters and bodies", () => {
   assertParameterNames("/auth/signup", "post", ["X-Rate-Limit-Identifier"]);
   assertParameterNames("/auth/signin", "post", ["X-Rate-Limit-Identifier"]);
@@ -204,11 +269,46 @@ test("openapi contract: volunteer endpoints should expose implemented parameters
 });
 
 test("openapi contract: members and admin endpoints should expose implemented parameters and bodies", () => {
+  assertParameterNames("/admin/access", "get", []);
   assertParameterNames("/members", "get", ["search", "status", "limit", "offset"]);
-  assertParameterNames("/admin/members/dashboard", "get", ["search", "limit"]);
+  assertParameterNames("/admin/executive-dashboard", "get", []);
+  assertParameterNames("/admin/executive-dashboard/targets/{key}", "patch", ["key"]);
+  assertParameterNames("/admin/members/dashboard", "get", ["search", "status", "organizationId", "limit", "offset"]);
+  assertPositiveIntegerPathParameter("/admin/members/{id}/actions", "post");
+  assertParameterNames("/admin/organizations", "get", ["search", "level", "status", "limit", "offset"]);
+  assertParameterNames("/admin/organizations", "post", []);
+  assertParameterNames("/admin/organizations/{id}", "get", ["id"]);
+  assertParameterNames("/admin/organizations/{id}", "patch", ["id"]);
+  assertParameterNames("/admin/organizations/{id}/mandates", "post", ["id"]);
+  assertParameterNames("/admin/organizations/{id}/mandates/{childId}", "patch", ["id", "childId"]);
+  assertParameterNames("/admin/organizations/{id}/objectives", "post", ["id"]);
+  assertParameterNames("/admin/organizations/{id}/objectives/{childId}", "patch", ["id", "childId"]);
   assertParameterNames("/admin/audit", "get", ["limit", "cursor", "action", "targetType", "targetId"]);
   assertParameterNames("/admin/notifications/email-test", "post", []);
   assertRequestBodyRef("/admin/notifications/email-test", "post", "#/components/schemas/AdminEmailTestInput");
+  assertRequestBodyRef(
+    "/admin/executive-dashboard/targets/{key}",
+    "patch",
+    "#/components/schemas/ExecutiveTargetUpdateInput"
+  );
+  assertRequestBodyRef("/admin/members/{id}/actions", "post", "#/components/schemas/MembershipActionInput");
+  assertComponentMatchesZodObject("MembershipActionInput", membershipActionSchema);
+  const componentSchemas = openApiSpec.components.schemas as Record<string, OpenApiComponentSchema>;
+  assert.deepEqual(componentSchemas.MembershipStatus?.enum, [...membershipStatuses]);
+  assert.deepEqual(componentSchemas.MembershipAction?.enum, [...membershipActions]);
+  assertComponentMatchesZodObject("ExecutiveTargetUpdateInput", updateExecutiveTargetSchema);
+  assertRequestBodyRef("/admin/organizations", "post", "#/components/schemas/OrganizationWriteInput");
+  assertRequestBodyRef("/admin/organizations/{id}", "patch", "#/components/schemas/OrganizationPatchInput");
+  assertRequestBodyRef("/admin/organizations/{id}/mandates", "post", "#/components/schemas/OrganizationMandateInput");
+  assertRequestBodyRef("/admin/organizations/{id}/mandates/{childId}", "patch", "#/components/schemas/OrganizationMandatePatchInput");
+  assertRequestBodyRef("/admin/organizations/{id}/objectives", "post", "#/components/schemas/OrganizationObjectiveInput");
+  assertRequestBodyRef("/admin/organizations/{id}/objectives/{childId}", "patch", "#/components/schemas/OrganizationObjectivePatchInput");
+  assertComponentMatchesZodObject("OrganizationWriteInput", createOrganizationSchema);
+  assertComponentMatchesZodObject("OrganizationPatchInput", updateOrganizationSchema);
+  assertComponentMatchesZodObject("OrganizationMandateInput", createOrganizationMandateSchema);
+  assertComponentMatchesZodObject("OrganizationMandatePatchInput", updateOrganizationMandateSchema);
+  assertComponentMatchesZodObject("OrganizationObjectiveInput", createOrganizationObjectiveSchema);
+  assertComponentMatchesZodObject("OrganizationObjectivePatchInput", updateOrganizationObjectiveSchema);
 
   const membersOperation = readOperation("/members", "get");
   assert.deepEqual(membersOperation.security, [{ BearerAuth: [] }]);

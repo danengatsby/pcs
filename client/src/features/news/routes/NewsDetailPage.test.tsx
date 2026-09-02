@@ -149,7 +149,8 @@ describe('NewsDetailPage', () => {
       </MemoryRouter>
     )
 
-    expect(screen.getByText('Sursă: AGERPRES')).toBeInTheDocument()
+    expect(screen.getByText('Sursă externă: AGERPRES')).toBeInTheDocument()
+    expect(screen.getByText(/opiniile aparțin publicației citate/)).toBeInTheDocument()
     const sourceLink = screen.getByRole('link', { name: /Citește articolul original/ })
     expect(sourceLink).toHaveAttribute('href', 'https://agerpres.ro/articol-test')
     expect(sourceLink).toHaveAttribute('target', '_blank')
@@ -276,6 +277,6 @@ describe('NewsDetailPage', () => {
       </MemoryRouter>
     )
 
-    expect(screen.getByText('Știri și comunicate')).toBeInTheDocument()
+    expect(screen.getByText('Informații din presă')).toBeInTheDocument()
   })
 })

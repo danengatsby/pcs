@@ -6,12 +6,19 @@ export const loadAuthPolicyPage = () => import('@features/auth/routes/AuthPolicy
 export const loadSigninPage = () => import('@features/auth/routes/SigninPage')
 export const loadUserProfilePage = () => import('@features/profile/routes/UserProfilePage')
 export const loadContactPage = () => import('@features/contact/routes/ContactPage')
+export const loadExecutiveDashboardPage = () => import('@features/executiveDashboard')
+export const loadTerritorialOrganizationsPage = () => import('@features/territorialOrganizations')
 export const loadAdminMembersDashboardPage = () => import('@features/adminMembersDashboard')
 export const loadVolunteersAdminPage = () => import('@features/volunteersAdmin')
 export const loadDocumentPage = () => import('@features/documents/routes/DocumentPage')
 export const loadManifestPage = () => import('@features/manifest/routes/ManifestPage')
+export const loadMobilizationPage = () => import('@features/mobilization/routes/MobilizationPage')
+export const loadPoliticalOperationsPage = () => import('@features/politicalOperations')
 
 export function prefetchAdminRoutes(): void {
+  void loadExecutiveDashboardPage()
+  void loadTerritorialOrganizationsPage()
   void loadAdminMembersDashboardPage()
   void loadVolunteersAdminPage()
+  void loadPoliticalOperationsPage()
 }

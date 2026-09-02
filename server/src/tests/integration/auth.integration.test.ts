@@ -66,6 +66,7 @@ test("auth flow should support signup/signin/me/signout with revocation", async 
 
     assert.equal(meResponse.body.error, null);
     assert.equal(meResponse.body.data?.user?.email, email.toLowerCase());
+    assert.equal(meResponse.body.data?.user?.role, "SUSTINATOR");
 
     await request(app)
       .post("/api/auth/signout")

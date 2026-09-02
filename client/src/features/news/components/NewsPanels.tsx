@@ -1,16 +1,23 @@
 import { Link } from 'react-router-dom'
 import { formatNewsDate } from '../formatNewsDate'
+import type { NewsEditorialSectionKey } from '../editorialSections'
 import type { NewsItem } from '../types'
 
 type NewsPanelsProps = {
   items: NewsItem[]
+  section?: NewsEditorialSectionKey
 }
 
-export function NewsPanels({ items }: NewsPanelsProps) {
+export function NewsPanels({ items, section }: NewsPanelsProps) {
   return (
     <div className="grid-2">
       {items.map((item) => (
-        <article key={item.id} className="card news-card">
+        <article key={item.id} className={`card news-card${section ? ` news-card--${section}` : ''}`}>
+          {section ? (
+            <span className="news-card__ownership">
+              {section === 'press' ? 'Sursă externă' : 'Publicat de PCS'}
+            </span>
+          ) : null}
           <div className="news-card__meta">
             {item.category ? <span className="news-card__category">{item.category}</span> : null}
             {item.publishedAt ? (

@@ -1,5 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../../lib/prisma.js";
+import type { AdminTerritoryScope } from "../../lib/adminAuthorization.js";
 import type { ListMembersQuery } from "./members.schema.js";
 
 type MemberDbRow = {
@@ -13,18 +14,70 @@ type MemberDbRow = {
   createdAt: string;
 };
 
-function buildWhere(filters: ListMembersQuery): Prisma.VolunteerWhereInput {
+function buildScopeWhere(scope: AdminTerritoryScope): Prisma.VolunteerWhereInput {
+  if (scope.national) {
+    return {};
+  }
+
+  const geographicConditions: Prisma.VolunteerWhereInput[] = [];
+  if (scope.countyIds.length > 0) {
+    geographicConditions.push({ countyId: { in: scope.countyIds } });
+  }
+  for (const countyName of scope.countyNames) {
+    geographicConditions.push({ county: { equals: countyName, mode: "insensitive" } });
+  }
+  for (const territory of scope.localities) {
+    geographicConditions.push({
+      AND: [
+        { locality: { equals: territory.locality, mode: "insensitive" } },
+        {
+          OR: [
+            { countyId: territory.countyId },
+            { county: { equals: territory.countyName, mode: "insensitive" } },
+          ],
+        },
+      ],
+    });
+  }
+
+  const conditions: Prisma.VolunteerWhereInput[] = [];
+  if (scope.organizationIds.length > 0) {
+    conditions.push({
+      membershipRecord: { is: { organizationId: { in: scope.organizationIds } } },
+    });
+  }
+  if (geographicConditions.length > 0) {
+    conditions.push({
+      AND: [
+        {
+          OR: [
+            { membershipRecord: { is: null } },
+            { membershipRecord: { is: { organizationId: null } } },
+          ],
+        },
+        { OR: geographicConditions },
+      ],
+    });
+  }
+
+  return conditions.length > 0 ? { OR: conditions } : { id: -1n };
+}
+
+function buildWhere(
+  filters: ListMembersQuery,
+  scope: AdminTerritoryScope
+): Prisma.VolunteerWhereInput {
   const search = filters.search.trim();
   const status = filters.status;
 
-  const where: Prisma.VolunteerWhereInput = {};
+  const filterWhere: Prisma.VolunteerWhereInput = {};
 
   if (status) {
-    where.workflowStatus = status;
+    filterWhere.workflowStatus = status;
   }
 
   if (search) {
-    where.OR = [
+    filterWhere.OR = [
       { fullName: { contains: search, mode: "insensitive" } },
       { email: { contains: search, mode: "insensitive" } },
       { county: { contains: search, mode: "insensitive" } },
@@ -32,14 +85,17 @@ function buildWhere(filters: ListMembersQuery): Prisma.VolunteerWhereInput {
     ];
   }
 
-  return where;
+  return { AND: [filterWhere, buildScopeWhere(scope)] };
 }
 
-export async function listMembersFromRepository(filters: ListMembersQuery): Promise<{
+export async function listMembersFromRepository(
+  filters: ListMembersQuery,
+  scope: AdminTerritoryScope
+): Promise<{
   rows: MemberDbRow[];
   total: number;
 }> {
-  const where = buildWhere(filters);
+  const where = buildWhere(filters, scope);
 
   const [volunteers, total] = await prisma.$transaction([
     prisma.volunteer.findMany({
