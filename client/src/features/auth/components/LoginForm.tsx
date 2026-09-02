@@ -105,7 +105,7 @@ export function LoginForm(): JSX.Element {
         </Button>
       </div>
       <p className="signin-form__admin-hint">
-        Accesul administrativ este disponibil numai conturilor cu rol PCS autorizat.
+        Folosește acest buton dacă ai primit acces de administrator PCS.
       </p>
     </form>
   )
