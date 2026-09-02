@@ -1,5 +1,6 @@
 const productionEnv = {
   NODE_ENV: "production",
+  APP_INSTANCE_COUNT: "1",
   AUTH_REFRESH_ENABLED: "true",
   NEWS_MEDIA_CLAMAV_ENABLED: "1",
   NEWS_MEDIA_CLAMAV_MODE: "clamd",

@@ -91,6 +91,17 @@ const authRefreshTtlSeconds = readAuthRefreshTtlSeconds();
 const authRefreshStore = readAuthRefreshStore();
 const redisUrl = readRedisUrl();
 const rateLimitStore = readRateLimitStore();
+const instanceCount = Number(process.env.APP_INSTANCE_COUNT?.trim() ?? "1");
+
+if (!Number.isInteger(instanceCount) || instanceCount <= 0) {
+  throw new Error("APP_INSTANCE_COUNT invalid.");
+}
+if (nodeEnv === "production" && instanceCount > 1 && rateLimitStore !== "redis") {
+  throw new Error("RATE_LIMIT_STORE=redis este obligatoriu in productie cu mai multe instante.");
+}
+if (nodeEnv === "production" && instanceCount > 1 && !redisUrl) {
+  throw new Error("REDIS_URL este obligatoriu in productie cu mai multe instante.");
+}
 
 const metricsEnabled = readMetricsEnabled(nodeEnv);
 const metricsBearerToken = readMetricsBearerToken();
@@ -136,6 +147,7 @@ export const env = {
   authRateLimitWindowMs: readAuthRateLimitWindowMs(),
   authRateLimitMax: readAuthRateLimitMax(),
   rateLimitStore,
+  instanceCount,
   healthcheckDbTimeoutMs: readHealthcheckDbTimeoutMs(),
   shutdownGraceMs: readShutdownGraceMs(),
   captchaMode,
