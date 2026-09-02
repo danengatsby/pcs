@@ -9,13 +9,14 @@ import type {
   OutboxStatus,
 } from "./notificationOutbox.types.js";
 
-const claimableStatuses: OutboxStatus[] = ["pending", "retry"];
+const claimableStatuses: OutboxStatus[] = ["pending", "retry", "delivery_unknown"];
 const outboxLockLeaseMs = 5 * 60 * 1000;
 
 type NotificationOutboxWriter = PrismaTx | typeof prisma;
 
 function mapClaimedRow(row: {
   id: bigint;
+  eventId: string;
   action: string;
   payload: unknown;
   attemptCount: number;
@@ -23,6 +24,7 @@ function mapClaimedRow(row: {
 }): NotificationOutboxRow {
   return {
     id: row.id.toString(),
+    eventId: row.eventId,
     action: row.action,
     payload: row.payload,
     attemptCount: row.attemptCount,
@@ -63,6 +65,7 @@ export async function claimOutboxRows(batchSize: number, nowIso: string): Promis
       take: Math.max(batchSize * 4, batchSize),
       select: {
         id: true,
+        eventId: true,
         action: true,
         payload: true,
         attemptCount: true,
@@ -151,6 +154,7 @@ async function updateOutboxRowState(
       nextAttemptAt,
       lastError: input.lastError,
       sentAt,
+      deliveryUnknownAt: null,
       lockedAt: null,
       updatedAt: now,
     },
@@ -184,6 +188,7 @@ async function updateOutboxRowState(
 
 export async function insertOutboxRow(input: {
   action: string;
+  eventId: string;
   payload: NotificationEmailPayload;
   maxAttempts: number;
   nextAttemptAt: string;
@@ -193,6 +198,7 @@ export async function insertOutboxRow(input: {
 
 export async function insertOutboxRows(input: Array<{
   action: string;
+  eventId: string;
   payload: NotificationEmailPayload;
   maxAttempts: number;
   nextAttemptAt: string;
@@ -203,6 +209,7 @@ export async function insertOutboxRows(input: Array<{
 
   const created = await runner.notificationEmailOutbox.createMany({
     data: input.map((item) => ({
+      eventId: item.eventId,
       action: item.action,
       payload: item.payload as Prisma.InputJsonValue,
       status: "pending",
@@ -223,6 +230,24 @@ export async function markOutboxSent(id: string, nowIso: string): Promise<void> 
     nextAttemptAt: nowIso,
     lastError: "",
     sentAt: nowIso,
+  });
+}
+
+export async function markOutboxDeliveryUnknown(
+  row: NotificationOutboxRow,
+  now: Date,
+  errorMessage: string
+): Promise<void> {
+  await prisma.notificationEmailOutbox.updateMany({
+    where: { id: BigInt(row.id) },
+    data: {
+      status: "delivery_unknown",
+      deliveryUnknownAt: now,
+      lastError: errorMessage,
+      lockedAt: null,
+      nextAttemptAt: new Date(now.getTime() + 60 * 60 * 1000),
+      updatedAt: now,
+    },
   });
 }
 

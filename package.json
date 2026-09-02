@@ -17,6 +17,7 @@
     "build": "npm run build --workspace server && npm run build --workspace client",
     "verify": "npm run lint && npm run db:check-schema && npm run build",
     "predeploy": "NODE_ENV=production node scripts/validate-production-config.mjs",
+    "deploy:production": "bash scripts/deploy-production.sh",
     "start": "npm run build && npm run start --workspace server",
     "db:init": "npm run db:init --workspace server",
     "db:migrate": "npm run db:migrate --workspace server",

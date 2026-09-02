@@ -2,6 +2,7 @@ import type * as net from "node:net";
 import type * as tls from "node:tls";
 
 export type SendEmailInput = {
+  eventId?: string;
   to: string[];
   subject: string;
   text: string;

@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { sendEmail } from "./email.js";
 import { env } from "./env.js";
 import { appLogger } from "./logger.js";
@@ -18,6 +19,7 @@ import {
   insertOutboxRow,
   insertOutboxRows,
   markOutboxInvalidPayload,
+  markOutboxDeliveryUnknown,
   markOutboxRetryOrFailed,
   markOutboxSent,
 } from "./notificationOutbox.repository.js";
@@ -28,6 +30,7 @@ import type {
 } from "./notificationOutbox.types.js";
 import { prisma } from "./prisma.js";
 import type { PrismaTx } from "./prismaTransaction.js";
+import { isDeliveryUnknownError } from "./emailCore/transport.js";
 
 export type {
   EnqueueNotificationEmailInput,
@@ -54,6 +57,7 @@ export async function enqueueNotificationEmails(
 
     return [{
       action: normalizeAction(item.action),
+      eventId: item.eventId ?? randomUUID(),
       payload,
       maxAttempts: normalizePositiveInt(item.maxAttempts, defaultMaxAttempts),
       nextAttemptAt: (item.nextAttemptAt ?? new Date()).toISOString(),
@@ -78,10 +82,12 @@ export async function enqueueNotificationEmail(
 
   const maxAttempts = normalizePositiveInt(input.maxAttempts, defaultMaxAttempts);
   const action = normalizeAction(input.action);
+  const eventId = input.eventId ?? randomUUID();
   const nextAttemptAt = (input.nextAttemptAt ?? new Date()).toISOString();
 
   await insertOutboxRow({
     action,
+    eventId,
     payload,
     maxAttempts,
     nextAttemptAt,
@@ -108,7 +114,7 @@ export async function processNotificationEmailOutboxBatch(
     return result;
   }
 
-  const deliver = options.deliver ?? sendEmail;
+  const deliver = options.deliver ?? ((payload, eventId) => sendEmail({ ...payload, eventId }));
   const rows = await claimOutboxRows(batchSize, nowIso);
   result.claimed = rows.length;
 
@@ -129,12 +135,17 @@ export async function processNotificationEmailOutboxBatch(
     }
 
     try {
-      await deliver(payload);
+      await deliver(payload, row.eventId);
       await markOutboxSent(row.id, nowIso);
       result.sent += 1;
     } catch (error) {
       const errorMessage = extractErrorMessage(error);
       incrementEmailFailure(row.action);
+      if (isDeliveryUnknownError(error)) {
+        await markOutboxDeliveryUnknown(row, now, errorMessage);
+        result.retried += 1;
+        continue;
+      }
       const finalStatus = await markOutboxRetryOrFailed(row, now, {
         baseDelaySeconds,
         maxDelaySeconds,

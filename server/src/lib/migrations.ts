@@ -148,6 +148,7 @@ export async function runMigrationSmokeChecks(): Promise<void> {
     { tableName: "auth_refresh_tokens", columnName: "token_hash" },
     { tableName: "auth_refresh_tokens", columnName: "csrf_token_hash" },
     { tableName: "notification_email_outbox", columnName: "status" },
+    { tableName: "notification_email_outbox", columnName: "event_id" },
     { tableName: "notification_email_outbox", columnName: "next_attempt_at" },
     { tableName: "admin_audit_outbox", columnName: "status" },
     { tableName: "admin_audit_outbox", columnName: "next_attempt_at" },

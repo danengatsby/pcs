@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import { env } from "../env.js";
 import type { SendEmailInput } from "./types.js";
 
@@ -35,7 +34,7 @@ export function buildRawMessage(input: SendEmailInput, recipients: string[]): st
   const from = sanitizeHeaderValue(env.emailFrom);
   const toHeader = recipients.join(", ");
   const replyTo = sanitizeHeaderValue(input.replyTo?.trim() || env.emailReplyTo || "");
-  const messageId = `<${randomUUID()}@${env.emailSmtpHost || "pcs.local"}>`;
+  const messageId = `<${input.eventId ?? "pcs-message"}@${env.emailSmtpHost || "pcs.local"}>`;
   const body = dotStuffBody(input.text);
 
   const headers = [
@@ -44,6 +43,7 @@ export function buildRawMessage(input: SendEmailInput, recipients: string[]): st
     `Subject: ${subject}`,
     `Date: ${new Date().toUTCString()}`,
     `Message-ID: ${messageId}`,
+    ...(input.eventId ? [`X-Idempotency-Key: ${sanitizeHeaderValue(input.eventId)}`] : []),
     "MIME-Version: 1.0",
     "Content-Type: text/plain; charset=utf-8",
     "Content-Transfer-Encoding: 8bit",

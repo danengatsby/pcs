@@ -2,10 +2,8 @@ import type { NextFunction, Request, Response } from "express";
 import { readAuthUser } from "../../../../lib/authMiddleware.js";
 import { requireAdminAccess } from "../../../../lib/adminAuthorization.js";
 import { recordAdminAudit } from "../../../../lib/adminAudit.js";
-import { triggerAdminAuditOutboxWorker } from "../../../../lib/adminAuditOutboxWorker.js";
 import { AppError } from "../../../../lib/errors.js";
 import { sendSuccess } from "../../../../lib/http.js";
-import { triggerNotificationOutboxWorker } from "../../../../lib/notificationOutboxWorker.js";
 import { withPrismaTransaction } from "../../../../lib/prismaTransaction.js";
 import { readVolunteerListFilters } from "../../parsing.js";
 import {
@@ -91,13 +89,6 @@ export async function bulkUpdateAdminVolunteerWorkflowHandler(
 
       return bulkResult;
     });
-
-    if (result.enqueuedEmailCount > 0) {
-      triggerNotificationOutboxWorker("volunteer.workflow_bulk_update");
-    }
-    if (result.enqueuedAuditCount > 0) {
-      triggerAdminAuditOutboxWorker("volunteer.workflow_bulk_update");
-    }
 
     sendSuccess(res, {
       message: "Workflow-ul selectat a fost actualizat.",

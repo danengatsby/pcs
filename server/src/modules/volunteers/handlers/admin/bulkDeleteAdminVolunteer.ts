@@ -2,7 +2,6 @@ import type { NextFunction, Request, Response } from "express";
 import { readAuthUser } from "../../../../lib/authMiddleware.js";
 import { requireAdminAccess } from "../../../../lib/adminAuthorization.js";
 import { recordAdminAudit } from "../../../../lib/adminAudit.js";
-import { triggerAdminAuditOutboxWorker } from "../../../../lib/adminAuditOutboxWorker.js";
 import { AppError } from "../../../../lib/errors.js";
 import { sendSuccess } from "../../../../lib/http.js";
 import { withPrismaTransaction } from "../../../../lib/prismaTransaction.js";
@@ -81,10 +80,6 @@ export async function bulkDeleteAdminVolunteerHandler(
 
       return bulkResult;
     });
-
-    if (result.enqueuedAuditCount > 0) {
-      triggerAdminAuditOutboxWorker("volunteer.delete");
-    }
 
     sendSuccess(res, {
       message: "Formularele de voluntar selectate au fost șterse.",

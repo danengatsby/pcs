@@ -2,7 +2,6 @@ import { env } from "./env.js";
 import { appLogger } from "./logger.js";
 import { incrementEmailFailure } from "./metrics.js";
 import { enqueueNotificationEmail } from "./notificationOutbox.js";
-import { triggerNotificationOutboxWorker } from "./notificationOutboxWorker.js";
 
 type SignupNotificationInput = {
   fullName: string;
@@ -87,9 +86,6 @@ async function queueNotification(
       payload,
     });
 
-    // Trigger an immediate outbox pass so user-facing confirmations are
-    // attempted right after enqueue, while the periodic worker still handles retries.
-    triggerNotificationOutboxWorker(`enqueue:${action}`);
   } catch (error) {
     incrementEmailFailure(action);
     appLogger.error(

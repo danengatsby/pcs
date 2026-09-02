@@ -15,6 +15,10 @@ import type { LineReader, SendEmailInput, SmtpSocket } from "./types.js";
 
 const smtpEhloClientName = "pcs-api";
 
+export function isDeliveryUnknownError(error: unknown): boolean {
+  return error instanceof Error && Reflect.get(error, "deliveryUnknown") === true;
+}
+
 export async function sendEmailViaSmtp(input: SendEmailInput): Promise<void> {
   const recipients = normalizeRecipients(input.to);
   if (recipients.length === 0) {
@@ -87,10 +91,19 @@ export async function sendEmailViaSmtp(input: SendEmailInput): Promise<void> {
       throw new Error("Niciun destinatar valid acceptat de serverul SMTP.");
     }
 
-    await sendSmtpCommand(socket, reader, "DATA", [354], "DATA");
-    await writeSocket(socket, `${buildRawMessage(input, recipients)}\r\n.\r\n`);
-    const sentResponse = await readSmtpResponse(reader);
-    assertExpectedCode(sentResponse, [250], "Transmitere email");
+    let deliveryAccepted = false;
+    try {
+      await sendSmtpCommand(socket, reader, "DATA", [354], "DATA");
+      deliveryAccepted = true;
+      await writeSocket(socket, `${buildRawMessage(input, recipients)}\r\n.\r\n`);
+      const sentResponse = await readSmtpResponse(reader);
+      assertExpectedCode(sentResponse, [250], "Transmitere email");
+    } catch (error) {
+      if (deliveryAccepted && error instanceof Error) {
+        Reflect.set(error, "deliveryUnknown", true);
+      }
+      throw error;
+    }
 
     await sendSmtpCommand(socket, reader, "QUIT", [221], "QUIT").catch(() => {
       // Ignore QUIT failures.

@@ -49,12 +49,7 @@ Pe host-ul de productie:
 cd /var/www/pcs
 npm ci
 cp server/.env.production.example server/.env # doar la prima configurare; păstrează valorile existente ulterior
-docker compose --profile production up -d clamav
-npm run predeploy
-npm run build
-NODE_ENV=production node server/dist/scripts/migrateDb.js
-pm2 startOrRestart ecosystem.config.cjs
-pm2 save
+npm run deploy:production
 ```
 
 Ordine importanta:
@@ -63,6 +58,7 @@ Ordine importanta:
 - `npm run db:seed` nu se ruleaza in productie
 - `pcs-server`, `pcs-email-outbox-worker` si `pcs-admin-audit-outbox-worker` sunt procese PM2 separate; workerii nu ruleaza in procesul API
 - `npm run predeploy` verifică secretele obligatorii, alinierea PM2/Docker/aplicație și răspunsul `PONG` al `clamd`
+- `npm run deploy:production` execută aceeași secvență reproductibilă: ClamAV, preflight, build, migrații, PM2 și smoke checks
 - configuratia PM2 seteaza explicit `NODE_ENV=production`; aplicatia trebuie sa porneasca fail-closed daca lipsesc secretele sau CAPTCHA obligatoriu
 
 ## 4) Smoke test post-deploy

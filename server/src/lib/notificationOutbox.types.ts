@@ -1,4 +1,4 @@
-export type OutboxStatus = "pending" | "processing" | "retry" | "sent" | "failed";
+export type OutboxStatus = "pending" | "processing" | "retry" | "delivery_unknown" | "sent" | "failed";
 
 export type NotificationEmailPayload = {
   to: string[];
@@ -9,6 +9,7 @@ export type NotificationEmailPayload = {
 
 export type EnqueueNotificationEmailInput = {
   action: string;
+  eventId?: string;
   payload: NotificationEmailPayload;
   maxAttempts?: number;
   nextAttemptAt?: Date;
@@ -16,6 +17,7 @@ export type EnqueueNotificationEmailInput = {
 
 export type NotificationOutboxRow = {
   id: string;
+  eventId: string;
   action: string;
   payload: unknown;
   attemptCount: number;
@@ -33,7 +35,7 @@ export type ProcessNotificationEmailOutboxBatchOptions = {
   now?: Date;
   baseDelaySeconds?: number;
   maxDelaySeconds?: number;
-  deliver?: (payload: NotificationEmailPayload) => Promise<void>;
+  deliver?: (payload: NotificationEmailPayload, eventId: string) => Promise<void>;
   force?: boolean;
 };
 
