@@ -36,11 +36,13 @@ test("visitor can submit the volunteer signup form and create account records", 
     const submitResponse = page.waitForResponse((response) => (
       response.request().method() === "POST"
       && response.url().endsWith("/api/volunteers")
-      && response.status() === 201
     ));
 
     await page.getByRole("button", { name: "Trimite cererea" }).click();
-    await submitResponse;
+    const response = await submitResponse;
+    const requestPayload = response.request().postDataJSON() as { captchaToken?: unknown };
+    expect(requestPayload.captchaToken).toEqual(expect.stringMatching(/\S+/));
+    expect(response.status(), await response.text()).toBe(201);
 
     await expect(page.getByText("Cererea de înscriere a fost trimisă. Mulțumim!")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Mulțumim pentru înscriere." })).toBeVisible();

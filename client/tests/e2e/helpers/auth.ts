@@ -16,9 +16,9 @@ export async function signInThroughUi(
   input: { email: string; password: string },
 ): Promise<void> {
   await page.goto("/auth/signin");
-  await page.getByLabel("Email").fill(input.email);
+  await page.getByLabel("Utilizator").fill(input.email);
   await page.getByLabel("Parolă").fill(input.password);
-  await page.getByRole("button", { name: "Autentificare" }).click();
+  await page.getByRole("button", { name: "Autentificare", exact: true }).click();
 }
 
 export async function signOutThroughUi(page: Page): Promise<void> {

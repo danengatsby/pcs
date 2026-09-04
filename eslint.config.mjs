@@ -58,6 +58,7 @@ export default tseslint.config(
       "server/src/**/*.tsx",
       "client/tests/**/*.{ts,tsx}",
       "playwright.config.ts",
+      "playwright.client.config.ts",
       "playwright.fullstack.config.ts",
     ],
     languageOptions: {

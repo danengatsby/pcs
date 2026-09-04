@@ -1,4 +1,4 @@
-import type { Page } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
 
 export type VolunteerSignupFormInput = {
   fullName: string;
@@ -26,4 +26,8 @@ export async function fillVolunteerSignupForm(
   await page.getByLabel("Competențe (opțional)").fill(input.skills);
   await page.getByLabel("De ce vrei să te implici?").fill(input.motivation);
   await page.getByRole("checkbox").check();
+
+  await expect(page.locator('[name="cf-turnstile-response"]').first()).toHaveValue(/\S+/, {
+    timeout: 20_000,
+  });
 }

@@ -123,12 +123,13 @@ npm run start
 ```
 
 Local, serverul Node serveste fisierele frontend din `client/dist`. Deploy-ul de productie construieste fiecare frontend intr-un release imutabil din `.releases/client` si il selecteaza prin `CLIENT_DIST_PATH` numai la restartul PM2.
-Buildul de productie necesita `VITE_CAPTCHA_SITE_KEY`; serverul necesita
+Buildul de productie necesita `VITE_CAPTCHA_SITE_KEY` real in `server/.env`; preflight-ul si Vite opresc release-ul daca valoarea lipseste sau este placeholder. Serverul necesita
 `CAPTCHA_MODE=required` si `CAPTCHA_SECRET_KEY`.
 
 Hardening build output activ:
 - frontend curata `client/dist` la fiecare build local (`emptyOutDir: true`)
 - deploy-ul de productie nu construieste direct in directorul frontend servit
+- `npm run build:client:production` transfera numai configuratia publica `VITE_CAPTCHA_*` din `server/.env` catre Vite
 - frontend fara source maps (`sourcemap: false`)
 - backend curata `server/dist` inainte de compilare
 
@@ -174,6 +175,8 @@ Aplicatia citeste configuratia din `server/.env`.
 Workerii PM2 separati sunt `pcs-email-outbox-worker` si `pcs-admin-audit-outbox-worker`.
 Pentru configurarea production folosește `server/.env.production.example`; scriptul de deploy ruleaza preflight-ul, construieste un release frontend nou si face restartul obligatoriu cu mediul actualizat.
 Host-ul de deploy trebuie sa aiba Chromium Playwright instalat; smoke-ul final deschide pagina reala si valideaza titlul si CTA-ul principal.
+
+E2E-ul full-stack pentru aderare foloseste perechea oficiala de test Turnstile, porneste serverul cu CAPTCHA obligatoriu si verifica tokenul, raspunsul `201` si inregistrarea din baza de test. Necesita `TEST_DATABASE_URL` explicit.
 
 ## Runbook productie
 

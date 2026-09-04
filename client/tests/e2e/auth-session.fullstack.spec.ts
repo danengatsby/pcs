@@ -49,7 +49,7 @@ test("user session is restored after reload and cleared on signout", async ({ pa
 
     await page.reload();
     await expect(page).toHaveURL(/\/auth\/signin$/);
-    await expect(page.getByRole("button", { name: "Autentificare" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Autentificare", exact: true })).toBeVisible();
   } finally {
     await deleteUserByEmail(email);
   }

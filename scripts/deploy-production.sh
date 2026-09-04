@@ -157,7 +157,7 @@ npm run build --workspace server
 
 log "Construiesc clientul într-un release imutabil: $client_release_dir"
 mkdir -p "$client_release_dir"
-npm run build --workspace client -- --outDir "$client_release_dir" --emptyOutDir
+npm run build:client:production -- --outDir "$client_release_dir" --emptyOutDir
 validate_client_release
 
 log "Aplic migrațiile DB."
