@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import type { AddressInfo } from "node:net";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import { after, before, test } from "node:test";
 import type { FastifyInstance } from "fastify";
 import Fastify from "fastify";
@@ -163,6 +166,49 @@ test("fastify adapter should expose manifest page parity", async () => {
 
   assert.match(response.text, /Manifestul PCS/i);
   assert.match(String(response.headers["content-security-policy"] ?? ""), /unsafe-inline/i);
+});
+
+test("fastify adapter should serve assets created after startup and return 404 for missing assets", async () => {
+  const clientDistPath = await mkdtemp(path.join(tmpdir(), "pcs-client-dist-"));
+  const assetsPath = path.join(clientDistPath, "assets");
+  await mkdir(assetsPath);
+  await writeFile(
+    path.join(clientDistPath, "index.html"),
+    '<!doctype html><html><body><div id="root">SPA fallback</div></body></html>',
+    "utf8"
+  );
+
+  const staticServer = await createFastifyServer({ clientDistPath });
+  await staticServer.ready();
+
+  try {
+    const lateBundleName = "runtime-bundle.js";
+    await writeFile(path.join(assetsPath, lateBundleName), "window.__PCS_READY__ = true;", "utf8");
+
+    const bundleResponse = await request(staticServer.server)
+      .get(`/assets/${lateBundleName}`)
+      .set("Accept-Encoding", "identity")
+      .expect(200);
+
+    assert.match(
+      String(bundleResponse.headers["content-type"] ?? ""),
+      /^application\/javascript(?:;|$)/i
+    );
+    assert.equal(bundleResponse.headers["cache-control"], "public, max-age=31536000, immutable");
+    assert.equal(bundleResponse.text, "window.__PCS_READY__ = true;");
+
+    const missingResponse = await request(staticServer.server)
+      .get("/assets/missing-bundle.js")
+      .set("Accept-Encoding", "identity")
+      .expect(404);
+
+    assert.doesNotMatch(String(missingResponse.headers["content-type"] ?? ""), /text\/html/i);
+    assert.notEqual(missingResponse.headers["cache-control"], "public, max-age=31536000, immutable");
+    assert.doesNotMatch(missingResponse.text, /SPA fallback/i);
+  } finally {
+    await staticServer.close();
+    await rm(clientDistPath, { recursive: true, force: true });
+  }
 });
 
 test("fastify adapter should return parseable JSON for clients that advertise compression", async () => {

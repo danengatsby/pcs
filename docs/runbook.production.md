@@ -9,6 +9,7 @@ Preconditii:
 - `CAPTCHA_MODE=required`, `CAPTCHA_SECRET_KEY` pe server si `VITE_CAPTCHA_SITE_KEY` in mediul buildului frontend
 - `NEWS_MEDIA_CLAMAV_ENABLED=1`, `NEWS_MEDIA_CLAMAV_MODE=clamd` si profilul Docker `production` pornit pentru serviciul ClamAV
 - `server/.env.production.example` copiat ca `server/.env` și completat cu valori reale
+- Chromium pentru Playwright instalat pe host (`npx playwright install --with-deps chromium`, o singura data sau dupa actualizari Playwright)
 - `TEST_DATABASE_URL` exportat catre o baza dedicata, cu `test` sau `testing` in nume
 - backup/snapshot DB recent daca release-ul contine migrari SQL
 
@@ -29,13 +30,15 @@ Criterii minime:
 - integration tests verzi
 
 Note:
-- `npm run test:smoke:compiled` ruleaza pe artefactul deja compilat din `server/dist` si valideaza `health`, `auth basic`, `members` si `admin volunteers`.
+- `npm run test:smoke:compiled` ruleaza pe artefactul deja compilat din `server/dist` si valideaza inclusiv HTML-ul public, bundle-ul JavaScript referit de acesta, `health`, `auth basic`, `members` si `admin volunteers`.
 - smoke-ul compilat creeaza date temporare de test; nu il rula pe baza de date de productie.
 
 ## 2) Build output hardening policy
 
 Reguli active in proiect:
-- frontend Vite foloseste `emptyOutDir: true` (elimina bundle-uri vechi din `client/dist`)
+- buildurile locale folosesc `client/dist`; deploy-ul de productie nu scrie in directorul servit
+- fiecare deploy construieste frontend-ul intr-un director nou `.releases/client/<release-id>` si porneste API-ul cu `CLIENT_DIST_PATH` setat la acel director imutabil
+- procesul PM2 este repornit obligatoriu dupa build, cu `--update-env`
 - frontend nu publica source maps (`sourcemap: false`)
 - backend curata `server/dist` inainte de compilare (`rm -rf dist && tsc`)
 
@@ -58,7 +61,9 @@ Ordine importanta:
 - `npm run db:seed` nu se ruleaza in productie
 - `pcs-server`, `pcs-email-outbox-worker` si `pcs-admin-audit-outbox-worker` sunt procese PM2 separate; workerii nu ruleaza in procesul API
 - `npm run predeploy` verifică secretele obligatorii, alinierea PM2/Docker/aplicație și răspunsul `PONG` al `clamd`
-- `npm run deploy:production` execută aceeași secvență reproductibilă: ClamAV, preflight, build, migrații, PM2 și smoke checks
+- `npm run deploy:production` execută aceeași secvență reproductibilă: ClamAV, preflight, build într-un release imutabil, migrații, restart PM2 și smoke checks
+- dupa smoke-ul bundle-ului, deploy-ul ruleaza Playwright contra instantei repornite si cere titlul public plus CTA-ul principal
+- nu rula `npm run build --workspace client` direct peste directorul indicat de `CLIENT_DIST_PATH`
 - configuratia PM2 seteaza explicit `NODE_ENV=production`; aplicatia trebuie sa porneasca fail-closed daca lipsesc secretele sau CAPTCHA obligatoriu
 
 ## 4) Smoke test post-deploy
@@ -75,9 +80,20 @@ curl -fsS http://127.0.0.1:4000/api-docs.json | head -c 200
 Verificari frontend public:
 
 ```bash
-curl -fsSI https://pcpens.online/
+html="$(curl -fsS https://pcpens.online/)"
+bundle="$(printf '%s' "$html" | sed -nE 's@.*src="(/assets/[^"]+\.js)".*@\1@p' | head -n 1)"
+curl -fsS -o /dev/null -w '%{content_type}\n' "https://pcpens.online$bundle"
+curl -fsS -o /dev/null -w '%{http_code}\n' https://pcpens.online/assets/does-not-exist.js
 curl -fsSI https://pcpens.online/manifest_pcs.html
 curl -fsSI https://pcpens.online/admin/volunteers
+```
+
+Bundle-ul trebuie sa raspunda cu `application/javascript`, iar asset-ul inexistent cu `404`, niciodata cu HTML-ul SPA.
+
+Verificarea browser poate fi reluata separat cu:
+
+```bash
+PCS_SMOKE_BASE_URL=https://pcpens.online npm run test:synthetic:public
 ```
 
 Verificari functionale manuale:
@@ -105,10 +121,10 @@ Atentie:
 - daca release-ul a introdus schema incompatibila, rollback-ul real cere restore din backup/snapshot DB sau un forward-fix rapid
 
 Rollback minim (schema compatibila):
-1. revino la commit-ul sau artefactul anterior stabil
-2. `npm ci && npm run build`
-3. `pm2 startOrRestart ecosystem.config.cjs`
-4. reruleaza smoke tests din sectiunea 4
+1. identifica release-ul frontend anterior din `.releases/client`
+2. revino la commit-ul sau artefactul server anterior stabil si compileaza serverul daca este necesar
+3. reporneste cu `CLIENT_DIST_PATH=/cale/absoluta/.releases/client/<release-id-anterior> pm2 startOrRestart ecosystem.config.cjs --update-env`
+4. ruleaza `pm2 save` si smoke tests din sectiunea 4
 
 Rollback complet (schema incompatibila):
 1. opreste traficul sau blocheaza write-urile

@@ -166,3 +166,12 @@ test("manifest page should be exposed in express adapter with manifest-specific 
   assert.match(cspHeader, /unsafe-inline/i);
   assert.match(cspHeader, /fonts\.googleapis\.com/i);
 });
+
+test("express adapter should return 404 instead of SPA HTML for missing assets", async () => {
+  const response = await request(app)
+    .get("/assets/missing-bundle.js")
+    .expect(404);
+
+  assert.doesNotMatch(String(response.headers["content-type"] ?? ""), /text\/html/i);
+  assert.doesNotMatch(response.text, /<div id="root">/i);
+});

@@ -74,6 +74,11 @@ export function registerClientSpaFallback(app: express.Express, clientDistPath: 
     })
   );
 
+  // Static misses must not be interpreted as client-side application routes.
+  app.get(["/assets", "/assets/*"], (_req, res) => {
+    res.status(404).type("text/plain").send("Not found");
+  });
+
   app.get("*", (_req, res) => {
     res.setHeader("Cache-Control", "no-store");
     res.sendFile(path.join(clientDistPath, "index.html"));

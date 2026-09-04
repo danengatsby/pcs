@@ -6,6 +6,9 @@ const productionEnv = {
   NEWS_MEDIA_CLAMAV_MODE: "clamd",
   NEWS_MEDIA_CLAMD_HOST: "127.0.0.1",
   NEWS_MEDIA_CLAMD_PORT: "3310",
+  ...(process.env.CLIENT_DIST_PATH?.trim()
+    ? { CLIENT_DIST_PATH: process.env.CLIENT_DIST_PATH.trim() }
+    : {}),
 };
 
 module.exports = {

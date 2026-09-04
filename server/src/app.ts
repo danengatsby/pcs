@@ -17,10 +17,10 @@ import {
 import {
   setupSwaggerUI,
 } from "./lib/swaggerUI.js";
+import { resolveClientDistPath } from "./lib/clientDist.js";
 
 const currentFile = fileURLToPath(import.meta.url);
 const currentDir = path.dirname(currentFile);
-const clientDistPath = path.resolve(currentDir, "../../client/dist");
 const uploadsPath = path.resolve(currentDir, "../uploads");
 
 export function createApp(): express.Express {
@@ -48,7 +48,7 @@ export function createApp(): express.Express {
 
   registerApiRoutes(app, uploadsPath);
   registerApiNotFoundRoute(app);
-  registerClientSpaFallback(app, clientDistPath);
+  registerClientSpaFallback(app, resolveClientDistPath());
 
   app.use(createErrorHandler());
   return app;

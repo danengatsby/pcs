@@ -6,6 +6,7 @@ dist
 .DS_Store
 .pm2
 client/dist
+.releases
 server/dist
 server/uploads
 coverage

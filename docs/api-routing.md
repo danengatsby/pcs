@@ -21,7 +21,7 @@ Consecinta: nu se mai adauga `express.Router()` noi pentru endpoint-uri API.
 ## Ce NU intra in registry
 
 - fisiere statice `/uploads`
-- fallback-ul SPA pentru `client/dist`
+- fisierele frontend din `CLIENT_DIST_PATH` (sau `client/dist` local) si fallback-ul SPA; `/assets/*` are ruta statica dedicata si nu ajunge niciodata la fallback
 - hook-urile/adaptoarele specifice Express sau Fastify
 
 Acestea raman in adapterele HTTP, nu in registry.

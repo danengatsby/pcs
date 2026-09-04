@@ -38,10 +38,10 @@ import {
 } from "./lib/swaggerUI.js";
 import { openApiSpec } from "./lib/openapi-spec.js";
 import { maxMediaFileBytes } from "./modules/news/media.js";
+import { resolveClientDistPath } from "./lib/clientDist.js";
 
 const currentFile = fileURLToPath(import.meta.url);
 const currentDir = path.dirname(currentFile);
-const clientDistPath = path.resolve(currentDir, "../../client/dist");
 const uploadsPath = path.resolve(currentDir, "../uploads");
 const manifestPageCspHeader = buildManifestPageCspHeaderValue();
 const permissionsPolicyHeader = buildPermissionsPolicyHeaderValue();
@@ -49,6 +49,14 @@ const permissionsPolicyHeader = buildPermissionsPolicyHeaderValue();
 type FastifyRequestWithMeta = FastifyRequest & {
   pcsRequestId?: string;
   pcsRequestStartedAt?: bigint;
+};
+
+type CreateFastifyServerOptions = {
+  clientDistPath?: string;
+};
+
+type ClientAssetRouteParams = {
+  "*": string;
 };
 
 function buildCspHeaderValue(): string {
@@ -173,8 +181,11 @@ async function registerFastifyApiDocs(fastify: FastifyInstance): Promise<void> {
   });
 }
 
-export async function createFastifyServer(): Promise<FastifyInstance> {
+export async function createFastifyServer(
+  options: CreateFastifyServerOptions = {}
+): Promise<FastifyInstance> {
   const cspHeader = buildCspHeaderValue();
+  const clientDistPath = options.clientDistPath ?? resolveClientDistPath();
   const fastify = Fastify({
     logger: false,
     trustProxy: env.trustProxy,
@@ -382,6 +393,17 @@ export async function createFastifyServer(): Promise<FastifyInstance> {
 
         reply.header("Cache-Control", "public, max-age=3600");
       },
+    });
+
+    // `wildcard: false` registers only the files present at startup. Keep the
+    // explicit asset route so a newly promoted bundle can never fall through
+    // to the SPA HTML response while a process is being restarted.
+    fastify.get<{ Params: ClientAssetRouteParams }>("/assets/*", async (request, reply) => {
+      return reply.sendFile(request.params["*"], path.join(clientDistPath, "assets"));
+    });
+
+    fastify.get("/assets", async (_request, reply) => {
+      return reply.code(404).type("text/plain; charset=utf-8").send("Not found");
     });
 
     fastify.get("/*", async (_request, reply) => {

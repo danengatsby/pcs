@@ -50,7 +50,7 @@ npm run verify
 npm run test:smoke
 ```
 
-`npm run test:smoke` ruleaza build-ul si apoi smoke tests pe artefactul compilat pentru `health`, `auth`, `members` si `admin volunteers`.
+`npm run test:smoke` ruleaza build-ul si apoi smoke tests pe artefactul compilat pentru frontend (HTML + bundle JavaScript), `health`, `auth`, `members` si `admin volunteers`.
 In CI, dupa `npm run build`, se foloseste `npm run test:smoke:compiled`.
 Testele care modifica baza de date necesita `TEST_DATABASE_URL`; numele bazei trebuie sa contina segmentul `test` sau `testing`.
 
@@ -122,12 +122,13 @@ npm run build
 npm run start
 ```
 
-In productie, serverul Node serveste si fisierele frontend din `client/dist`.
+Local, serverul Node serveste fisierele frontend din `client/dist`. Deploy-ul de productie construieste fiecare frontend intr-un release imutabil din `.releases/client` si il selecteaza prin `CLIENT_DIST_PATH` numai la restartul PM2.
 Buildul de productie necesita `VITE_CAPTCHA_SITE_KEY`; serverul necesita
 `CAPTCHA_MODE=required` si `CAPTCHA_SECRET_KEY`.
 
 Hardening build output activ:
-- frontend curata `client/dist` la fiecare build (`emptyOutDir: true`)
+- frontend curata `client/dist` la fiecare build local (`emptyOutDir: true`)
+- deploy-ul de productie nu construieste direct in directorul frontend servit
 - frontend fara source maps (`sourcemap: false`)
 - backend curata `server/dist` inainte de compilare
 
@@ -165,15 +166,14 @@ Metadata release/build (optional, recomandat in productie):
 ## PM2 (optional)
 
 ```bash
-npm run build
-pm2 startOrRestart ecosystem.config.cjs
-pm2 save
+npm run deploy:production
 ```
 
 Procesul PM2 pentru acest repo este `pcs-server`.
 Aplicatia citeste configuratia din `server/.env`.
 Workerii PM2 separati sunt `pcs-email-outbox-worker` si `pcs-admin-audit-outbox-worker`.
-Pentru configurarea production folosește `server/.env.production.example` și rulează `npm run predeploy` înainte de build/deploy.
+Pentru configurarea production folosește `server/.env.production.example`; scriptul de deploy ruleaza preflight-ul, construieste un release frontend nou si face restartul obligatoriu cu mediul actualizat.
+Host-ul de deploy trebuie sa aiba Chromium Playwright instalat; smoke-ul final deschide pagina reala si valideaza titlul si CTA-ul principal.
 
 ## Runbook productie
 
