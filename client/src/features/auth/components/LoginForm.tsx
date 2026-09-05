@@ -19,7 +19,13 @@ export function LoginForm({ onAuthenticatingChange }: { onAuthenticatingChange?:
   const isLoading = state.status === 'loading'
   const errorMessage = state.status === 'error' ? state.error.message : null
 
-  async function authenticate(nextIntent: SigninIntent): Promise<void> {
+  // Doar pentru mediul de dezvoltare local: nu există în bundle-ul de producție
+  // (import.meta.env.DEV este false la build de producție, iar Vite elimină ramura).
+  const devAdminEmail = import.meta.env.DEV ? import.meta.env.VITE_DEV_ADMIN_EMAIL?.trim() : undefined
+  const devAdminPassword = import.meta.env.DEV ? import.meta.env.VITE_DEV_ADMIN_PASSWORD?.trim() : undefined
+  const devAdminShortcutEnabled = Boolean(import.meta.env.DEV && devAdminEmail && devAdminPassword)
+
+  async function authenticate(nextIntent: SigninIntent, credentials?: { email: string; password: string }): Promise<void> {
     if (isLoading) return
 
     setIntent(nextIntent)
@@ -27,7 +33,7 @@ export function LoginForm({ onAuthenticatingChange }: { onAuthenticatingChange?:
     // profile redirect cannot race the explicit administrative destination.
     onAuthenticatingChange?.(true)
     setAdminError(null)
-    const result = await submit({ email, password })
+    const result = await submit(credentials ?? { email, password })
 
     if (!result.ok) {
       onAuthenticatingChange?.(false)
@@ -106,6 +112,22 @@ export function LoginForm({ onAuthenticatingChange }: { onAuthenticatingChange?:
       <p className="signin-form__admin-hint">
         Folosește acest buton dacă ai primit acces de administrator PCS.
       </p>
+
+      {devAdminShortcutEnabled ? (
+        <div className="signin-form__dev-shortcut">
+          <Button
+            type="button"
+            variant="default"
+            disabled={isLoading}
+            onClick={() => void authenticate('admin', { email: devAdminEmail!, password: devAdminPassword! })}
+          >
+            {isLoading && intent === 'admin' ? 'Se autentifică (dev)...' : '🧪 Autentificare admin (doar dev)'}
+          </Button>
+          <p className="muted">
+            Vizibil doar în mediul de dezvoltare local (VITE_DEV_ADMIN_EMAIL / VITE_DEV_ADMIN_PASSWORD). Nu apare în build-ul de producție.
+          </p>
+        </div>
+      ) : null}
     </form>
   )
 }
