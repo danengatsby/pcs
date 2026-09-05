@@ -1,10 +1,11 @@
 import { useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { Button, Input, Select } from '@components'
 import { useAuth } from '@features/auth/context'
+import { useAdminRecordFocus } from '@features/adminShell/useAdminRecordFocus'
 import { mobilizationInterests } from '@features/mobilization/config'
 import { usePoliticalOperations } from '../hooks/usePoliticalOperations'
-import type { CommunicationAudience, PoliticalAction, PoliticalOperationsData } from '../types'
+import type { CommunicationAudience, PoliticalAction, PoliticalOperationsData, UpdatePoliticalActionInput } from '../types'
 
 function isoOrNull(value: string): string | null {
   return value ? new Date(value).toISOString() : null
@@ -16,13 +17,20 @@ function ActionCard({ action, data, saving, addParticipant, updateParticipant, u
   saving: boolean
   addParticipant: (id: string, email: string, dueAt: string | null, notes: string) => Promise<unknown>
   updateParticipant: (id: string, input: { status?: string; attendanceStatus?: string }) => Promise<unknown>
-  updateAction: (id: string, input: { status?: string; resultValue?: number | null; resultSummary?: string; expectedVersion: number }) => Promise<unknown>
+  updateAction: (id: string, input: UpdatePoliticalActionInput) => Promise<unknown>
 }) {
   const [email, setEmail] = useState('')
   const [dueAt, setDueAt] = useState('')
   const [notes, setNotes] = useState('')
   const [resultValue, setResultValue] = useState(action.resultValue === null ? '' : String(action.resultValue))
   const [resultSummary, setResultSummary] = useState(action.resultSummary)
+  const [coordinator, setCoordinator] = useState(action.coordinator?.id ?? '')
+  const [searchParams] = useSearchParams()
+  const selectedParticipant = searchParams.get('participant')
+  useAdminRecordFocus(searchParams.get('action') === action.id
+    ? selectedParticipant && action.participants.some((participant) => participant.id === selectedParticipant)
+      ? `participant-${selectedParticipant}` : `action-${action.id}`
+    : null)
 
   async function submitParticipant(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -37,7 +45,7 @@ function ActionCard({ action, data, saving, addParticipant, updateParticipant, u
   }
 
   return (
-    <article className="card political-ops__action">
+    <article className="card political-ops__action" id={`action-${action.id}`} tabIndex={-1} style={{ scrollMarginTop: '100px' }}>
       <header className="political-ops__action-header">
         <div><span className="hero-kicker">{action.type === 'event' ? 'Eveniment' : action.type === 'campaign' ? 'Campanie' : 'Sarcină'}</span><h2>{action.title}</h2></div>
         <span className="status-pill">{action.status} · {action.visibility}</span>
@@ -45,15 +53,23 @@ function ActionCard({ action, data, saving, addParticipant, updateParticipant, u
       <p>{action.summary}</p>
       <p><strong>Obiectiv:</strong> {action.objective}</p>
       <p className="muted">Coordonator: {action.coordinator?.fullName || 'neasignat'} · Județe: {action.counties.map((county) => county.name).join(', ') || 'național'}</p>
+      {data.access.capabilities.includes('mobilization.manage') && <form className="political-ops__inline-form" onSubmit={(event) => { event.preventDefault(); void updateAction(action.id, { coordinatorUserId: coordinator || null, expectedVersion: action.version }).catch(() => undefined) }}>
+        <Select label={`Coordonator pentru ${action.title}`} value={coordinator} onChange={(event) => setCoordinator(event.target.value)} placeholder="Neatribuit" options={data.candidates.filter((candidate) => candidate.userId && ['CONSILIER', 'SECRETAR', 'VICEPRESEDINTE', 'PRESEDINTE'].includes(candidate.role ?? '')).map((candidate) => ({ value: candidate.userId!, label: candidate.fullName }))} />
+        <Button type="submit" loading={saving} disabled={coordinator === (action.coordinator?.id ?? '')}>Salvează coordonatorul</Button>
+      </form>}
       <div className="political-ops__metrics">
         <span>Invitați <strong>{action.metrics.invited}</strong></span>
         <span>Confirmați <strong>{action.metrics.confirmed}</strong></span>
+        <span>În așteptare <strong>{action.participants.filter((participant) => participant.status === 'waitlisted').length}</strong></span>
         <span>Prezenți <strong>{action.metrics.present}</strong></span>
         <span>Ore raportate <strong>{action.metrics.reportedHours}</strong></span>
       </div>
 
-      <details className="political-ops__details">
+      <details className="political-ops__details" open={searchParams.has('participant') ? true : undefined}>
         <summary>Participanți și raportare ({action.participants.length})</summary>
+        {action.participants.some((participant) => participant.status === 'waitlisted') ? (
+          <p>Lista de așteptare este afișată în ordinea înscrierii. Contactează persoana înainte de confirmarea locului.</p>
+        ) : null}
         <form className="political-ops__inline-form" onSubmit={(event) => void submitParticipant(event)}>
           <Select label="Membru / voluntar" value={email} onChange={(event) => setEmail(event.target.value)} required placeholder="Alege persoana" options={data.candidates.map((candidate) => ({ value: candidate.email, label: `${candidate.fullName} — ${candidate.county || candidate.membershipStatus}` }))} />
           {action.type !== 'event' ? <Input label="Termen" type="datetime-local" value={dueAt} onChange={(event) => setDueAt(event.target.value)} /> : null}
@@ -62,11 +78,21 @@ function ActionCard({ action, data, saving, addParticipant, updateParticipant, u
         </form>
         <div className="political-ops__participants">
           {action.participants.map((participant) => (
-            <div key={participant.id}>
-              <span><strong>{participant.fullName}</strong><small>{participant.status} · {participant.hours} ore</small></span>
-              {action.type === 'event' ? (
+            <div key={participant.id} id={`participant-${participant.id}`} tabIndex={-1} style={{ scrollMarginTop: '100px' }}>
+              <span><strong>{participant.fullName}</strong><small>{participant.status === 'waitlisted' ? 'Pe lista de așteptare' : participant.status} · {participant.hours} ore</small><small>{participant.email}</small></span>
+              {participant.report && <p>Raport: {participant.report}</p>}
+              {participant.result && <p>Rezultat: {participant.result}</p>}
+              {participant.status === 'waitlisted' ? (
+                <div>
+                  <Button disabled={saving} onClick={() => { void updateParticipant(participant.id, { status: 'confirmed' }).catch(() => undefined) }}>Confirmă locul</Button>
+                  <Button disabled={saving} onClick={() => { void updateParticipant(participant.id, { status: 'cancelled' }).catch(() => undefined) }}>Retrage cererea</Button>
+                </div>
+              ) : action.type === 'event' ? (
                 <div><Button disabled={saving} onClick={() => void updateParticipant(participant.id, { attendanceStatus: 'present', status: 'completed' })}>Prezent</Button><Button disabled={saving} onClick={() => void updateParticipant(participant.id, { attendanceStatus: 'absent' })}>Absent</Button></div>
               ) : <Button disabled={saving} onClick={() => void updateParticipant(participant.id, { status: 'completed' })}>Validează raportul</Button>}
+              {['confirmed', 'active', 'in_progress', 'reported'].includes(participant.status) ? (
+                <Button disabled={saving} onClick={() => { void updateParticipant(participant.id, { status: 'cancelled' }).catch(() => undefined) }}>Anulează participarea</Button>
+              ) : null}
             </div>
           ))}
         </div>
@@ -86,7 +112,9 @@ function ActionCard({ action, data, saving, addParticipant, updateParticipant, u
 
 export function PoliticalOperationsPage() {
   const { user } = useAuth()
-  const { data, loading, saving, error, reload, createAction, addParticipant, updateParticipant, updateAction, preview, dispatch } = usePoliticalOperations()
+  const [searchParams] = useSearchParams()
+  const actionId = searchParams.get('action')
+  const { data, loading, saving, error, reload, createAction, addParticipant, updateParticipant, updateAction, preview, dispatch } = usePoliticalOperations(actionId)
   const [createStatus, setCreateStatus] = useState<string | null>(null)
   const [type, setType] = useState<'event' | 'campaign' | 'volunteer_task'>('event')
   const [title, setTitle] = useState('')
@@ -154,9 +182,10 @@ export function PoliticalOperationsPage() {
     <div className="political-ops">
       <section className="hero political-ops__hero">
         <div className="hero-kicker">60–90 de zile · mobilizare politică</div>
-        <div className="political-ops__hero-top"><div><h1>Operațiuni și mobilizare</h1><p className="lead">Evenimente, campanii, sarcini, participare și comunicare segmentată pe consimțământ.</p><p className="muted">Arie autorizată: {data?.access.scope ?? 'se încarcă'}</p></div><div className="political-ops__actions"><Link className="btn" to="/admin/dashboard">Tablou de comandă</Link><Button loading={loading} onClick={reload}>Reîncarcă</Button></div></div>
+        <div className="political-ops__hero-top"><div><h1>Operațiuni și mobilizare</h1><p className="lead">Evenimente, campanii, sarcini, participare și comunicare segmentată pe consimțământ.</p><p className="muted">Arie autorizată: {data?.access.scope ?? 'se încarcă'}</p></div><div className="political-ops__actions"><Button loading={loading} onClick={reload}>Reîncarcă</Button></div></div>
       </section>
       {error ? <div className="alert error">{error}</div> : null}
+      {actionId && <p>Acțiune selectată din agenda conducerii. <Link to="/admin/mobilization">Toate acțiunile</Link></p>}
 
       <section className="executive-dashboard__summary" aria-label="Rezumat mobilizare">
         {[['Evenimente', data?.summary.events], ['Campanii', data?.summary.campaigns], ['Sarcini', data?.summary.tasks], ['Participanți', data?.summary.participants], ['Ore raportate', data?.summary.reportedHours]].map(([label, value]) => <article className="card executive-dashboard__summary-card" key={String(label)}><span>{label}</span><strong>{value ?? 0}</strong></article>)}

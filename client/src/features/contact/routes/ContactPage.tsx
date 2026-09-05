@@ -153,7 +153,7 @@ export function ContactPage() {
             <div className="hero-kicker">În teritoriu</div>
             <h2 id="contact-branches-title">Organizații județene și locale</h2>
           </div>
-          <p>Sunt afișate exclusiv organizațiile active și datele lor de contact validate în registrul PCS.</p>
+          <p>Sunt afișate exclusiv organizațiile active și datele aprobate editorial în registrul PCS.</p>
         </div>
 
         {organizationsLoading ? <p className="contact-registry-state">Se încarcă registrul teritorial…</p> : null}

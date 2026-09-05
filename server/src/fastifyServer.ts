@@ -406,7 +406,11 @@ export async function createFastifyServer(
       return reply.code(404).type("text/plain; charset=utf-8").send("Not found");
     });
 
-    fastify.get("/*", async (_request, reply) => {
+    fastify.get("/*", async (request, reply) => {
+      const requestPath = readFastifyRequestPath(request);
+      if (requestPath === "/api" || requestPath.startsWith("/api/")) {
+        return reply.callNotFound();
+      }
       reply.header("Cache-Control", "no-store");
       return reply.sendFile("index.html", clientDistPath);
     });
@@ -414,7 +418,7 @@ export async function createFastifyServer(
 
   fastify.setNotFoundHandler((request, reply) => {
     const requestPath = readFastifyRequestPath(request);
-    if (requestPath.startsWith("/api/")) {
+    if (requestPath === "/api" || requestPath.startsWith("/api/")) {
       const requestId = (request as FastifyRequestWithMeta).pcsRequestId ?? "unknown";
       sendFastifyError(reply, requestId, 404, "API_ROUTE_NOT_FOUND", "Ruta API inexistenta.");
       return;

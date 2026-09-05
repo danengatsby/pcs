@@ -448,23 +448,23 @@ async function cleanupDemoPeople(client: PoolClient): Promise<void> {
   await client.query("DELETE FROM communication_dispatches WHERE created_by IN (SELECT id FROM users WHERE email ILIKE $1)", [emailPattern]);
   await client.query(`DELETE FROM communication_dispatch_recipients recipient USING communication_consents consent
     WHERE recipient.consent_id = consent.id AND consent.email ILIKE $1`, [emailPattern]);
-  await client.query("DELETE FROM mobilization_participants WHERE email ILIKE $1", [emailPattern]);
-  await client.query("DELETE FROM mobilization_responses WHERE email ILIKE $1", [emailPattern]);
-  await client.query("DELETE FROM communication_consents WHERE email ILIKE $1", [emailPattern]);
-  await client.query("DELETE FROM membership_records WHERE email ILIKE $1", [emailPattern]);
-  await client.query("DELETE FROM organization_leadership_mandates WHERE organization_id LIKE 'seed-org-%'");
+  await client.query("DELETE FROM mobilization_participants WHERE is_demo = TRUE OR email ILIKE $1", [emailPattern]);
+  await client.query("DELETE FROM mobilization_responses WHERE is_demo = TRUE OR email ILIKE $1", [emailPattern]);
+  await client.query("DELETE FROM communication_consents WHERE is_demo = TRUE OR email ILIKE $1", [emailPattern]);
+  await client.query("DELETE FROM membership_records WHERE is_demo = TRUE OR email ILIKE $1", [emailPattern]);
+  await client.query("DELETE FROM organization_leadership_mandates WHERE is_demo = TRUE OR organization_id LIKE 'seed-org-%'");
   await client.query(`DELETE FROM organization_objectives
-    WHERE organization_id LIKE 'seed-org-%' AND title LIKE '[Demo] %'`);
-  await client.query("DELETE FROM volunteers WHERE email ILIKE $1", [emailPattern]);
-  await client.query("DELETE FROM users WHERE email ILIKE $1", [emailPattern]);
+    WHERE is_demo = TRUE OR (organization_id LIKE 'seed-org-%' AND title LIKE '[Demo] %')`);
+  await client.query("DELETE FROM volunteers WHERE is_demo = TRUE OR email ILIKE $1", [emailPattern]);
+  await client.query("DELETE FROM users WHERE is_demo = TRUE OR email ILIKE $1", [emailPattern]);
 }
 
 async function seedUsers(client: PoolClient, people: SeedPerson[], passwordHash: string): Promise<Map<string, string>> {
   const inserted = await insertRowsInBatches<{ id: string; email: string }>({
     client,
-    statement: "INSERT INTO users (full_name, email, password_hash, role, created_at)",
-    columnCount: 5,
-    rows: people.map((person) => [person.fullName, person.email, passwordHash, person.role, person.createdAt]),
+    statement: "INSERT INTO users (full_name, email, password_hash, role, is_demo, created_at)",
+    columnCount: 6,
+    rows: people.map((person) => [person.fullName, person.email, passwordHash, person.role, true, person.createdAt]),
     suffix: "RETURNING id, email",
   });
   return new Map(inserted.map((row) => [row.email.toLowerCase(), row.id.toString()]));
@@ -497,23 +497,24 @@ async function seedOrganizations(
     client,
     statement: `INSERT INTO organizations (
       id, code, level, name, county, members_count, status, parent_id,
-      official_email, phone, headquarters, founded_at, created_by, updated_by
+      official_email, phone, headquarters, founded_at, created_by, updated_by, is_demo
     )`,
-    columnCount: 14,
+    columnCount: 15,
     rows: organizations.map((organization) => {
       const actorId = organization.level === "national"
         ? nationalPresidentId
         : leaderIdByCounty.get(organization.county as CountyName) ?? nationalPresidentId;
       return [organization.id, organization.code, organization.level, organization.name, organization.county,
         organization.membersCount, organization.status, organization.parentId, organization.officialEmail,
-        organization.phone, organization.headquarters, organization.foundedAt, actorId, actorId];
+        organization.phone, organization.headquarters, organization.foundedAt, actorId, actorId, true];
     }),
     suffix: `ON CONFLICT (id) DO UPDATE SET
       code = EXCLUDED.code, level = EXCLUDED.level, name = EXCLUDED.name,
       county = EXCLUDED.county, members_count = EXCLUDED.members_count, status = EXCLUDED.status,
       parent_id = EXCLUDED.parent_id, official_email = EXCLUDED.official_email, phone = EXCLUDED.phone,
       headquarters = EXCLUDED.headquarters, founded_at = EXCLUDED.founded_at,
-      created_by = EXCLUDED.created_by, updated_by = EXCLUDED.updated_by, updated_at = NOW()`,
+      created_by = EXCLUDED.created_by, updated_by = EXCLUDED.updated_by, is_demo = TRUE,
+      public_approved_at = NULL, public_approved_by = NULL, updated_at = NOW()`,
   });
   await insertRowsInBatches({
     client,
@@ -537,9 +538,9 @@ async function seedVolunteers(
       full_name, email, phone, county, county_id, locality, skills, motivation,
       workflow_status, internal_notes, status_updated_at, status_updated_by,
       owner_user_id, follow_up_at, reminder_at, last_contact_at, contact_channel,
-      crm_priority, rejection_reason, crm_tags, skill_tags, created_at
+      crm_priority, rejection_reason, crm_tags, skill_tags, is_demo, created_at
     )`,
-    columnCount: 22,
+    columnCount: 23,
     rows: people.map((person, index) => {
       const actorId = person.organizationId === NATIONAL_ORGANIZATION_ID
         ? nationalPresidentId : presidentIdByCounty.get(person.county) ?? nationalPresidentId;
@@ -553,7 +554,7 @@ async function seedVolunteers(
         contacted ? daysAfter(person.createdAt, 3) : null, person.contactChannel, person.priority,
         person.membershipStatus === "terminated" ? "Încheiere demonstrativă a calității de membru." : "",
         JSON.stringify(["seed-demo", buildSlug(person.county), person.membershipStatus]),
-        JSON.stringify(person.skillTags), person.createdAt];
+        JSON.stringify(person.skillTags), true, person.createdAt];
     }),
     suffix: "RETURNING id, email",
   });
@@ -598,9 +599,9 @@ async function seedMemberships(
       user_id, volunteer_id, full_name, email, status, organization_id, member_number,
       application_at, validated_at, approved_at, approval_organization_id, approval_body,
       joined_at, suspended_at, ended_at, status_reason, version, created_by, updated_by,
-      created_at, updated_at
+      is_demo, created_at, updated_at
     )`,
-    columnCount: 21,
+    columnCount: 22,
     rows: people.map((person) => {
       const stage = statusOrder.indexOf(person.membershipStatus);
       const verifiedAt = stage >= statusOrder.indexOf("verified") ? daysAfter(person.createdAt, 2) : null;
@@ -621,7 +622,7 @@ async function seedMemberships(
         person.membershipStatus === "terminated" ? decisionAt : null,
         person.membershipStatus === "suspended" ? "Suspendare temporară demonstrativă"
           : person.membershipStatus === "terminated" ? "Retragere demonstrativă" : "",
-        membershipVersion(person.membershipStatus), actorId, actorId, person.createdAt, decisionAt];
+        membershipVersion(person.membershipStatus), actorId, actorId, true, person.createdAt, decisionAt];
     }),
     suffix: "RETURNING id, email",
   });
@@ -653,10 +654,10 @@ async function seedMembershipEvents(
     client,
     statement: `INSERT INTO membership_events (
       membership_id, action, previous_status, next_status, previous_organization_id,
-      next_organization_id, reason, actor_user_id, effective_at, created_at
+      next_organization_id, reason, actor_user_id, is_demo, effective_at, created_at
     )`,
-    columnCount: 10,
-    rows,
+    columnCount: 11,
+    rows: rows.map((row) => [...row.slice(0, 8), true, ...row.slice(8)]),
   });
   return rows.length;
 }
@@ -669,7 +670,7 @@ async function seedMandatesAndObjectives(
 ): Promise<{ mandates: number; objectives: number }> {
   const mandateRows: SqlValue[][] = people.filter((person) => person.positionTitle).map((person) => [
     person.organizationId, userIdByEmail.get(person.email) ?? null, person.fullName,
-    person.positionTitle, daysAfter(person.createdAt, 6), null, "active",
+    person.positionTitle, daysAfter(person.createdAt, 6), null, "active", true,
   ]);
   for (const organization of organizations) {
     if (organization.level !== "local") {continue;}
@@ -678,15 +679,16 @@ async function seedMandatesAndObjectives(
     );
     if (countyPresident) {
       mandateRows.push([organization.id, userIdByEmail.get(countyPresident.email) ?? null,
-        countyPresident.fullName, "Coordonator local interimar", daysAfter(countyPresident.createdAt, 10), null, "active"]);
+        countyPresident.fullName, "Coordonator local interimar", daysAfter(countyPresident.createdAt, 10), null, "active", true]);
     }
   }
   await insertRowsInBatches({
     client,
     statement: `INSERT INTO organization_leadership_mandates (
       organization_id, user_id, full_name, position_title, started_at, ended_at, status
+      , is_demo
     )`,
-    columnCount: 7,
+    columnCount: 8,
     rows: mandateRows,
   });
 
@@ -700,15 +702,15 @@ async function seedMandatesAndObjectives(
       "Obiectiv demonstrativ folosit pentru verificarea planificării și raportării.",
       organization.level === "national" ? "județe acoperite" : "membri activi",
       targetValue, currentValue, "număr", dateOnlyAfter(90 + (index % 120)),
-      currentValue >= targetValue ? "achieved" : index % 5 === 0 ? "at_risk" : "in_progress"];
+      currentValue >= targetValue ? "achieved" : index % 5 === 0 ? "at_risk" : "in_progress", true];
   });
   await insertRowsInBatches({
     client,
     statement: `INSERT INTO organization_objectives (
       organization_id, title, description, metric_name, target_value,
-      current_value, unit, due_date, status
+      current_value, unit, due_date, status, is_demo
     )`,
-    columnCount: 9,
+    columnCount: 10,
     rows: objectiveRows,
   });
   return { mandates: mandateRows.length, objectives: objectiveRows.length };
@@ -731,16 +733,16 @@ async function seedCommunicationConsents(
       JSON.stringify([interests[index % interests.length], interests[(index + 2) % interests.length]]),
       emailConsent, smsConsent, whatsappConsent, "portal-membru-v1", "seed_demo",
       JSON.stringify({ demo: true, seedKey: person.key }), hasConsent ? daysAfter(person.createdAt, 1) : null,
-      hasConsent ? null : daysAfter(person.createdAt, 1), person.createdAt, daysAfter(person.createdAt, 1)];
+      hasConsent ? null : daysAfter(person.createdAt, 1), true, person.createdAt, daysAfter(person.createdAt, 1)];
   });
   await insertRowsInBatches({
     client,
     statement: `INSERT INTO communication_consents (
       user_id, membership_id, full_name, email, phone, county_id, county, locality,
       interests, email_consent, sms_consent, whatsapp_consent, consent_version,
-      source, evidence, granted_at, withdrawn_at, created_at, updated_at
+      source, evidence, granted_at, withdrawn_at, is_demo, created_at, updated_at
     )`,
-    columnCount: 19,
+    columnCount: 20,
     rows,
   });
   return rows.length;
@@ -762,7 +764,10 @@ async function seedMobilization(
       coordinator_user_id = $3, created_by = $3,
       objective = CASE WHEN objective = '' THEN 'Obiectiv demonstrativ pentru coordonarea și raportarea activității.' ELSE objective END,
       target_metric = CASE WHEN target_metric = '' THEN 'participanți' ELSE target_metric END,
-      target_value = COALESCE(target_value, 50), updated_at = NOW() WHERE slug = $1`,
+      target_value = COALESCE(target_value, 50), is_demo = TRUE,
+      public_approved_at = NULL, public_approved_by = NULL,
+      public_response_count = NULL, response_count_approved_at = NULL,
+      response_count_approved_by = NULL, updated_at = NOW() WHERE slug = $1`,
     [slug, NATIONAL_ORGANIZATION_ID, userIdByEmail.get(email) ?? null]);
   }
 
@@ -787,7 +792,7 @@ async function seedMobilization(
       finished ? 2 + (index % 6) : 0, person.createdAt, status !== "invited" ? daysAfter(person.createdAt, 2) : null,
       null, finished ? daysAfter(person.createdAt, 8) : null, status === "completed" ? daysAfter(person.createdAt, 9) : null,
       userIdByEmail.get(coordinatorEmailBySlug.get(action.slug) ?? "") ?? null,
-      person.createdAt, finished ? daysAfter(person.createdAt, 9) : person.createdAt];
+      true, person.createdAt, finished ? daysAfter(person.createdAt, 9) : person.createdAt];
   });
   await insertRowsInBatches({
     client,
@@ -795,9 +800,9 @@ async function seedMobilization(
       action_id, user_id, membership_id, full_name, email, participation_role,
       status, attendance_status, due_at, notes, report, result, hours,
       invited_at, responded_at, checked_in_at, reported_at, reviewed_at,
-      assigned_by, created_at, updated_at
+      assigned_by, is_demo, created_at, updated_at
     )`,
-    columnCount: 21,
+    columnCount: 22,
     rows: participantRows,
   });
 
@@ -808,7 +813,7 @@ async function seedMobilization(
       JSON.stringify(index % 2 === 0 ? ["organizare", "comunicare"] : ["pensii", "sanatate"]),
       index % 3 === 0 ? "weekend" : "flexibil", "Răspuns demonstrativ pentru testarea mobilizării.",
       index % 4 !== 0, index % 4 !== 0, index % 3 === 0, index % 5 === 0,
-      "mobilizare-v2", true, person.createdAt];
+      "mobilizare-v2", true, true, person.createdAt];
   });
   if (responseRows.length > 0 && actionResult.rows.length > 0) {
     await insertRowsInBatches({
@@ -816,9 +821,9 @@ async function seedMobilization(
       statement: `INSERT INTO mobilization_responses (
         action_id, full_name, email, phone, county, locality, interests, availability,
         message, updates_consent, email_consent, sms_consent, whatsapp_consent,
-        consent_version, privacy_consent, created_at
+        consent_version, privacy_consent, is_demo, created_at
       )`,
-      columnCount: 16,
+      columnCount: 17,
       rows: responseRows,
     });
   }
@@ -847,31 +852,33 @@ async function seedMembershipDues(
       rows.push([membershipId, periodStart, periodEnd, 10, "RON", status, dueAt,
         status === "paid" ? daysAfter(dueAt, -2) : null,
         `DEMO-${person.key}-${periodStart.toISOString().slice(0, 7)}`.slice(0, 120),
-        periodStart, status === "paid" ? daysAfter(dueAt, -2) : periodStart]);
+        true, periodStart, status === "paid" ? daysAfter(dueAt, -2) : periodStart]);
     }
   }
   await insertRowsInBatches({
     client,
     statement: `INSERT INTO membership_dues (
       membership_id, period_start, period_end, amount, currency, status,
-      due_at, paid_at, reference, created_at, updated_at
+      due_at, paid_at, reference, is_demo, created_at, updated_at
     )`,
-    columnCount: 11,
+    columnCount: 12,
     rows,
   });
   return rows.length;
 }
 
 async function main(): Promise<void> {
-  if (process.env.NODE_ENV?.trim().toLowerCase() === "production") {
-    throw new Error("Seed-ul demonstrativ este dezactivat in productie.");
+  const nodeEnv = process.env.NODE_ENV?.trim().toLowerCase();
+  if (nodeEnv !== "test" || process.env.DEMO_DATA_ALLOWED !== "1") {
+    throw new Error(
+      "Seed-ul demonstrativ necesita NODE_ENV=test si opt-in explicit DEMO_DATA_ALLOWED=1.",
+    );
   }
+  const testDatabaseUrl = process.env.TEST_DATABASE_URL?.trim() ?? "";
   assertSafeTestDatabase({
-    nodeEnv: process.env.NODE_ENV ?? "development",
-    databaseUrl: process.env.NODE_ENV?.trim().toLowerCase() === "test"
-      ? process.env.TEST_DATABASE_URL ?? ""
-      : process.env.DATABASE_URL ?? "",
-    testDatabaseUrl: process.env.TEST_DATABASE_URL ?? "",
+    nodeEnv,
+    databaseUrl: testDatabaseUrl,
+    testDatabaseUrl,
   });
 
   const seedSql = await readFile(new URL("../../sql/seed.sql", import.meta.url), "utf8");

@@ -13,6 +13,8 @@ import {
 } from "../modules/volunteers/types.js";
 import { packageVersion } from "./buildInfo.js";
 import { env } from "./env.js";
+import { governanceAdminPaths } from "./openapi-admin-governance.js";
+import { executiveInterventionPaths, executiveInterventionSchemas } from "./openapi-executive-interventions.js";
 
 function createSuccessResponseSchema(dataSchema: Record<string, unknown>): Record<string, unknown> {
   return {
@@ -1382,40 +1384,6 @@ export const openApiSpec = {
       },
     },
     "/volunteers": {
-      get: {
-        tags: ["Volunteers"],
-        summary: "List public volunteers",
-        description: "Retrieve list of active volunteers (public data only)",
-        operationId: "listPublicVolunteers",
-        parameters: [
-          {
-            name: "limit",
-            in: "query",
-            description: "Maximum number of public volunteer rows to return.",
-            schema: {
-              type: "integer",
-              minimum: 1,
-              maximum: 1000,
-              default: 300,
-            },
-          },
-        ],
-        responses: {
-          "200": {
-            description: "List of volunteers",
-            content: {
-              "application/json": {
-                schema: createSuccessResponseSchema({
-                  type: "array",
-                  items: {
-                    $ref: "#/components/schemas/VolunteerPublicItem",
-                  },
-                }),
-              },
-            },
-          },
-        },
-      },
       post: {
         tags: ["Volunteers"],
         summary: "Create volunteer",
@@ -1519,29 +1487,6 @@ export const openApiSpec = {
         },
       },
     },
-    "/volunteers/by-county": {
-      get: {
-        tags: ["Volunteers"],
-        summary: "List volunteers by county",
-        description: "Group volunteers by county with counts",
-        operationId: "listVolunteersByCounty",
-        responses: {
-          "200": {
-            description: "Volunteers grouped by county",
-            content: {
-              "application/json": {
-                schema: createSuccessResponseSchema({
-                  type: "array",
-                  items: {
-                    $ref: "#/components/schemas/VolunteerCountyCountItem",
-                  },
-                }),
-              },
-            },
-          },
-        },
-      },
-    },
     "/mobilization/actions": {
       get: {
         tags: ["Mobilization"],
@@ -1604,7 +1549,7 @@ export const openApiSpec = {
             content: { "application/json": { schema: { $ref: "#/components/schemas/ApiErrorResponse" } } },
           },
           "409": {
-            description: "Response already exists for this email",
+            description: "Duplicate response (MOBILIZATION_RESPONSE_EXISTS) or no seats remaining (MOBILIZATION_ACTION_FULL); retry with joinWaitlist=true only with explicit consent",
             content: { "application/json": { schema: { $ref: "#/components/schemas/ApiErrorResponse" } } },
           },
           "429": {
@@ -1672,6 +1617,20 @@ export const openApiSpec = {
         },
       },
     },
+    ...governanceAdminPaths,
+    ...executiveInterventionPaths,
+    "/admin/tasks": {
+      get: {
+        tags: ["Admin Access"], operationId: "getAdminTasks",
+        summary: "Count pending administrative queues within effective capabilities and territory",
+        description: "Counts are not paginated. One record is counted once per queue; CRM and membership may represent distinct tasks for the same application. No executive duplicate is included in total.",
+        security: [{ BearerAuth: [] }], parameters: [],
+        responses: {
+          "200": { description: "Private, non-cacheable queue counts", content: { "application/json": { schema: createSuccessResponseSchema({ $ref: "#/components/schemas/AdminTasks" }) } } },
+          "401": { description: "Unauthorized" }, "403": { description: "Administrative capability and active mandate required" },
+        },
+      },
+    },
     "/admin/access": {
       get: {
         tags: ["Admin Access"],
@@ -1700,6 +1659,7 @@ export const openApiSpec = {
         operationId: "listPoliticalOperations",
         security: [{ BearerAuth: [] }],
         parameters: [
+          { name: "actionId", in: "query", schema: { type: "string", pattern: "^[1-9][0-9]*$" } },
           { name: "type", in: "query", schema: { type: "string", enum: ["event", "campaign", "volunteer_task"] } },
           { name: "status", in: "query", schema: { type: "string", enum: ["draft", "open", "closed", "archived"] } },
           { name: "limit", in: "query", schema: { type: "integer", minimum: 1, maximum: 100, default: 50 } },
@@ -2489,22 +2449,40 @@ export const openApiSpec = {
         },
       },
     },
+    "/governance/journal": {
+      get: {
+        tags: ["Governance"],
+        summary: "Get the public governance journal",
+        description: "Retrieve published decisions with issuing body, date, quorum, and result.",
+        operationId: "listGovernanceJournal",
+        responses: {
+          "200": {
+            description: "Public governance journal",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/ApiSuccessResponse" } } },
+          },
+        },
+      },
+    },
     "/stats": {
       get: {
         tags: ["Statistics"],
         summary: "Get platform statistics",
-        description: "Retrieve aggregated platform statistics",
+        description: "National editorially approved snapshots only; filters are rejected. Volunteer counts below 10 (including zero) are null; larger counts are rounded down to multiples of 10. Metadata describes this policy without exposing raw counts or cohort details.",
         operationId: "getStats",
         responses: {
           "200": {
             description: "Platform statistics",
             content: {
               "application/json": {
-                schema: {
-                  $ref: "#/components/schemas/ApiSuccessResponse",
-                },
+                schema: createSuccessResponseSchema({
+                  $ref: "#/components/schemas/PublicStatsData",
+                }),
               },
             },
+          },
+          "400": {
+            description: "Public statistics do not accept query filters",
+            content: { "application/json": { schema: { $ref: "#/components/schemas/ApiErrorResponse" } } },
           },
         },
       },
@@ -3424,47 +3402,32 @@ export const openApiSpec = {
         type: "string",
         enum: [...volunteerPriorityValues],
       },
-      VolunteerPublicRole: {
-        type: "string",
-        enum: [...userRoleValues, "FARA_CONT"],
-      },
-      VolunteerPublicItem: {
-        type: "object",
-        required: ["id", "fullName", "email", "password", "status", "role"],
+      AdminTasks: {
+        type: "object", additionalProperties: false, required: ["generatedAt", "counts", "total"],
         properties: {
-          id: {
-            type: "string",
-          },
-          fullName: {
-            type: "string",
-          },
-          email: {
-            type: "string",
-            format: "email",
-          },
-          password: {
-            type: "string",
-            enum: ["protejata", "nesetata"],
-          },
-          status: {
-            $ref: "#/components/schemas/VolunteerWorkflowStatus",
-          },
-          role: {
-            $ref: "#/components/schemas/VolunteerPublicRole",
-          },
+          generatedAt: { type: "string", format: "date-time" },
+          total: { type: "integer", minimum: 0 },
+          counts: { type: "object", additionalProperties: false, properties: Object.fromEntries(
+            ["volunteers", "members", "organizations", "mobilization", "congresses", "arbitration"].map((key) => [key, { type: "integer", minimum: 0 }])
+          ) },
         },
-        additionalProperties: false,
       },
-      VolunteerCountyCountItem: {
+      PublicStatsData: {
         type: "object",
-        required: ["county", "count"],
+        required: ["volunteers", "news"],
         properties: {
-          county: {
-            type: "string",
-          },
-          count: {
+          volunteers: {
             type: "integer",
+            nullable: true,
+            minimum: 10,
+            multipleOf: 10,
+            description: "National lower bound rounded down to tens; null for fewer than 10 people or an unavailable/unapproved snapshot.",
+          },
+          news: {
+            type: "integer",
+            nullable: true,
             minimum: 0,
+            description: "Editorially approved news count; null when unavailable.",
           },
         },
         additionalProperties: false,
@@ -3542,7 +3505,7 @@ export const openApiSpec = {
         type: "object",
         required: [
           "id", "slug", "type", "title", "summary", "description", "scope", "county", "locality",
-          "startsAt", "endsAt", "participationMode", "commitment", "capacity", "responseCount",
+          "startsAt", "endsAt", "participationMode", "commitment", "capacity", "availableSpots", "responseCount",
         ],
         properties: {
           id: { type: "string" },
@@ -3559,7 +3522,8 @@ export const openApiSpec = {
           participationMode: { type: "string" },
           commitment: { type: "string" },
           capacity: { type: "integer", minimum: 1, nullable: true },
-          responseCount: { type: "integer", minimum: 0 },
+          availableSpots: { type: "integer", minimum: 0, nullable: true, description: "Live availability; null means unlimited. Independent of the editorial response-count snapshot." },
+          responseCount: { type: ["integer", "null"], minimum: 0 },
         },
         additionalProperties: false,
       },
@@ -3587,6 +3551,7 @@ export const openApiSpec = {
             default: "",
           },
           message: { type: "string", maxLength: 1200, default: "" },
+          joinWaitlist: { type: "boolean", default: false, description: "Consent to a waiting-list entry if no seat remains. If a seat is available, participation is confirmed." },
           updatesConsent: { type: "boolean", default: false },
           emailConsent: { type: "boolean", default: false },
           smsConsent: { type: "boolean", default: false },
@@ -3599,10 +3564,11 @@ export const openApiSpec = {
       },
       MobilizationResponseData: {
         type: "object",
-        required: ["accepted", "id"],
+        required: ["accepted", "id", "registrationStatus"],
         properties: {
           accepted: { type: "boolean" },
           id: { type: "string", nullable: true },
+          registrationStatus: { type: "string", enum: ["confirmed", "waitlisted"], nullable: true },
         },
         additionalProperties: false,
       },
@@ -3671,6 +3637,7 @@ export const openApiSpec = {
         type: "object",
         required: ["expectedVersion"],
         properties: {
+          coordinatorUserId: { type: "string", pattern: "^[1-9][0-9]*$", nullable: true },
           status: { type: "string", enum: ["draft", "open", "closed", "archived"] },
           resultValue: { type: "number", minimum: 0, maximum: 1000000000, nullable: true },
           resultSummary: { type: "string", maxLength: 5000 },
@@ -3691,7 +3658,7 @@ export const openApiSpec = {
       PoliticalParticipantUpdateInput: {
         type: "object",
         properties: {
-          status: { type: "string", enum: ["invited", "confirmed", "declined", "active", "in_progress", "reported", "completed", "cancelled"] },
+          status: { type: "string", enum: ["invited", "confirmed", "waitlisted", "declined", "active", "in_progress", "reported", "completed", "cancelled"] },
           attendanceStatus: { type: "string", enum: ["not_applicable", "pending", "present", "absent", "excused"] },
           report: { type: "string", maxLength: 5000 },
           result: { type: "string", maxLength: 3000 },
@@ -4240,7 +4207,7 @@ export const openApiSpec = {
       },
       OrganizationLevel: {
         type: "string",
-        enum: ["national", "county", "local"],
+        enum: ["national", "county", "municipal", "local"],
       },
       OrganizationStatus: {
         type: "string",
@@ -4304,7 +4271,7 @@ export const openApiSpec = {
       },
       OrganizationMandateInput: {
         type: "object",
-        required: ["fullName", "positionTitle", "startedAt"],
+        required: ["fullName", "positionTitle", "startedAt", "decision"],
         properties: {
           userId: { type: "integer", minimum: 1, nullable: true },
           fullName: { type: "string", minLength: 3, maxLength: 160 },
@@ -4312,6 +4279,7 @@ export const openApiSpec = {
           startedAt: { type: "string", format: "date" },
           endedAt: { type: "string", format: "date", nullable: true },
           status: { type: "string", enum: ["planned", "active", "completed", "suspended"], default: "active" },
+          decision: { $ref: "#/components/schemas/OrganizationMandateDecision" },
         },
         additionalProperties: false,
       },
@@ -4325,8 +4293,19 @@ export const openApiSpec = {
           startedAt: { type: "string", format: "date" },
           endedAt: { type: "string", format: "date", nullable: true },
           status: { type: "string", enum: ["planned", "active", "completed", "suspended"] },
+          decision: { $ref: "#/components/schemas/OrganizationMandateDecision" },
         },
         additionalProperties: false,
+      },
+      OrganizationMandateDecision: {
+        type: "object", additionalProperties: false,
+        required: ["decisionNumber", "decisionDate", "issuingBody", "minutesPath"],
+        properties: {
+          decisionNumber: { type: "string", minLength: 1, maxLength: 80 },
+          decisionDate: { type: "string", format: "date" },
+          issuingBody: { type: "string", minLength: 3, maxLength: 180 },
+          minutesPath: { type: "string", minLength: 1, maxLength: 320 },
+        },
       },
       OrganizationObjectiveInput: {
         type: "object",
@@ -4358,6 +4337,7 @@ export const openApiSpec = {
         },
         additionalProperties: false,
       },
+      ...executiveInterventionSchemas,
       ExecutiveDashboardSummary: {
         type: "object",
         required: [

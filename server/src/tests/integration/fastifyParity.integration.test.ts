@@ -168,7 +168,7 @@ test("fastify adapter should expose manifest page parity", async () => {
   assert.match(String(response.headers["content-security-policy"] ?? ""), /unsafe-inline/i);
 });
 
-test("fastify adapter should serve assets created after startup and return 404 for missing assets", async () => {
+test("fastify adapter serves new assets but never uses SPA fallback for missing assets or API routes", async () => {
   const clientDistPath = await mkdtemp(path.join(tmpdir(), "pcs-client-dist-"));
   const assetsPath = path.join(clientDistPath, "assets");
   await mkdir(assetsPath);
@@ -205,6 +205,16 @@ test("fastify adapter should serve assets created after startup and return 404 f
     assert.doesNotMatch(String(missingResponse.headers["content-type"] ?? ""), /text\/html/i);
     assert.notEqual(missingResponse.headers["cache-control"], "public, max-age=31536000, immutable");
     assert.doesNotMatch(missingResponse.text, /SPA fallback/i);
+
+    for (const apiPath of ["/api", "/api/volunteers", "/api/volunteers/by-county?county=Cluj", "/api/missing-route"]) {
+      const apiResponse = await request(staticServer.server).get(apiPath).expect(404);
+      assert.equal(apiResponse.body?.data, null);
+      assert.equal(apiResponse.body?.error?.code, "API_ROUTE_NOT_FOUND");
+      assert.doesNotMatch(apiResponse.text, /SPA fallback/i);
+      await request(staticServer.server).head(apiPath).expect(404);
+    }
+    const clientRoute = await request(staticServer.server).get("/contact").expect(200);
+    assert.match(clientRoute.text, /SPA fallback/i);
   } finally {
     await staticServer.close();
     await rm(clientDistPath, { recursive: true, force: true });

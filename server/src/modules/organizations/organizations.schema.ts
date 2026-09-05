@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const organizationLevels = ["national", "county", "local"] as const;
+export const organizationLevels = ["national", "county", "municipal", "local"] as const;
 export const organizationStatuses = ["forming", "active", "inactive", "dissolved"] as const;
 export const territoryTypes = ["national", "county", "locality"] as const;
 export const mandateStatuses = ["planned", "active", "completed", "suspended"] as const;
@@ -83,6 +83,12 @@ export const createOrganizationMandateSchema = z.object({
   startedAt: isoDateSchema,
   endedAt: nullableDateSchema,
   status: z.enum(mandateStatuses).optional().default("active"),
+  decision: z.object({
+    decisionNumber: z.string().trim().min(1).max(80),
+    decisionDate: isoDateSchema,
+    issuingBody: z.string().trim().min(3).max(180),
+    minutesPath: z.string().trim().min(1).max(320),
+  }).strict(),
 }).strict().superRefine((value, context) => {
   if (value.endedAt && value.endedAt < value.startedAt) {
     context.addIssue({ code: z.ZodIssueCode.custom, message: "Data încheierii nu poate preceda începutul mandatului." });
@@ -96,6 +102,12 @@ export const updateOrganizationMandateSchema = z.object({
   startedAt: isoDateSchema.optional(),
   endedAt: nullableDateSchema,
   status: z.enum(mandateStatuses).optional(),
+  decision: z.object({
+    decisionNumber: z.string().trim().min(1).max(80),
+    decisionDate: isoDateSchema,
+    issuingBody: z.string().trim().min(3).max(180),
+    minutesPath: z.string().trim().min(1).max(320),
+  }).strict().optional(),
 }).strict().refine((value) => Object.keys(value).length > 0, "Trimite cel puțin un câmp de actualizat.");
 
 export const createOrganizationObjectiveSchema = z.object({
@@ -136,7 +148,6 @@ export type OrganizationRecord = {
   level: (typeof organizationLevels)[number];
   name: string;
   county: string;
-  membersCount: number;
   foundedAt: string | null;
   territories: string[];
   officialEmail: string;

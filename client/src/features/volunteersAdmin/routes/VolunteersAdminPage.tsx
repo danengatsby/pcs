@@ -272,7 +272,6 @@ export function VolunteersAdminPage() {
         canPromote={canPromote}
         canDelete={canDelete}
         canExport={canExport}
-        canViewExecutive={canPromote}
         loading={loading}
         exporting={exporting}
         bulkUpdating={bulkUpdating}

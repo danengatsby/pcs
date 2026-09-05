@@ -1,5 +1,4 @@
 import { useDeferredValue, useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
 import { Button, Input, Select } from '@components'
 import { useAuth } from '@features/auth/context'
 import { useAdminMembersDashboard, useMembershipAction } from '../hooks/useAdminMembersDashboard'
@@ -343,10 +342,6 @@ export function AdminMembersDashboardPage() {
             <p className="muted">Conectat ca {user?.fullName ?? 'administrator'} · {user ? formatRole(user.role) : '—'}</p>
           </div>
           <div className="admin-members__actions">
-            {user?.role === 'VICEPRESEDINTE' || user?.role === 'PRESEDINTE'
-              ? <Link className="btn" to="/admin/dashboard">Tablou de comandă</Link>
-              : <Link className="btn" to="/admin/volunteers">CRM teritorial</Link>}
-            <Link className="btn" to="/admin/organizations">Organizații teritoriale</Link>
             <Button onClick={reload} loading={loading}>Reîncarcă</Button>
           </div>
         </div>

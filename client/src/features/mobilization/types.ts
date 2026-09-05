@@ -25,7 +25,8 @@ export type MobilizationAction = {
   participationMode: string
   commitment: string
   capacity: number | null
-  responseCount: number
+  availableSpots: number | null
+  responseCount: number | null
 }
 
 export type MobilizationResponseRequest = {
@@ -37,6 +38,7 @@ export type MobilizationResponseRequest = {
   interests: MobilizationInterest[]
   availability?: MobilizationAvailability
   message?: string
+  joinWaitlist?: boolean
   updatesConsent: boolean
   emailConsent: boolean
   smsConsent: boolean
@@ -49,4 +51,5 @@ export type MobilizationResponseRequest = {
 export type MobilizationResponse = {
   accepted: boolean
   id: string | null
+  registrationStatus: 'confirmed' | 'waitlisted' | null
 }

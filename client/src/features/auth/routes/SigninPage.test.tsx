@@ -39,8 +39,7 @@ function renderSigninPage(auth: Partial<AuthContextValue>) {
         <Routes>
           <Route path="/auth/signin" element={<SigninPage />} />
           <Route path="/profil" element={<div>Profil utilizator</div>} />
-          <Route path="/admin/dashboard" element={<div>Tablou de comandă admin</div>} />
-          <Route path="/admin/volunteers" element={<div>Administrare voluntari</div>} />
+          <Route path="/admin" element={<div>Administrare PCS</div>} />
         </Routes>
       </MemoryRouter>
     </AuthContext.Provider>,
@@ -91,7 +90,7 @@ describe('SigninPage', () => {
     expect(screen.getByRole('button', { name: 'Autentificare ca admin' })).toBeInTheDocument()
   })
 
-  it('authenticates an authorized administrator directly into the executive dashboard', async () => {
+  it('authenticates an authorized administrator into the shared workspace', async () => {
     const user = userEvent.setup()
     const signin = vi.fn(async () => signinSuccess('PRESEDINTE'))
     renderSigninPage({ signin })
@@ -104,7 +103,7 @@ describe('SigninPage', () => {
       email: 'admin',
       password: 'ParolaSigura#2026',
     })
-    expect(await screen.findByText('Tablou de comandă admin')).toBeInTheDocument()
+    expect(await screen.findByText('Administrare PCS')).toBeInTheDocument()
   })
 
   it('rejects admin mode for a non-administrative account and clears the session', async () => {

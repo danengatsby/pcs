@@ -3,7 +3,12 @@ import { test } from "node:test";
 import request from "supertest";
 import { createApp } from "../../app.js";
 import { query } from "../../lib/db.js";
-import { buildTestNewsTitle, deleteNewsById } from "../helpers/dbTestUtils.js";
+import {
+  buildTestEmail,
+  buildTestNewsTitle,
+  deleteNewsById,
+  deleteUserByEmail,
+} from "../helpers/dbTestUtils.js";
 
 const app = createApp();
 
@@ -30,7 +35,7 @@ function readNextCursor(meta: unknown): string | null {
   return normalized || null;
 }
 
-async function insertPublishedNews(title: string, publishedAt: string): Promise<number> {
+async function insertPublishedNews(title: string, publishedAt: string, approverId: string | null): Promise<number> {
   const result = await query<NewsIdRow>(
     `
       INSERT INTO news (
@@ -40,9 +45,16 @@ async function insertPublishedNews(title: string, publishedAt: string): Promise<
         content,
         published_at,
         status,
-        tags
+        tags,
+        is_demo,
+        public_approved_at,
+        public_approved_by
       )
-      VALUES ($1, $2, 'Comunicat', $3, $4::timestamptz, 'published', $5::jsonb)
+      VALUES (
+        $1, $2, 'Comunicat', $3, $4::timestamptz, 'published', $5::jsonb, FALSE,
+        CASE WHEN $6::bigint IS NULL THEN NULL ELSE NOW() END,
+        $6::bigint
+      )
       RETURNING id
     `,
     [
@@ -51,6 +63,7 @@ async function insertPublishedNews(title: string, publishedAt: string): Promise<
       `Continut test: ${title}`,
       publishedAt,
       JSON.stringify(["keyset-test"]),
+      approverId,
     ]
   );
 
@@ -59,6 +72,7 @@ async function insertPublishedNews(title: string, publishedAt: string): Promise<
 
 test("public news endpoint should paginate with keyset cursor in stable order", async () => {
   const createdIds: number[] = [];
+  const approverEmail = buildTestEmail("news-pagination-approver");
   const baseTimeMs = Date.parse("2099-02-01T12:00:00.000Z");
   const equalPublishedAt = new Date(baseTimeMs).toISOString();
   const olderPublishedAt = new Date(baseTimeMs - 2000).toISOString();
@@ -68,10 +82,18 @@ test("public news endpoint should paginate with keyset cursor in stable order", 
   const titleOlder = buildTestNewsTitle("PUBLIC-KEYSET-C");
 
   try {
-    const idTieFirst = await insertPublishedNews(titleTieFirst, equalPublishedAt);
-    const idTieSecond = await insertPublishedNews(titleTieSecond, equalPublishedAt);
-    const idOlder = await insertPublishedNews(titleOlder, olderPublishedAt);
-    createdIds.push(idTieFirst, idTieSecond, idOlder);
+    const approverResult = await query<{ id: string }>(`
+      INSERT INTO users (full_name, email, password_hash, role, is_demo)
+      VALUES ('Aprobator Stiri Test', $1, 'not-used', 'PRESEDINTE', FALSE)
+      RETURNING id
+    `, [approverEmail]);
+    const approverId = approverResult.rows[0]?.id;
+    assert.ok(approverId);
+    const idTieFirst = await insertPublishedNews(titleTieFirst, equalPublishedAt, approverId);
+    const idTieSecond = await insertPublishedNews(titleTieSecond, equalPublishedAt, approverId);
+    const idOlder = await insertPublishedNews(titleOlder, olderPublishedAt, approverId);
+    const unapprovedId = await insertPublishedNews(buildTestNewsTitle("UNAPPROVED"), equalPublishedAt, null);
+    createdIds.push(idTieFirst, idTieSecond, idOlder, unapprovedId);
 
     const pageOne = await request(app)
       .get("/api/news?limit=1")
@@ -114,6 +136,7 @@ test("public news endpoint should paginate with keyset cursor in stable order", 
         await deleteNewsById(id);
       }
     }
+    await deleteUserByEmail(approverEmail);
   }
 });
 

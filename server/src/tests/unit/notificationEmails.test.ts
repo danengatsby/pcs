@@ -54,3 +54,14 @@ test("buildNewsLink should point to the SPA news detail route", () => {
     env.publicBaseUrl = previousBaseUrl;
   }
 });
+
+test("waiting-list emails never promise a confirmed seat or repeat the action confirmation commitment", () => {
+  const message = buildMobilizationResponseConfirmationText({
+    fullName: "Participant Test", email: "waiting@example.test", actionTitle: "Eveniment limitat",
+    actionType: "event", participationMode: "Online", commitment: "Locul tau este garantat.",
+    county: "Cluj", interests: ["organizare"], updatesConsent: false, registrationStatus: "waitlisted",
+  });
+  assert.match(message, /lista de asteptare/i);
+  assert.match(message, /nu confirma un loc/i);
+  assert.doesNotMatch(message, /Locul tau este garantat/);
+});

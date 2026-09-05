@@ -1,9 +1,10 @@
-INSERT INTO news (title, summary, category, content, published_at)
+INSERT INTO news (title, summary, category, content, is_demo, published_at)
 SELECT
   seed.title,
   seed.summary,
   seed.category,
   seed.content,
+  TRUE,
   seed.published_at
 FROM (
   VALUES

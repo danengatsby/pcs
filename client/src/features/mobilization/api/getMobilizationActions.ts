@@ -29,8 +29,13 @@ function parseAction(value: unknown): MobilizationAction {
   if (requiredStrings.some((key) => typeof value[key] !== 'string')) {
     throw new Error('Acțiunea primită este incompletă.')
   }
-  if (typeof value.responseCount !== 'number' || (value.capacity !== null && typeof value.capacity !== 'number')) {
+  if ((value.responseCount !== null && typeof value.responseCount !== 'number') || (value.capacity !== null && typeof value.capacity !== 'number')) {
     throw new Error('Indicatorii acțiunii sunt invalizi.')
+  }
+  if (value.capacity === null ? value.availableSpots !== null
+    : typeof value.availableSpots !== 'number' || !Number.isInteger(value.availableSpots)
+      || value.availableSpots < 0 || value.availableSpots > value.capacity) {
+    throw new Error('Disponibilitatea acțiunii este invalidă.')
   }
 
   return {
@@ -48,6 +53,7 @@ function parseAction(value: unknown): MobilizationAction {
     participationMode: value.participationMode as string,
     commitment: value.commitment as string,
     capacity: value.capacity as number | null,
+    availableSpots: value.availableSpots as number | null,
     responseCount: value.responseCount,
   }
 }

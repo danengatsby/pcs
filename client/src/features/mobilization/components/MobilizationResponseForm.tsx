@@ -7,6 +7,7 @@ import {
   mobilizationInterests,
 } from '../config'
 import { useSubmitMobilizationResponse } from '../hooks/useSubmitMobilizationResponse'
+import { MobilizationActionFullError } from '../api/submitMobilizationResponse'
 import type {
   MobilizationAction,
   MobilizationAvailability,
@@ -56,6 +57,8 @@ export function MobilizationResponseForm({ action, onClose }: MobilizationRespon
   const [form, setForm] = useState<FormState>(initialState)
   const [status, setStatus] = useState<string | null>(null)
   const [submitted, setSubmitted] = useState(false)
+  const [capacityExhausted, setCapacityExhausted] = useState(false)
+  const waitlistMode = action.availableSpots === 0 || capacityExhausted
   const config = mobilizationActionTypeConfig[action.type]
 
   const updateField = (key: keyof Omit<FormState, 'interests' | 'emailConsent' | 'smsConsent' | 'whatsappConsent' | 'privacyConsent'>) => (
@@ -85,7 +88,7 @@ export function MobilizationResponseForm({ action, onClose }: MobilizationRespon
     setStatus(null)
     reset()
     try {
-      await submit({
+      const response = await submit({
         slug: action.slug,
         payload: {
           fullName: form.fullName,
@@ -96,6 +99,7 @@ export function MobilizationResponseForm({ action, onClose }: MobilizationRespon
           interests: form.interests,
           availability: form.availability,
           message: form.message,
+          joinWaitlist: waitlistMode,
           updatesConsent: form.emailConsent || form.smsConsent || form.whatsappConsent,
           emailConsent: form.emailConsent,
           smsConsent: form.smsConsent,
@@ -106,8 +110,11 @@ export function MobilizationResponseForm({ action, onClose }: MobilizationRespon
         },
       })
       setSubmitted(true)
-      setStatus('Răspunsul tău a fost înregistrat. Vei primi detaliile următoare prin canalul indicat.')
+      setStatus(response.registrationStatus === 'waitlisted'
+        ? 'Ești pe lista de așteptare. Înscrierea nu confirmă un loc; organizatorii te vor contacta dacă devine disponibil.'
+        : 'Răspunsul tău a fost înregistrat. Vei primi detaliile următoare prin canalul indicat.')
     } catch (error) {
+      if (error instanceof MobilizationActionFullError) setCapacityExhausted(true)
       setStatus(error instanceof Error ? error.message : 'Răspunsul nu a putut fi trimis.')
     }
   }
@@ -136,7 +143,9 @@ export function MobilizationResponseForm({ action, onClose }: MobilizationRespon
 
       <div className="mobilization-form__commitment">
         <strong>Ce se întâmplă după trimitere</strong>
-        <span>{action.commitment}</span>
+        <span>{waitlistMode
+          ? 'Locuri epuizate. Poți solicita înscrierea pe lista de așteptare. Dacă un loc devine disponibil înainte de trimitere, înscrierea va fi confirmată direct.'
+          : action.commitment}</span>
       </div>
 
       <form className="form mobilization-form__fields" onSubmit={handleSubmit}>
@@ -238,7 +247,9 @@ export function MobilizationResponseForm({ action, onClose }: MobilizationRespon
         </div>
 
         <div className="mobilization-form__submit">
-          <Button type="submit" variant="primary" loading={submitting}>{config.cta}</Button>
+          <Button type="submit" variant="primary" loading={submitting}>
+            {waitlistMode ? 'Înscrie-mă pe lista de așteptare' : config.cta}
+          </Button>
           {status ? <p role="status" aria-live="polite">{status}</p> : null}
         </div>
       </form>

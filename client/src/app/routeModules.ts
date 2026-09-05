@@ -14,11 +14,5 @@ export const loadDocumentPage = () => import('@features/documents/routes/Documen
 export const loadManifestPage = () => import('@features/manifest/routes/ManifestPage')
 export const loadMobilizationPage = () => import('@features/mobilization/routes/MobilizationPage')
 export const loadPoliticalOperationsPage = () => import('@features/politicalOperations')
-
-export function prefetchAdminRoutes(): void {
-  void loadExecutiveDashboardPage()
-  void loadTerritorialOrganizationsPage()
-  void loadAdminMembersDashboardPage()
-  void loadVolunteersAdminPage()
-  void loadPoliticalOperationsPage()
-}
+export const loadCongressPage = () => import('@features/adminGovernance/CongressPage')
+export const loadArbitrationPage = () => import('@features/adminGovernance/ArbitrationPage')

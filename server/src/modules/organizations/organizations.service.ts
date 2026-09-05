@@ -37,6 +37,9 @@ function organizationError(error: unknown): never {
   }
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     if (error.code === "P2002") {
+      if (error.meta?.target === "organization_mandates_no_overlap") {
+        throw new AppError(409, "ORGANIZATION_MANDATE_CONFLICT", "Mandatul se suprapune cu aceeași funcție sau cu un mandat activ al titularului.");
+      }
       throw new AppError(409, "ORGANIZATION_CONFLICT", "Codul organizației este deja folosit.");
     }
     if (error.code === "P2003" || error.code === "P2004") {
@@ -104,11 +107,11 @@ async function validateOrganizationStructure(input: {
     throw new AppError(
       400,
       "ORGANIZATION_VALIDATION_FAILED",
-      `O organizație ${input.level === "county" ? "județeană" : "locală"} trebuie legată de nivelul ${expectedParentLevel}.`
+      `O organizație ${input.level === "county" ? "județeană" : input.level === "municipal" ? "municipală" : "locală"} trebuie legată de nivelul ${expectedParentLevel}.`
     );
   }
 
-  if (input.level === "local") {
+  if (input.level === "local" || input.level === "municipal") {
     const parentCountyIds = new Set(parent.territories
       .map((territory) => territory.countyId)
       .filter((countyId): countyId is number => typeof countyId === "number"));
@@ -220,11 +223,12 @@ async function assertOrganizationAndUser(organizationId: string, userId?: number
 
 export async function createOrganizationMandateService(
   organizationId: string,
-  input: CreateOrganizationMandateInput
+  input: CreateOrganizationMandateInput,
+  actorId: bigint
 ) {
   await assertOrganizationAndUser(organizationId, input.userId);
   try {
-    await createOrganizationMandateRepository(organizationId, input);
+    await createOrganizationMandateRepository(organizationId, { ...input, actorId });
     return getOrganizationDetailService(organizationId);
   } catch (error) {
     return organizationError(error);
@@ -234,11 +238,12 @@ export async function createOrganizationMandateService(
 export async function updateOrganizationMandateService(
   organizationId: string,
   mandateId: number,
-  input: UpdateOrganizationMandateInput
+  input: UpdateOrganizationMandateInput,
+  actorId: bigint
 ) {
   await assertOrganizationAndUser(organizationId, input.userId);
   try {
-    const updated = await updateOrganizationMandateRepository(organizationId, mandateId, input);
+    const updated = await updateOrganizationMandateRepository(organizationId, mandateId, { ...input, actorId });
     if (!updated) {
       throw new AppError(404, "ORGANIZATION_MANDATE_NOT_FOUND", "Mandatul nu a fost găsit.");
     }

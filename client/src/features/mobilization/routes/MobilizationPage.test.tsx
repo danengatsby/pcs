@@ -7,6 +7,7 @@ import { useMobilizationActions } from '../hooks/useMobilizationActions'
 import { useSubmitMobilizationResponse } from '../hooks/useSubmitMobilizationResponse'
 import type { MobilizationAction, MobilizationActionType } from '../types'
 import { MobilizationPage } from './MobilizationPage'
+import { MobilizationActionFullError } from '../api/submitMobilizationResponse'
 
 vi.mock('@features/contact/hooks/useCounties', () => ({ useCounties: vi.fn() }))
 vi.mock('../hooks/useMobilizationActions', () => ({ useMobilizationActions: vi.fn() }))
@@ -30,6 +31,7 @@ function action(id: number, type: MobilizationActionType, title: string): Mobili
     participationMode: 'Online',
     commitment: 'Primești detaliile următoare pe email.',
     capacity: type === 'event' ? 100 : null,
+    availableSpots: type === 'event' ? 99 : null,
     responseCount: id,
   }
 }
@@ -52,7 +54,7 @@ describe('MobilizationPage', () => {
       submitting: false,
       reset: vi.fn(),
     })
-    submit.mockResolvedValue({ accepted: true, id: '44' })
+    submit.mockResolvedValue({ accepted: true, id: '44', registrationStatus: 'confirmed' })
   })
 
   it('shows all mobilization instruments and separates participation from membership', () => {
@@ -102,5 +104,59 @@ describe('MobilizationPage', () => {
       }),
     }))
     expect(await screen.findByRole('heading', { name: 'Mulțumim pentru implicare.' })).toBeInTheDocument()
+  })
+
+  it('disables direct registration at capacity and offers an explicit waiting-list submission', async () => {
+    const user = userEvent.setup()
+    vi.mocked(useMobilizationActions).mockReturnValue({
+      actions: [{ ...actions[0], availableSpots: 0, responseCount: null }], loading: false, error: null,
+    })
+    submit.mockResolvedValue({ accepted: true, id: '45', registrationStatus: 'waitlisted' })
+    render(<MemoryRouter><MobilizationPage /></MemoryRouter>)
+    expect(screen.getByText('0 locuri disponibile')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Locuri epuizate' })).toBeDisabled()
+    await user.click(screen.getByRole('button', { name: 'Lista de așteptare' }))
+    await user.type(screen.getByLabelText('Nume complet'), 'Ana Popescu')
+    await user.type(screen.getByLabelText('Email'), 'ana@example.test')
+    await user.selectOptions(screen.getByLabelText(/Județ/), 'Cluj')
+    await user.click(screen.getByRole('checkbox', { name: 'Pensii și venituri' }))
+    await user.click(screen.getByRole('checkbox', { name: /Sunt de acord cu prelucrarea/ }))
+    await user.click(screen.getByRole('button', { name: 'Înscrie-mă pe lista de așteptare' }))
+    expect(submit).toHaveBeenCalledWith(expect.objectContaining({ payload: expect.objectContaining({ joinWaitlist: true }) }))
+    expect(await screen.findByText(/Ești pe lista de așteptare. Înscrierea nu confirmă un loc/)).toBeInTheDocument()
+  })
+
+  it('preserves entered data when the last seat is taken and requires another click to join the waitlist', async () => {
+    const user = userEvent.setup()
+    submit.mockRejectedValueOnce(new MobilizationActionFullError('Locuri epuizate.'))
+    render(<MemoryRouter><MobilizationPage /></MemoryRouter>)
+    await user.click(screen.getByRole('button', { name: 'Confirmă prezența' }))
+    await user.type(screen.getByLabelText('Nume complet'), 'Ana Popescu')
+    await user.type(screen.getByLabelText('Email'), 'ana@example.test')
+    await user.selectOptions(screen.getByLabelText(/Județ/), 'Cluj')
+    await user.click(screen.getByRole('checkbox', { name: 'Pensii și venituri' }))
+    await user.click(screen.getByRole('checkbox', { name: /Sunt de acord cu prelucrarea/ }))
+    await user.click(screen.getByRole('button', { name: 'Confirmă prezența' }))
+    const waitlistButton = await screen.findByRole('button', { name: 'Înscrie-mă pe lista de așteptare' })
+    expect(submit).toHaveBeenCalledTimes(1)
+    expect(submit).toHaveBeenLastCalledWith(expect.objectContaining({ payload: expect.objectContaining({ joinWaitlist: false }) }))
+    expect(screen.getByLabelText('Email')).toHaveValue('ana@example.test')
+    submit.mockResolvedValueOnce({ accepted: true, id: '46', registrationStatus: 'waitlisted' })
+    await user.click(waitlistButton)
+    expect(submit).toHaveBeenLastCalledWith(expect.objectContaining({ payload: expect.objectContaining({ joinWaitlist: true }) }))
+    expect(await screen.findByText(/Ești pe lista de așteptare/)).toBeInTheDocument()
+  })
+
+  it('uses refreshed availability for an already selected action', async () => {
+    const user = userEvent.setup()
+    const view = render(<MemoryRouter><MobilizationPage /></MemoryRouter>)
+    await user.click(screen.getByRole('button', { name: 'Confirmă prezența' }))
+    vi.mocked(useMobilizationActions).mockReturnValue({
+      actions: [{ ...actions[0], availableSpots: 0 }], loading: false, error: null,
+    })
+    view.rerender(<MemoryRouter><MobilizationPage /></MemoryRouter>)
+    expect(screen.getByRole('button', { name: 'Locuri epuizate' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Înscrie-mă pe lista de așteptare' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Confirmă prezența' })).not.toBeInTheDocument()
   })
 })

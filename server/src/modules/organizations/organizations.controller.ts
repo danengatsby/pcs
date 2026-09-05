@@ -178,7 +178,7 @@ export const createAdminOrganizationMandateController: RequestHandler = async (r
     const { id } = parseOrThrow(organizationIdParamSchema, req.params);
     assertOrganizationInScope(requireAdminAccess(res).scope, id);
     const payload = parseOrThrow(createOrganizationMandateSchema, req.body);
-    const organization = await createOrganizationMandateService(id, payload);
+    const organization = await createOrganizationMandateService(id, payload, BigInt(actor.id));
     await auditOrganizationMutation({
       actor,
       action: "organization.mandate.create",
@@ -197,7 +197,7 @@ export const updateAdminOrganizationMandateController: RequestHandler = async (r
     const { id, childId } = parseOrThrow(organizationChildIdParamSchema, req.params);
     assertOrganizationInScope(requireAdminAccess(res).scope, id);
     const payload = parseOrThrow(updateOrganizationMandateSchema, req.body);
-    const organization = await updateOrganizationMandateService(id, childId, payload);
+    const organization = await updateOrganizationMandateService(id, childId, payload, BigInt(actor.id));
     await auditOrganizationMutation({
       actor,
       action: "organization.mandate.update",

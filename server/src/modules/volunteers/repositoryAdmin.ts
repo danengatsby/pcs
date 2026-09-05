@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+import type { UserRole } from "../../lib/authToken.js";
 import { enqueueAdminAuditEntries } from "../../lib/adminAuditOutbox.js";
 import { enqueueNotificationEmails } from "../../lib/notificationOutbox.js";
 import { prisma } from "../../lib/prisma.js";
@@ -13,7 +14,6 @@ import {
   type VolunteerContactChannel,
   type VolunteerOwnerOption,
   type VolunteerPriority,
-  type VolunteerPublicRole,
   type VolunteerListFilters,
   type VolunteerWorkflowStatus,
 } from "./types.js";
@@ -135,7 +135,7 @@ type BulkAdminActor = {
   role?: string;
 };
 
-function normalizeAccountRole(role: string | null | undefined): Exclude<VolunteerPublicRole, "FARA_CONT"> | null {
+function normalizeAccountRole(role: string | null | undefined): UserRole | null {
   const normalizedRole = (role ?? "").trim().toUpperCase();
   if (
     normalizedRole === "SUSTINATOR"
@@ -494,6 +494,20 @@ function buildVolunteerAdminCombinedCte(): Prisma.Sql {
         ON v.email_key = u.email_key
     )
   `;
+}
+
+export async function countRecruitmentTasks(scope: AdminTerritoryScope): Promise<number> {
+  const rows = await prisma.$queryRaw<Array<{ total: bigint }>>(Prisma.sql`
+    ${buildVolunteerAdminCombinedCte()}
+    SELECT COUNT(*) AS total FROM combined
+    WHERE ${buildVolunteerAdminScopeCondition(scope)} AND (
+      combined.workflow_status = 'nou'
+      OR (combined.workflow_status <> 'activ' AND (
+        combined.follow_up_at < NOW() OR combined.reminder_at < NOW()
+      ))
+    )
+  `);
+  return Number(rows[0]?.total ?? 0);
 }
 
 function buildVolunteerAdminListQuery(input: {

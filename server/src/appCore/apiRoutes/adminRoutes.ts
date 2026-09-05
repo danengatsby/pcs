@@ -3,6 +3,8 @@ import type { ApiRouteDefinition } from "../apiRouteTypes.js";
 import { requireAdminCapability, requireAuth } from "../../lib/authMiddleware.js";
 import { requireAdminAccess, territoryScopeLabel } from "../../lib/adminAuthorization.js";
 import { sendSuccess } from "../../lib/http.js";
+import { getAdminTasksHandler } from "../../modules/admin/handlers/getAdminTasks.js";
+import { listInterventionsController, listExpirationsController, updateExpirationController } from "../../modules/executiveDashboard/interventions.controller.js";
 import { listAdminAuditHandler } from "../../modules/admin/handlers/listAdminAudit.js";
 import { sendAdminEmailTestHandler } from "../../modules/admin/handlers/sendAdminEmailTest.js";
 import {
@@ -37,6 +39,25 @@ import {
   createCommunicationDispatchController,
   previewCommunicationAudienceController,
 } from "../../modules/communications/communications.controller.js";
+import {
+  addCongressCandidacyController,
+  addCongressDelegateController,
+  castCongressVoteController,
+  checkInCongressDelegateController,
+  createCongressController,
+  listCongressController,
+  transitionCongressController,
+  validateCongressCandidacyController,
+} from "../../modules/congress/congress.controller.js";
+import {
+  addArbitrationEvidenceController,
+  addArbitrationPartyController,
+  appealArbitrationCaseController,
+  createArbitrationCaseController,
+  declareArbitrationConflictController,
+  decideArbitrationCaseController,
+  listArbitrationCasesController,
+} from "../../modules/arbitration/arbitration.controller.js";
 
 const recruitmentReadGuard = requireAdminCapability("recruitment.read");
 const recruitmentExportGuard = requireAdminCapability("recruitment.export");
@@ -54,10 +75,17 @@ const mobilizationManageGuard = requireAdminCapability("mobilization.manage");
 const communicationPreviewGuard = requireAdminCapability("communication.preview");
 const auditReadGuard = requireAdminCapability("audit.read");
 const notificationTestGuard = requireAdminCapability("notifications.test");
+const congressReadGuard = requireAdminCapability("congress.read");
+const congressManageGuard = requireAdminCapability("congress.manage");
+const congressVoteGuard = requireAdminCapability("congress.vote");
+const arbitrationReadGuard = requireAdminCapability("arbitration.read");
+const arbitrationManageGuard = requireAdminCapability("arbitration.manage");
+const arbitrationAdjudicateGuard = requireAdminCapability("arbitration.adjudicate");
 
 const adminAccessHandler: RequestHandler = (_req, res, next) => {
   try {
     const access = requireAdminAccess(res);
+    res.setHeader("Cache-Control", "private, no-store");
     sendSuccess(res, {
       role: access.actor.role,
       capabilities: access.capabilities,
@@ -80,6 +108,7 @@ const adminAccessHandler: RequestHandler = (_req, res, next) => {
 
 export const adminRoutes: ApiRouteDefinition[] = [
   { method: "GET", url: "/api/admin/access", handlers: [requireAuth, recruitmentReadGuard, adminAccessHandler] },
+  { method: "GET", url: "/api/admin/tasks", handlers: [requireAuth, recruitmentReadGuard, getAdminTasksHandler] },
   { method: "GET", url: "/api/admin/volunteers", handlers: [requireAuth, recruitmentReadGuard, listAdminVolunteersHandler] },
   { method: "GET", url: "/api/admin/volunteers/owners", handlers: [requireAuth, recruitmentReadGuard, listAdminVolunteerOwnersHandler] },
   { method: "GET", url: "/api/admin/volunteers/export.csv", handlers: [requireAuth, recruitmentExportGuard, exportAdminVolunteersCsvHandler] },
@@ -89,6 +118,9 @@ export const adminRoutes: ApiRouteDefinition[] = [
   { method: "PATCH", url: "/api/admin/volunteers/:id/workflow", handlers: [requireAuth, recruitmentManageGuard, updateAdminVolunteerWorkflowHandler] },
   { method: "DELETE", url: "/api/admin/volunteers/:id", handlers: [requireAuth, recruitmentDeleteGuard, deleteAdminVolunteerHandler] },
   { method: "GET", url: "/api/admin/executive-dashboard", handlers: [requireAuth, executiveReadGuard, getExecutiveDashboardController] },
+  { method: "GET", url: "/api/admin/executive-dashboard/interventions", handlers: [requireAuth, executiveReadGuard, listInterventionsController] },
+  { method: "GET", url: "/api/admin/executive-dashboard/expirations", handlers: [requireAuth, executiveReadGuard, listExpirationsController] },
+  { method: "PATCH", url: "/api/admin/executive-dashboard/expirations/:source/:id", handlers: [requireAuth, executiveTargetGuard, updateExpirationController] },
   { method: "PATCH", url: "/api/admin/executive-dashboard/targets/:key", handlers: [requireAuth, executiveTargetGuard, updateExecutiveTargetController] },
   { method: "GET", url: "/api/admin/mobilization", handlers: [requireAuth, mobilizationReadGuard, listPoliticalOperationsController] },
   { method: "POST", url: "/api/admin/mobilization/actions", handlers: [requireAuth, mobilizationManageGuard, createPoliticalOperationController] },
@@ -107,4 +139,19 @@ export const adminRoutes: ApiRouteDefinition[] = [
   { method: "PATCH", url: "/api/admin/organizations/:id/objectives/:childId", handlers: [requireAuth, organizationObjectiveGuard, updateAdminOrganizationObjectiveController] },
   { method: "POST", url: "/api/admin/notifications/email-test", handlers: [requireAuth, notificationTestGuard, sendAdminEmailTestHandler] },
   { method: "GET", url: "/api/admin/audit", handlers: [requireAuth, auditReadGuard, listAdminAuditHandler] },
+  { method: "GET", url: "/api/admin/congresses", handlers: [requireAuth, congressReadGuard, listCongressController] },
+  { method: "POST", url: "/api/admin/congresses", handlers: [requireAuth, congressManageGuard, createCongressController] },
+  { method: "POST", url: "/api/admin/congresses/:id/delegates", handlers: [requireAuth, congressManageGuard, addCongressDelegateController] },
+  { method: "POST", url: "/api/admin/congresses/:id/candidacies", handlers: [requireAuth, congressManageGuard, addCongressCandidacyController] },
+  { method: "POST", url: "/api/admin/congresses/:id/candidacies/:candidacyId/validate", handlers: [requireAuth, congressManageGuard, validateCongressCandidacyController] },
+  { method: "POST", url: "/api/admin/congresses/:id/status", handlers: [requireAuth, congressManageGuard, transitionCongressController] },
+  { method: "POST", url: "/api/admin/congresses/:id/delegates/:delegateId/check-in", handlers: [requireAuth, congressManageGuard, checkInCongressDelegateController] },
+  { method: "POST", url: "/api/admin/congresses/:id/votes", handlers: [requireAuth, congressVoteGuard, castCongressVoteController] },
+  { method: "GET", url: "/api/admin/arbitration/cases", handlers: [requireAuth, arbitrationReadGuard, listArbitrationCasesController] },
+  { method: "POST", url: "/api/admin/arbitration/cases", handlers: [requireAuth, arbitrationManageGuard, createArbitrationCaseController] },
+  { method: "POST", url: "/api/admin/arbitration/cases/:id/parties", handlers: [requireAuth, arbitrationManageGuard, addArbitrationPartyController] },
+  { method: "POST", url: "/api/admin/arbitration/cases/:id/evidence", handlers: [requireAuth, arbitrationManageGuard, addArbitrationEvidenceController] },
+  { method: "POST", url: "/api/admin/arbitration/cases/:id/conflicts", handlers: [requireAuth, arbitrationManageGuard, declareArbitrationConflictController] },
+  { method: "POST", url: "/api/admin/arbitration/cases/:id/decision", handlers: [requireAuth, arbitrationAdjudicateGuard, decideArbitrationCaseController] },
+  { method: "POST", url: "/api/admin/arbitration/cases/:id/appeals", handlers: [requireAuth, arbitrationManageGuard, appealArbitrationCaseController] },
 ];

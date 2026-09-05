@@ -14,12 +14,18 @@ type PublicNewsSelectRow = {
 };
 
 function isPubliclyVisibleWhere(now: Date): {
+  isDemo: false;
+  publicApprovedAt: { not: null };
+  publicApprovedBy: { not: null };
   OR: Array<
     | { status: "published" }
     | { status: "scheduled"; publishedAt: { lte: Date } }
   >;
 } {
   return {
+    isDemo: false,
+    publicApprovedAt: { not: null },
+    publicApprovedBy: { not: null },
     OR: [
       { status: "published" },
       { status: "scheduled", publishedAt: { lte: now } },

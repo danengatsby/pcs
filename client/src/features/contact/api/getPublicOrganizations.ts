@@ -6,7 +6,6 @@ export type PublicOrganization = {
   level: 'national' | 'county' | 'local'
   name: string
   county: string
-  membersCount: number
   foundedAt: string | null
   territories: string[]
   officialEmail: string

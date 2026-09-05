@@ -64,6 +64,8 @@ export type CreatePoliticalActionInput = {
   targetValue: number | null
 }
 
+export type UpdatePoliticalActionInput = { status?: string; resultValue?: number | null; resultSummary?: string; coordinatorUserId?: string | null; expectedVersion: number }
+
 export type CommunicationAudience = {
   channel: 'email' | 'sms' | 'whatsapp'
   organizationId: string | null

@@ -11,6 +11,7 @@ Preconditii:
 - `server/.env.production.example` copiat ca `server/.env` și completat cu valori reale
 - Chromium pentru Playwright instalat pe host (`npx playwright install --with-deps chromium`, o singura data sau dupa actualizari Playwright)
 - `TEST_DATABASE_URL` exportat catre o baza dedicata, cu `test` sau `testing` in nume
+- baza production are nume distinct de orice baza `test`, `demo` sau `seed`; preflight-ul refuza configuratiile amestecate
 - backup/snapshot DB recent daca release-ul contine migrari SQL
 
 Ruleaza local sau in CI pe un mediu non-productie:
@@ -57,8 +58,9 @@ npm run deploy:production
 
 Ordine importanta:
 - migrarea ruleaza dupa build si inainte de restart
+- dupa migrare, deploy-ul sterge tranzactional numai randurile marcate `is_demo=true`, apoi cere inventar zero; o dependenta ambigua anuleaza curatarea
 - scriptul de migrari este forward-only si executa smoke checks DB dupa aplicare
-- `npm run db:seed` nu se ruleaza in productie
+- `npm run db:seed` functioneaza numai cu `NODE_ENV=test`, `DEMO_DATA_ALLOWED=1` si un `TEST_DATABASE_URL` al carui nume contine `test`/`testing`
 - `pcs-server`, `pcs-email-outbox-worker` si `pcs-admin-audit-outbox-worker` sunt procese PM2 separate; workerii nu ruleaza in procesul API
 - `npm run predeploy` verifică secretele obligatorii, alinierea PM2/Docker/aplicație și răspunsul `PONG` al `clamd`
 - preflight-ul verifica prezenta cheii publice Turnstile si egalitatea `VITE_CAPTCHA_ACTION` / `CAPTCHA_EXPECTED_ACTION`; Vite repeta validarea cheii la build
@@ -67,8 +69,34 @@ Ordine importanta:
 - dupa smoke-ul bundle-ului, deploy-ul ruleaza Playwright contra instantei repornite si cere titlul public plus CTA-ul principal
 - nu rula `npm run build --workspace client` direct peste directorul indicat de `CLIENT_DIST_PATH`
 - configuratia PM2 seteaza explicit `NODE_ENV=production`; aplicatia trebuie sa porneasca fail-closed daca lipsesc secretele sau CAPTCHA obligatoriu
+- API-ul refuza pornirea in production daca exista orice rand `is_demo=true`
+
+Publicarea este separata de starea operationala:
+
+- directorul public de voluntari si agregarea pe judete sunt eliminate (`GET /api/volunteers` si `GET /api/volunteers/by-county` raspund 404); inscrierea prin POST si lista oficiala de judete raman disponibile;
+- `/api/stats` publica doar snapshot-ul national aprobat: totalul de voluntari este `null` sub 10 persoane (inclusiv zero) sau fara aprobare, iar peste prag se rotunjeste in jos la zeci (17 devine 10, 1264 devine 1260). Valoarea este un prag inferior, nu un total exact;
+- nu sunt acceptate filtre teritoriale, pe rol/status sau pe date. Raspunsul nu include distributii, numaratori brute ori identificatori de persoane; metadatele descriu doar politica de publicare. Totalurile exacte raman in administrarea autentificata;
+
+- salvarea unei stiri ca `published`/`scheduled`, a unei organizatii ca `active` sau a unui mandat ca `active` inregistreaza aprobatorul si momentul aprobarii;
+- orice editare partiala care nu reconfirma starea publica revoca aprobarea, fail-closed;
+- indicatorii sunt snapshot-uri, nu numaratori live. Dupa verificarea cifrelor, un presedinte real aproba explicit valorile dorite:
+
+```bash
+PUBLICATION_APPROVER_EMAIL=presedinte@example.ro \
+PUBLIC_INDICATORS=volunteers,news,mobilization_responses \
+PUBLICATION_APPROVAL_CONFIRM=APPROVE_REVIEWED_INDICATORS \
+npm run publication:approve-indicators --workspace server
+```
 
 ## 4) Smoke test post-deploy
+
+Capacitatea actiunilor (migrarea `037_mobilization_waitlist.sql`):
+
+- locurile sunt ocupate de participantii `confirmed`, `active`, `in_progress`, `reported` si `completed`; invitatiile, retragerile si lista de asteptare nu ocupa locuri;
+- `availableSpots` reflecta disponibilitatea curenta, separat de snapshot-ul editorial `responseCount`; capacitatea `null` inseamna fara limita;
+- inscrierea publica, confirmarile administrative si raspunsurile din portal blocheaza aceeasi actiune pe durata tranzactiei;
+- la epuizarea locurilor, API-ul raspunde `409 MOBILIZATION_ACTION_FULL`; `joinWaitlist=true` permite salvarea unei participari `waitlisted`, numai la solicitarea persoanei;
+- in administrare, persoanele in asteptare apar primele, in ordinea inscrierii. Dupa contactare, `Confirma locul` verifica din nou capacitatea. Retragerea/anularea elibereaza un loc; promovarea este manuala.
 
 Verificari API:
 

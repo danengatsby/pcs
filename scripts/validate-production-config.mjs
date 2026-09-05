@@ -62,6 +62,24 @@ function checkClamd(host, port) {
 const values = { ...parse(await fs.readFile(envPath, "utf8")), ...process.env };
 for (const name of required) assertRealValue(values, name);
 if (values.NODE_ENV !== "production") fail("NODE_ENV trebuie să fie production.");
+if (/(^|[_-])(test|testing|demo|seed)([_-]|$)/i.test(values.POSTGRES_DB.trim())) {
+  fail("POSTGRES_DB de producție nu poate avea nume de bază test/demo/seed.");
+}
+if (values.TEST_DATABASE_URL?.trim()) {
+  const productionUrl = values.DATABASE_URL?.trim();
+  if (productionUrl && productionUrl === values.TEST_DATABASE_URL.trim()) {
+    fail("TEST_DATABASE_URL trebuie să fie complet separat de DATABASE_URL.");
+  }
+  try {
+    const testDatabaseName = decodeURIComponent(new URL(values.TEST_DATABASE_URL.trim()).pathname.replace(/^\/+/, ""));
+    if (testDatabaseName === values.POSTGRES_DB.trim()) {
+      fail("TEST_DATABASE_URL și POSTGRES_DB indică aceeași bază.");
+    }
+  } catch (error) {
+    if (error.message?.startsWith("Production config invalid:")) throw error;
+    fail("TEST_DATABASE_URL este invalid.");
+  }
+}
 if (values.CAPTCHA_MODE !== "required") fail("CAPTCHA_MODE trebuie să fie required.");
 if ([
   "1x00000000000000000000AA",

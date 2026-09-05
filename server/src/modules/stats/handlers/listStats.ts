@@ -1,40 +1,29 @@
 import type { RequestHandler } from "express";
 import { sendSuccess } from "../../../lib/http.js";
-import { prisma } from "../../../lib/prisma.js";
+import { query } from "../../../lib/db.js";
+import { AppError } from "../../../lib/errors.js";
+import { publicVolunteerCount, volunteerStatisticsPrivacy } from "../privacy.js";
 
-export const listStatsHandler: RequestHandler = async (_req, res, next) => {
+export const listStatsHandler: RequestHandler = async (req, res, next) => {
   try {
-    const now = new Date();
-    const [volunteersCountRows, news] = await Promise.all([
-      prisma.$queryRaw<Array<{ count: bigint | number }>>`
-        SELECT COUNT(*) AS count
-        FROM (
-          SELECT LOWER(email) AS email
-          FROM volunteers
-          UNION
-          SELECT LOWER(email) AS email
-          FROM users
-          WHERE role = 'ADERENT'
-        ) AS member_emails
-      `,
-      prisma.news.count({
-        where: {
-          OR: [
-            { status: "published" },
-            {
-              status: "scheduled",
-              publishedAt: { lte: now },
-            },
-          ],
-        },
-      }),
-    ]);
-    const rawCount = volunteersCountRows[0]?.count ?? 0;
-    const volunteers = typeof rawCount === "bigint" ? Number(rawCount) : rawCount;
+    if (Object.keys(req.query).length > 0) {
+      throw new AppError(400, "BAD_REQUEST", "Statisticile publice sunt naționale și nu acceptă filtre.");
+    }
+    const indicators = await query<{ key: string; value: string }>(`
+      SELECT key, value::TEXT
+      FROM public_indicators
+      WHERE key = ANY($1::varchar[])
+        AND is_demo = FALSE
+        AND approved_at IS NOT NULL
+        AND approved_by IS NOT NULL
+    `, [["volunteers", "news"]]);
+    const valueByKey = new Map(indicators.rows.map((row) => [row.key, Number(row.value)]));
 
     sendSuccess(res, {
-      volunteers,
-      news,
+      volunteers: publicVolunteerCount(valueByKey.get("volunteers")),
+      news: valueByKey.get("news") ?? null,
+    }, {
+      meta: { volunteerStatistics: volunteerStatisticsPrivacy },
     });
   } catch (error) {
     next(error);

@@ -112,7 +112,7 @@ function overdueCondition(now: Date, untouchedThreshold: Date): Prisma.Sql {
   )`;
 }
 
-function executiveScopeCondition(scope: AdminTerritoryScope): Prisma.Sql {
+export function executiveScopeCondition(scope: AdminTerritoryScope): Prisma.Sql {
   if (scope.national) {
     return Prisma.sql`TRUE`;
   }

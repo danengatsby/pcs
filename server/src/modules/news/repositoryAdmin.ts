@@ -19,6 +19,7 @@ type NewsWriteDbInput = {
   publishedAt: string | undefined;
   status: NewsStatus;
   tags: string[];
+  publicApprovedBy: bigint | null;
 };
 
 type NewsDbSelectRow = {
@@ -196,6 +197,9 @@ export async function insertAdminNews(input: NewsWriteDbInput, runner: QueryRunn
       sourceUrl: input.sourceUrl,
       publishedAt: input.publishedAt ? new Date(input.publishedAt) : undefined,
       status: input.status,
+      isDemo: false,
+      publicApprovedAt: input.publicApprovedBy ? new Date() : null,
+      publicApprovedBy: input.publicApprovedBy,
       tags: input.tags,
     },
     select: {
@@ -235,6 +239,9 @@ export async function updateAdminNewsById(
         sourceUrl: input.sourceUrl,
         publishedAt: input.publishedAt ? new Date(input.publishedAt) : undefined,
         status: input.status,
+        isDemo: false,
+        publicApprovedAt: input.publicApprovedBy ? new Date() : null,
+        publicApprovedBy: input.publicApprovedBy,
         tags: input.tags,
       },
       select: {

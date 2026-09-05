@@ -1,7 +1,8 @@
 import { useMemo, useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { useLocation, useSearchParams } from 'react-router-dom'
 import { Button, Input, Select } from '@components'
 import { useAuth } from '@features/auth/context'
+import { useAdminRecordFocus } from '@features/adminShell/useAdminRecordFocus'
 import {
   useOrganizationDetail,
   useOrganizationMutations,
@@ -23,6 +24,7 @@ import type {
 const levelLabels: Record<OrganizationLevel, string> = {
   national: 'Națională',
   county: 'Județeană',
+  municipal: 'Municipală',
   local: 'Locală',
 }
 
@@ -98,7 +100,7 @@ function OrganizationEditor({
       : emptyTerritories(),
   )
 
-  const parentLevel: OrganizationLevel | null = level === 'county' ? 'national' : level === 'local' ? 'county' : null
+  const parentLevel: OrganizationLevel | null = level === 'county' ? 'national' : level === 'municipal' || level === 'local' ? 'county' : null
   const parentOptions = registry.rows
     .filter((organization) => organization.level === parentLevel && organization.id !== initial?.id && organization.status !== 'dissolved')
     .map((organization) => ({ value: organization.id, label: `${organization.code} — ${organization.name}` }))
@@ -132,7 +134,7 @@ function OrganizationEditor({
       : territories.map((territory) => ({
         type: territoryType,
         countyId: Number(territory.countyId),
-        ...(level === 'local' ? { locality: territory.locality } : {}),
+        ...((level === 'local' || level === 'municipal') ? { locality: territory.locality } : {}),
       }))
 
     try {
@@ -341,7 +343,7 @@ function ObjectiveCard({ objective, canWrite, saving, onUpdate }: {
     : objective.status === 'achieved' ? 100 : 0
 
   return (
-    <article className={`territorial-org__objective is-${objective.status}`}>
+    <article className={`territorial-org__objective is-${objective.status}`} id={`objective-${objective.id}`} tabIndex={-1} style={{ scrollMarginTop: '100px' }}>
       <div className="territorial-org__item-top">
         <div><h4>{objective.title}</h4><p>{objective.metricName || 'Indicator nespecificat'}</p></div>
         <span className="territorial-org__badge">{objectiveStatusLabels[objective.status]}</span>
@@ -376,8 +378,14 @@ function OrganizationDetailPanel({ organization, canEdit, canManageMandates, can
   onEdit: () => void
   onAction: ReturnType<typeof useOrganizationMutations>['execute']
 }) {
+  const { hash } = useLocation()
+  const [params] = useSearchParams()
+  const targetObjective = organization.objectives.find((objective) => hash === `#objective-${objective.id}`)
+  useAdminRecordFocus(params.get('selected') === organization.id
+    ? targetObjective ? `objective-${targetObjective.id}` : `organization-${organization.id}`
+    : null)
   return (
-    <div className="territorial-org__detail">
+    <div className="territorial-org__detail" id={`organization-${organization.id}`} tabIndex={-1} style={{ scrollMarginTop: '100px' }}>
       <section className="panel">
         <header className="panel__header territorial-org__detail-header">
           <div>
@@ -485,7 +493,9 @@ function OrganizationList({ rows, selectedId, onSelect }: {
 export function TerritorialOrganizationsPage() {
   const { user } = useAuth()
   const { registry, loading, error, reload } = useOrganizationRegistry()
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const selectedId = searchParams.get('selected')
+  const setSelectedId = (id: string | null) => { const next = new URLSearchParams(searchParams); if (id) next.set('selected', id); else next.delete('selected'); setSearchParams(next) }
   const [search, setSearch] = useState('')
   const [showCreate, setShowCreate] = useState(false)
   const [editing, setEditing] = useState(false)
@@ -520,9 +530,6 @@ export function TerritorialOrganizationsPage() {
         <div className="territorial-org__hero-top">
           <div className="stack-12"><h1>Organizații teritoriale</h1><p className="lead">Filiale reale, ierarhie, teritorii, conduceri, mandate și obiective verificabile.</p></div>
           <div className="territorial-org__hero-actions">
-            <Link className="btn" to={user?.role === 'VICEPRESEDINTE' || user?.role === 'PRESEDINTE' ? '/admin/dashboard' : '/admin/volunteers'}>
-              {user?.role === 'VICEPRESEDINTE' || user?.role === 'PRESEDINTE' ? 'Tablou de comandă' : 'CRM teritorial'}
-            </Link>
             {canCreate ? <Button variant="primary" onClick={() => { setShowCreate(true); setEditing(false); mutations.reset() }}>Organizație nouă</Button> : null}
             <Button onClick={reload} loading={loading}>Reîncarcă</Button>
           </div>

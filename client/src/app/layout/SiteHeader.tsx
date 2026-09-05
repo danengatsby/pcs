@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { prefetchAdminRoutes } from '@app/routeModules'
 import { useAuth } from '@features/auth/context'
 import { hasAdminAccess } from '@features/auth/types'
 import type { DocumentItem } from '@features/documents/config'
@@ -71,10 +70,6 @@ export function SiteHeader() {
     }
   }
 
-  function handleAdminIntent() {
-    prefetchAdminRoutes()
-  }
-
   async function ensureDocumentsLoaded(): Promise<void> {
     if (documents) {
       return
@@ -123,9 +118,7 @@ export function SiteHeader() {
   }
 
   const userLabel = user?.fullName.trim() || user?.email || ''
-  const adminLanding = user?.role === 'VICEPRESEDINTE' || user?.role === 'PRESEDINTE'
-    ? '/admin/dashboard'
-    : '/admin/volunteers'
+  const adminLanding = '/admin'
 
   return (
     <header className="site-header" ref={headerRef}>
@@ -210,8 +203,6 @@ export function SiteHeader() {
             <Link
               className="nav-link"
               to={adminLanding}
-              onMouseEnter={handleAdminIntent}
-              onFocus={handleAdminIntent}
               onClick={handleNavigation}
             >
               Admin

@@ -1,4 +1,6 @@
 import { query, withTransaction } from "../../lib/db.js";
+import { AppError } from "../../lib/errors.js";
+import { actionFullError, hasAvailableSeat, reservedEmailsSql } from "./mobilization.capacity.js";
 import type { MobilizationResponseInput } from "./mobilization.schema.js";
 import type { MobilizationAction, MobilizationActionType } from "./mobilization.types.js";
 
@@ -17,7 +19,8 @@ type MobilizationActionRow = {
   participation_mode: string;
   commitment: string;
   capacity: number | null;
-  response_count: number | string;
+  available_spots: number | null;
+  response_count: number | string | null;
 };
 
 function toIsoString(value: Date | string | null): string | null {
@@ -43,7 +46,8 @@ function mapAction(row: MobilizationActionRow): MobilizationAction {
     participationMode: row.participation_mode,
     commitment: row.commitment,
     capacity: row.capacity,
-    responseCount: Number(row.response_count),
+    availableSpots: row.available_spots,
+    responseCount: row.response_count === null ? null : Number(row.response_count),
   };
 }
 
@@ -64,13 +68,23 @@ export async function listPublicMobilizationActions(): Promise<MobilizationActio
       action.participation_mode,
       action.commitment,
       action.capacity,
-      COUNT(DISTINCT response.id)::INTEGER AS response_count
+      CASE WHEN action.capacity IS NULL THEN NULL ELSE GREATEST(0, action.capacity - (
+        SELECT COUNT(*)::INTEGER FROM (${reservedEmailsSql("action.id")}) seats
+      )) END AS available_spots,
+      CASE
+        WHEN action.response_count_approved_at IS NOT NULL
+          AND action.response_count_approved_by IS NOT NULL
+        THEN action.public_response_count
+        ELSE NULL
+      END AS response_count
     FROM mobilization_actions AS action
-    LEFT JOIN mobilization_responses AS response ON response.action_id = action.id
     LEFT JOIN mobilization_action_counties AS action_county ON action_county.action_id = action.id
     LEFT JOIN counties AS county ON county.id = action_county.county_id
     WHERE action.status = 'open'
       AND action.visibility = 'public'
+      AND action.is_demo = FALSE
+      AND action.public_approved_at IS NOT NULL
+      AND action.public_approved_by IS NOT NULL
       AND (action.ends_at IS NULL OR action.ends_at >= NOW())
     GROUP BY action.id
     ORDER BY action.sort_order ASC, action.starts_at ASC NULLS LAST, action.id ASC
@@ -84,6 +98,7 @@ export async function createMobilizationResponse(
   input: MobilizationResponseInput,
 ): Promise<{
   id: string;
+  registrationStatus: "confirmed" | "waitlisted";
   actionTitle: string;
   actionType: MobilizationActionType;
   participationMode: string;
@@ -96,12 +111,16 @@ export async function createMobilizationResponse(
       action_type: MobilizationActionType;
       participation_mode: string;
       commitment: string;
+      capacity: number | null;
     }>(`
-      SELECT id, title, action_type, participation_mode, commitment
+      SELECT id, title, action_type, participation_mode, commitment, capacity
       FROM mobilization_actions
       WHERE slug = $1
         AND status = 'open'
         AND visibility = 'public'
+        AND is_demo = FALSE
+        AND public_approved_at IS NOT NULL
+        AND public_approved_by IS NOT NULL
         AND (ends_at IS NULL OR ends_at >= NOW())
       LIMIT 1
       FOR UPDATE
@@ -111,6 +130,14 @@ export async function createMobilizationResponse(
     if (!action) {
       return null;
     }
+
+    const duplicate = await client.query("SELECT id FROM mobilization_responses WHERE action_id = $1 AND LOWER(email) = LOWER($2)", [action.id, input.email]);
+    if (duplicate.rowCount) {
+      throw new AppError(409, "MOBILIZATION_RESPONSE_EXISTS", "Există deja un răspuns pentru această acțiune și adresă de email.");
+    }
+    const available = await hasAvailableSeat(client, action.id, action.capacity, input.email);
+    if (!available && !input.joinWaitlist) {throw actionFullError();}
+    const registrationStatus = available ? "confirmed" : "waitlisted";
 
     const emailConsent = input.emailConsent || input.updatesConsent;
     const result = await client.query<{ id: string }>(`
@@ -129,9 +156,10 @@ export async function createMobilizationResponse(
         sms_consent,
         whatsapp_consent,
         consent_version,
-        privacy_consent
+        privacy_consent,
+        is_demo
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9, $10, $11, $12, $13, $14, $15)
+      VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9, $10, $11, $12, $13, $14, $15, FALSE)
       RETURNING id
     `, [
       action.id,
@@ -173,7 +201,8 @@ export async function createMobilizationResponse(
         consent_version,
         source,
         evidence,
-        granted_at
+        granted_at,
+        is_demo
       )
       SELECT
         membership.user_id,
@@ -191,7 +220,8 @@ export async function createMobilizationResponse(
         $10,
         'mobilization_response',
         jsonb_build_object('responseId', $11::bigint, 'privacyConsent', TRUE),
-        CASE WHEN $7 OR $8 OR $9 THEN NOW() ELSE NULL END
+        CASE WHEN $7 OR $8 OR $9 THEN NOW() ELSE NULL END,
+        FALSE
       FROM (SELECT 1) seed
       LEFT JOIN membership_records membership ON LOWER(membership.email) = LOWER($2)
       LEFT JOIN counties county ON county.name = $4
@@ -214,6 +244,7 @@ export async function createMobilizationResponse(
         consent_version = EXCLUDED.consent_version,
         source = EXCLUDED.source,
         evidence = communication_consents.evidence || EXCLUDED.evidence,
+        is_demo = FALSE,
         granted_at = CASE
           WHEN EXCLUDED.email_consent OR EXCLUDED.sms_consent OR EXCLUDED.whatsapp_consent
             THEN COALESCE(communication_consents.granted_at, NOW())
@@ -263,7 +294,8 @@ export async function createMobilizationResponse(
           WHEN 'volunteer_task' THEN 'assignee'
           ELSE 'participant'
         END,
-        CASE $4 WHEN 'campaign' THEN 'active' ELSE 'confirmed' END,
+        CASE WHEN $5::boolean THEN 'waitlisted'
+          WHEN $4 = 'campaign' THEN 'active' ELSE 'confirmed' END,
         CASE $4 WHEN 'event' THEN 'pending' ELSE 'not_applicable' END,
         NOW()
       FROM (SELECT 1) seed
@@ -277,10 +309,11 @@ export async function createMobilizationResponse(
         attendance_status = EXCLUDED.attendance_status,
         responded_at = NOW(),
         updated_at = NOW()
-    `, [action.id, input.fullName, input.email, action.action_type]);
+    `, [action.id, input.fullName, input.email, action.action_type, registrationStatus === "waitlisted"]);
 
     return {
       id: created.id.toString(),
+      registrationStatus,
       actionTitle: action.title,
       actionType: action.action_type,
       participationMode: action.participation_mode,

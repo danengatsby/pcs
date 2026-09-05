@@ -38,7 +38,7 @@ export const createMobilizationResponseController: RequestHandler = async (req, 
   }
 
   if (payload.data.website) {
-    sendSuccess(res, { accepted: true, id: null }, { status: 202 });
+    sendSuccess(res, { accepted: true, id: null, registrationStatus: null }, { status: 202 });
     return;
   }
 
@@ -47,11 +47,12 @@ export const createMobilizationResponseController: RequestHandler = async (req, 
     if (!response) {
       throw new AppError(404, "MOBILIZATION_ACTION_NOT_FOUND", "Acțiunea nu este disponibilă pentru înscrieri.");
     }
-    sendSuccess(res, { accepted: true, id: response.id }, { status: 201 });
+    sendSuccess(res, { accepted: true, id: response.id, registrationStatus: response.registrationStatus }, { status: 201 });
     void sendMobilizationResponseConfirmationEmail({
       fullName: payload.data.fullName,
       email: payload.data.email,
       actionTitle: response.actionTitle,
+      registrationStatus: response.registrationStatus,
       actionType: response.actionType,
       participationMode: response.participationMode,
       commitment: response.commitment,

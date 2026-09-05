@@ -4,9 +4,7 @@ export {
   insertVolunteer,
   insertVolunteerUser,
   upsertPendingMembership,
-  listVolunteerCountsByCounty,
-  listPublicVolunteers,
-} from "./repositoryPublic.js";
+} from "./repositorySignup.js";
 
 export {
   bulkDeleteAdminVolunteers,

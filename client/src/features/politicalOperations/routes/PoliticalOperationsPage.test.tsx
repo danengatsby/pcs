@@ -67,4 +67,21 @@ describe('PoliticalOperationsPage', () => {
     expect(screen.queryByText('membru@example.test')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Pune emailurile în coadă' })).toBeInTheDocument()
   })
+
+  it('offers a capacity-checked confirmation for waiting participants', async () => {
+    const user = userEvent.setup()
+    actions.updateParticipant.mockResolvedValue({ id: '99', status: 'confirmed' })
+    vi.mocked(usePoliticalOperations).mockReturnValue({
+      data: { ...data, actions: [{ ...data.actions[0], participants: [{
+        id: '99', fullName: 'Participant în așteptare', email: 'waiting@example.test',
+        status: 'waitlisted', attendanceStatus: 'pending', report: '', result: '', hours: 0, dueAt: null,
+      }] }] },
+      loading: false, saving: false, error: null, ...actions,
+    })
+    renderPage()
+    await user.click(screen.getByText('Participanți și raportare (1)'))
+    expect(screen.getByText('Pe lista de așteptare · 0 ore')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Confirmă locul' }))
+    expect(actions.updateParticipant).toHaveBeenCalledWith('99', { status: 'confirmed' })
+  })
 })

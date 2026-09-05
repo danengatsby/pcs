@@ -7,22 +7,6 @@ import {
   volunteerStatusValues,
 } from "./types.js";
 
-const defaultPublicVolunteersLimit = 300;
-const maxPublicVolunteersLimit = 1000;
-
-export function parsePublicVolunteersLimit(raw: unknown): number {
-  if (typeof raw !== "string") {
-    return defaultPublicVolunteersLimit;
-  }
-
-  const parsed = Number.parseInt(raw, 10);
-  if (!Number.isInteger(parsed) || parsed < 1) {
-    return defaultPublicVolunteersLimit;
-  }
-
-  return Math.min(parsed, maxPublicVolunteersLimit);
-}
-
 export function parsePositiveInt(raw: unknown, fallback: number, min = 1, max = 500): number {
   const parsed = Number(raw ?? fallback);
   if (!Number.isFinite(parsed)) {

@@ -1,4 +1,4 @@
-export type OrganizationLevel = 'national' | 'county' | 'local'
+export type OrganizationLevel = 'national' | 'county' | 'municipal' | 'local'
 export type OrganizationStatus = 'forming' | 'active' | 'inactive' | 'dissolved'
 export type TerritoryType = 'national' | 'county' | 'locality'
 export type MandateStatus = 'planned' | 'active' | 'completed' | 'suspended'

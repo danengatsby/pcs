@@ -21,9 +21,10 @@ const deadlineFormatter = new Intl.DateTimeFormat('ro-RO', {
 })
 
 function responseLabel(action: MobilizationAction): string {
+  if (action.responseCount === null) return 'indicator în curs de validare'
   if (action.type === 'petition') return action.responseCount === 1 ? 'semnătură' : 'semnături'
   if (action.type === 'consultation') return action.responseCount === 1 ? 'contribuție' : 'contribuții'
-  if (action.type === 'event') return action.responseCount === 1 ? 'confirmare' : 'confirmări'
+  if (action.type === 'event') return action.responseCount === 1 ? 'răspuns' : 'răspunsuri'
   return action.responseCount === 1 ? 'persoană implicată' : 'persoane implicate'
 }
 
@@ -35,6 +36,7 @@ function scopeLabel(action: MobilizationAction): string {
 
 export function MobilizationActionCard({ action, selected, onSelect }: MobilizationActionCardProps) {
   const config = mobilizationActionTypeConfig[action.type]
+  const full = action.availableSpots === 0
 
   return (
     <article className={`mobilization-card mobilization-card--${action.type}${selected ? ' is-selected' : ''}`}>
@@ -66,14 +68,21 @@ export function MobilizationActionCard({ action, selected, onSelect }: Mobilizat
 
       <div className="mobilization-card__impact">
         <span>
-          <strong>{action.responseCount}</strong> {responseLabel(action)}
+          <strong>{action.responseCount ?? '—'}</strong> {responseLabel(action)}
         </span>
-        {action.capacity ? <span>{Math.max(action.capacity - action.responseCount, 0)} locuri disponibile</span> : null}
+        {action.availableSpots !== null
+          ? <span>{action.availableSpots} locuri disponibile</span>
+          : null}
       </div>
 
-      <button className="btn primary" type="button" aria-pressed={selected} onClick={() => onSelect(action)}>
-        {selected ? 'Acțiune selectată' : config.cta}
+      <button className="btn primary" type="button" disabled={full} aria-pressed={selected && !full} onClick={() => onSelect(action)}>
+        {full ? 'Locuri epuizate' : selected ? 'Acțiune selectată' : config.cta}
       </button>
+      {full ? (
+        <button className="btn" type="button" aria-pressed={selected} onClick={() => onSelect(action)}>
+          Lista de așteptare
+        </button>
+      ) : null}
     </article>
   )
 }

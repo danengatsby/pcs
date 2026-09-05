@@ -131,7 +131,14 @@ export async function updatePoliticalOperationService(input: {
   if (!existing) {
     throw new AppError(404, "POLITICAL_OPERATION_NOT_FOUND", "Acțiunea nu există în aria ta autorizată.");
   }
-  const updated = await updatePoliticalOperationFromRepository({ id, payload: input.payload });
+  if (input.payload.coordinatorUserId && !await readCoordinatorInScope(BigInt(input.payload.coordinatorUserId), input.access.scope)) {
+    throw new AppError(400, "POLITICAL_OPERATION_INVALID", "Coordonatorul nu aparține ariei autorizate sau nu are un rol de organizare.");
+  }
+  const updated = await updatePoliticalOperationFromRepository({
+    id,
+    payload: input.payload,
+    actorId: BigInt(input.access.actor.id),
+  });
   if (!updated) {
     throw new AppError(409, "POLITICAL_OPERATION_VERSION_CONFLICT", "Acțiunea a fost modificată între timp. Reîncarcă pagina.");
   }

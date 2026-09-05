@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { submitMobilizationResponse } from '../api/submitMobilizationResponse'
+import { MobilizationActionFullError, submitMobilizationResponse } from '../api/submitMobilizationResponse'
 import { mobilizationQueryKeys } from '../queryKeys'
 import type { MobilizationResponseRequest } from '../types'
 
@@ -10,6 +10,11 @@ export function useSubmitMobilizationResponse() {
       submitMobilizationResponse(slug, payload)
     ),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: mobilizationQueryKeys.actions() }),
+    onError: (error) => {
+      if (error instanceof MobilizationActionFullError) {
+        return queryClient.invalidateQueries({ queryKey: mobilizationQueryKeys.actions() })
+      }
+    },
   })
 
   return {

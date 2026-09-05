@@ -71,10 +71,10 @@ describe('UserProfilePage', () => {
       },
     })
 
-    expect(screen.getByRole('link', { name: 'Zona administrativă' })).toHaveAttribute('href', '/admin/dashboard')
-    expect(screen.getByRole('link', { name: 'Deschide tabloul de comandă →' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Zona administrativă' })).toHaveAttribute('href', '/admin')
+    expect(screen.getByRole('link', { name: 'Deschide administrarea →' })).toHaveAttribute(
       'href',
-      '/admin/dashboard',
+      '/admin',
     )
   })
 

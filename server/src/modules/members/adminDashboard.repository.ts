@@ -251,7 +251,7 @@ function buildFilterWhere(filters: AdminMembersDashboardQuery): Prisma.Membershi
   return where;
 }
 
-function buildMembershipScopeWhere(
+export function buildMembershipScopeWhere(
   scope: AdminTerritoryScope
 ): Prisma.MembershipRecordWhereInput {
   if (scope.national) {

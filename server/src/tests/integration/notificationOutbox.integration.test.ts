@@ -29,6 +29,7 @@ async function insertOutboxRow(input: {
   const result = await query<OutboxIdRow>(
     `
       INSERT INTO notification_email_outbox (
+        event_id,
         action,
         payload,
         status,
@@ -39,10 +40,11 @@ async function insertOutboxRow(input: {
         created_at,
         updated_at
       )
-      VALUES ($1, $2::jsonb, 'pending', 0, $3, $4::timestamptz, '', NOW(), NOW())
+      VALUES ($1, $2, $3::jsonb, 'pending', 0, $4, $5::timestamptz, '', NOW(), NOW())
       RETURNING id::text AS id
     `,
     [
+      `test-${input.action}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
       input.action,
       JSON.stringify(input.payload),
       input.maxAttempts,

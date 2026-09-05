@@ -8,71 +8,75 @@ datasource db {
 }
 
 model User {
-  id                     BigInt      @id @default(autoincrement()) @db.BigInt
-  fullName               String      @map("full_name") @db.VarChar(160)
-  email                  String      @db.VarChar(180)
-  passwordHash           String      @map("password_hash") @db.VarChar(255)
-  role                   String      @db.VarChar(20)
-  createdAt              DateTime    @map("created_at") @default(now()) @db.Timestamptz(6)
-  refreshTokens          AuthRefreshToken[]
-  adminAuditEntries      AdminAuditLog[] @relation("AdminAuditActor")
-  volunteersOwned        Volunteer[] @relation("VolunteerOwner")
-  volunteersStatusUpdate Volunteer[] @relation("VolunteerStatusUpdatedBy")
-  newsMediaAssetsCreated NewsMediaAsset[]
-  executiveTargetsUpdated ExecutiveTarget[] @relation("ExecutiveTargetUpdatedBy")
-  organizationsCreated    Organization[] @relation("OrganizationCreatedBy")
-  organizationsUpdated    Organization[] @relation("OrganizationUpdatedBy")
+  id                      BigInt                          @id @default(autoincrement()) @db.BigInt
+  fullName                String                          @map("full_name") @db.VarChar(160)
+  email                   String                          @db.VarChar(180)
+  passwordHash            String                          @map("password_hash") @db.VarChar(255)
+  role                    String                          @db.VarChar(20)
+  isDemo                  Boolean                         @default(false) @map("is_demo")
+  createdAt               DateTime                        @default(now()) @map("created_at") @db.Timestamptz(6)
+  refreshTokens           AuthRefreshToken[]
+  adminAuditEntries       AdminAuditLog[]                 @relation("AdminAuditActor")
+  volunteersOwned         Volunteer[]                     @relation("VolunteerOwner")
+  volunteersStatusUpdate  Volunteer[]                     @relation("VolunteerStatusUpdatedBy")
+  newsMediaAssetsCreated  NewsMediaAsset[]
+  executiveTargetsUpdated ExecutiveTarget[]               @relation("ExecutiveTargetUpdatedBy")
+  organizationsCreated    Organization[]                  @relation("OrganizationCreatedBy")
+  organizationsUpdated    Organization[]                  @relation("OrganizationUpdatedBy")
   organizationMandates    OrganizationLeadershipMandate[]
-  membershipRecord        MembershipRecord? @relation("MembershipSubjectUser")
-  membershipsCreated      MembershipRecord[] @relation("MembershipCreatedBy")
-  membershipsUpdated      MembershipRecord[] @relation("MembershipUpdatedBy")
-  membershipEvents        MembershipEvent[] @relation("MembershipEventActor")
+  membershipRecord        MembershipRecord?               @relation("MembershipSubjectUser")
+  membershipsCreated      MembershipRecord[]              @relation("MembershipCreatedBy")
+  membershipsUpdated      MembershipRecord[]              @relation("MembershipUpdatedBy")
+  membershipEvents        MembershipEvent[]               @relation("MembershipEventActor")
 
   @@map("users")
 }
 
 model County {
-  id             Int         @id @default(autoincrement())
-  name           String      @unique @db.VarChar(120)
-  normalizedName String      @unique @map("normalized_name") @db.VarChar(120)
-  createdAt      DateTime    @map("created_at") @default(now()) @db.Timestamptz(6)
-  volunteers     Volunteer[]
+  id                      Int                     @id @default(autoincrement())
+  name                    String                  @unique @db.VarChar(120)
+  normalizedName          String                  @unique @map("normalized_name") @db.VarChar(120)
+  createdAt               DateTime                @default(now()) @map("created_at") @db.Timestamptz(6)
+  volunteers              Volunteer[]
   organizationTerritories OrganizationTerritory[]
 
   @@map("counties")
 }
 
 model News {
-  id          Int      @id @default(autoincrement())
-  title       String   @db.VarChar(180)
-  summary     String   @db.VarChar(320)
-  category    String   @default("Comunicat") @db.VarChar(80)
-  content     String   @default("") @db.Text
-  sourceName  String   @map("source_name") @default("") @db.VarChar(160)
-  sourceUrl   String   @map("source_url") @default("") @db.VarChar(1000)
-  status      String   @default("published") @db.VarChar(20)
-  tags        Json
-  publishedAt DateTime @map("published_at") @default(now()) @db.Timestamptz(6)
-  createdAt   DateTime @map("created_at") @default(now()) @db.Timestamptz(6)
-  mediaLinks  NewsMediaLink[]
+  id               Int             @id @default(autoincrement())
+  title            String          @db.VarChar(180)
+  summary          String          @db.VarChar(320)
+  category         String          @default("Comunicat") @db.VarChar(80)
+  content          String          @default("") @db.Text
+  sourceName       String          @default("") @map("source_name") @db.VarChar(160)
+  sourceUrl        String          @default("") @map("source_url") @db.VarChar(1000)
+  status           String          @default("published") @db.VarChar(20)
+  isDemo           Boolean         @default(false) @map("is_demo")
+  publicApprovedAt DateTime?       @map("public_approved_at") @db.Timestamptz(6)
+  publicApprovedBy BigInt?         @map("public_approved_by") @db.BigInt
+  tags             Json
+  publishedAt      DateTime        @default(now()) @map("published_at") @db.Timestamptz(6)
+  createdAt        DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  mediaLinks       NewsMediaLink[]
 
   @@map("news")
 }
 
 model NewsMediaAsset {
-  id           BigInt         @id @default(autoincrement()) @db.BigInt
-  storagePath  String         @unique @map("storage_path") @db.VarChar(600)
-  publicUrl    String         @unique @map("public_url") @db.VarChar(600)
-  originalName String         @map("original_name") @db.VarChar(255)
-  mimeType     String         @map("mime_type") @db.VarChar(120)
-  sizeBytes    BigInt         @map("size_bytes") @db.BigInt
-  kind         String         @db.VarChar(20)
-  title        String         @default("") @db.VarChar(180)
-  alt          String         @default("") @db.VarChar(240)
-  createdBy    BigInt?        @map("created_by") @db.BigInt
-  createdByRef User?          @relation(fields: [createdBy], references: [id], onDelete: SetNull)
-  deletedAt    DateTime?      @map("deleted_at") @db.Timestamptz(6)
-  createdAt    DateTime       @map("created_at") @default(now()) @db.Timestamptz(6)
+  id           BigInt          @id @default(autoincrement()) @db.BigInt
+  storagePath  String          @unique @map("storage_path") @db.VarChar(600)
+  publicUrl    String          @unique @map("public_url") @db.VarChar(600)
+  originalName String          @map("original_name") @db.VarChar(255)
+  mimeType     String          @map("mime_type") @db.VarChar(120)
+  sizeBytes    BigInt          @map("size_bytes") @db.BigInt
+  kind         String          @db.VarChar(20)
+  title        String          @default("") @db.VarChar(180)
+  alt          String          @default("") @db.VarChar(240)
+  createdBy    BigInt?         @map("created_by") @db.BigInt
+  createdByRef User?           @relation(fields: [createdBy], references: [id], onDelete: SetNull)
+  deletedAt    DateTime?       @map("deleted_at") @db.Timestamptz(6)
+  createdAt    DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
   links        NewsMediaLink[]
 
   @@map("news_media_assets")
@@ -86,7 +90,7 @@ model NewsMediaLink {
   title     String         @default("") @db.VarChar(180)
   alt       String         @default("") @db.VarChar(240)
   sortOrder Int            @default(0) @map("sort_order")
-  createdAt DateTime       @map("created_at") @default(now()) @db.Timestamptz(6)
+  createdAt DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
   news      News           @relation(fields: [newsId], references: [id], onDelete: Cascade)
   asset     NewsMediaAsset @relation(fields: [assetId], references: [id], onDelete: Restrict)
 
@@ -95,32 +99,33 @@ model NewsMediaLink {
 }
 
 model Volunteer {
-  id                 BigInt    @id @default(autoincrement()) @db.BigInt
-  fullName           String    @map("full_name") @db.VarChar(160)
-  email              String    @db.VarChar(180)
-  phone              String    @db.VarChar(40)
-  county             String    @db.VarChar(120)
-  countyId           Int?      @map("county_id")
-  countyRef          County?   @relation(fields: [countyId], references: [id], onDelete: Restrict)
-  locality           String    @db.VarChar(120)
-  skills             String    @db.VarChar(220)
-  motivation         String    @db.Text
-  workflowStatus     String    @map("workflow_status") @default("nou") @db.VarChar(20)
-  internalNotes      String    @map("internal_notes") @default("") @db.Text
-  statusUpdatedAt    DateTime? @map("status_updated_at") @db.Timestamptz(6)
-  statusUpdatedBy    BigInt?   @map("status_updated_by") @db.BigInt
-  statusUpdatedByRef User?     @relation("VolunteerStatusUpdatedBy", fields: [statusUpdatedBy], references: [id], onDelete: SetNull)
-  ownerUserId        BigInt?   @map("owner_user_id") @db.BigInt
-  ownerUserRef       User?     @relation("VolunteerOwner", fields: [ownerUserId], references: [id], onDelete: SetNull)
-  followUpAt         DateTime? @map("follow_up_at") @db.Timestamptz(6)
-  reminderAt         DateTime? @map("reminder_at") @db.Timestamptz(6)
-  lastContactAt      DateTime? @map("last_contact_at") @db.Timestamptz(6)
-  contactChannel     String?   @map("contact_channel") @db.VarChar(30)
-  crmPriority        String    @map("crm_priority") @default("medie") @db.VarChar(20)
-  rejectionReason    String    @map("rejection_reason") @default("") @db.Text
-  crmTags            Json      @map("crm_tags") @default("[]")
-  skillTags          Json      @map("skill_tags") @default("[]")
-  createdAt          DateTime  @map("created_at") @default(now()) @db.Timestamptz(6)
+  id                 BigInt            @id @default(autoincrement()) @db.BigInt
+  fullName           String            @map("full_name") @db.VarChar(160)
+  email              String            @db.VarChar(180)
+  phone              String            @db.VarChar(40)
+  county             String            @db.VarChar(120)
+  countyId           Int?              @map("county_id")
+  countyRef          County?           @relation(fields: [countyId], references: [id], onDelete: Restrict)
+  locality           String            @db.VarChar(120)
+  skills             String            @db.VarChar(220)
+  motivation         String            @db.Text
+  workflowStatus     String            @default("nou") @map("workflow_status") @db.VarChar(20)
+  isDemo             Boolean           @default(false) @map("is_demo")
+  internalNotes      String            @default("") @map("internal_notes") @db.Text
+  statusUpdatedAt    DateTime?         @map("status_updated_at") @db.Timestamptz(6)
+  statusUpdatedBy    BigInt?           @map("status_updated_by") @db.BigInt
+  statusUpdatedByRef User?             @relation("VolunteerStatusUpdatedBy", fields: [statusUpdatedBy], references: [id], onDelete: SetNull)
+  ownerUserId        BigInt?           @map("owner_user_id") @db.BigInt
+  ownerUserRef       User?             @relation("VolunteerOwner", fields: [ownerUserId], references: [id], onDelete: SetNull)
+  followUpAt         DateTime?         @map("follow_up_at") @db.Timestamptz(6)
+  reminderAt         DateTime?         @map("reminder_at") @db.Timestamptz(6)
+  lastContactAt      DateTime?         @map("last_contact_at") @db.Timestamptz(6)
+  contactChannel     String?           @map("contact_channel") @db.VarChar(30)
+  crmPriority        String            @default("medie") @map("crm_priority") @db.VarChar(20)
+  rejectionReason    String            @default("") @map("rejection_reason") @db.Text
+  crmTags            Json              @default("[]") @map("crm_tags")
+  skillTags          Json              @default("[]") @map("skill_tags")
+  createdAt          DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
   membershipRecord   MembershipRecord?
 
   @@map("volunteers")
@@ -131,7 +136,7 @@ model RateLimitEntry {
   keyHash     String   @map("key_hash") @db.Char(64)
   windowStart DateTime @map("window_start") @db.Timestamptz(6)
   hits        Int      @default(1)
-  updatedAt   DateTime @map("updated_at") @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
 
   @@id([scope, keyHash])
   @@map("rate_limit_entries")
@@ -140,7 +145,7 @@ model RateLimitEntry {
 model AuthRevokedToken {
   jti       String   @id @db.VarChar(120)
   expiresAt DateTime @map("expires_at") @db.Timestamptz(6)
-  revokedAt DateTime @map("revoked_at") @default(now()) @db.Timestamptz(6)
+  revokedAt DateTime @default(now()) @map("revoked_at") @db.Timestamptz(6)
 
   @@map("auth_revoked_tokens")
 }
@@ -157,41 +162,41 @@ model AuthRefreshToken {
   rotatedToId   BigInt?   @map("rotated_to_id") @db.BigInt
   userAgent     String    @map("user_agent") @db.VarChar(255)
   ipAddress     String    @map("ip_address") @db.VarChar(120)
-  createdAt     DateTime  @map("created_at") @default(now()) @db.Timestamptz(6)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
 
   @@map("auth_refresh_tokens")
 }
 
 model AdminAuditLog {
-  id         BigInt    @id @default(autoincrement()) @db.BigInt
+  id          BigInt   @id @default(autoincrement()) @db.BigInt
   actorUserId BigInt?  @map("actor_user_id") @db.BigInt
   actorUser   User?    @relation("AdminAuditActor", fields: [actorUserId], references: [id], onDelete: SetNull)
-  actorEmail String    @map("actor_email") @db.VarChar(180)
-  actorRole  String    @map("actor_role") @db.VarChar(20)
-  action     String    @db.VarChar(120)
-  targetType String    @map("target_type") @db.VarChar(80)
-  targetId   String    @map("target_id") @db.VarChar(120)
-  details    Json      @db.JsonB
-  createdAt  DateTime  @map("created_at") @default(now()) @db.Timestamptz(6)
+  actorEmail  String   @map("actor_email") @db.VarChar(180)
+  actorRole   String   @map("actor_role") @db.VarChar(20)
+  action      String   @db.VarChar(120)
+  targetType  String   @map("target_type") @db.VarChar(80)
+  targetId    String   @map("target_id") @db.VarChar(120)
+  details     Json     @db.JsonB
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   @@map("admin_audit_log")
 }
 
 model NotificationEmailOutbox {
-  id           BigInt    @id @default(autoincrement()) @db.BigInt
-  eventId      String    @unique @map("event_id") @db.VarChar(120)
-  action       String    @db.VarChar(120)
-  payload      Json      @db.JsonB
-  status       String    @default("pending") @db.VarChar(20)
-  attemptCount Int       @map("attempt_count") @default(0)
-  maxAttempts  Int       @map("max_attempts") @default(6)
-  nextAttemptAt DateTime @map("next_attempt_at") @default(now()) @db.Timestamptz(6)
-  lastError    String    @map("last_error") @default("") @db.Text
-  lockedAt     DateTime? @map("locked_at") @db.Timestamptz(6)
-  sentAt       DateTime? @map("sent_at") @db.Timestamptz(6)
+  id                BigInt    @id @default(autoincrement()) @db.BigInt
+  eventId           String    @unique @map("event_id") @db.VarChar(120)
+  action            String    @db.VarChar(120)
+  payload           Json      @db.JsonB
+  status            String    @default("pending") @db.VarChar(20)
+  attemptCount      Int       @default(0) @map("attempt_count")
+  maxAttempts       Int       @default(6) @map("max_attempts")
+  nextAttemptAt     DateTime  @default(now()) @map("next_attempt_at") @db.Timestamptz(6)
+  lastError         String    @default("") @map("last_error") @db.Text
+  lockedAt          DateTime? @map("locked_at") @db.Timestamptz(6)
+  sentAt            DateTime? @map("sent_at") @db.Timestamptz(6)
   deliveryUnknownAt DateTime? @map("delivery_unknown_at") @db.Timestamptz(6)
-  createdAt    DateTime  @map("created_at") @default(now()) @db.Timestamptz(6)
-  updatedAt    DateTime  @map("updated_at") @default(now()) @db.Timestamptz(6)
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
 
   @@map("notification_email_outbox")
 }
@@ -201,44 +206,49 @@ model AdminAuditOutbox {
   action        String    @db.VarChar(120)
   payload       Json      @db.JsonB
   status        String    @default("pending") @db.VarChar(20)
-  attemptCount  Int       @map("attempt_count") @default(0)
-  maxAttempts   Int       @map("max_attempts") @default(6)
-  nextAttemptAt DateTime  @map("next_attempt_at") @default(now()) @db.Timestamptz(6)
-  lastError     String    @map("last_error") @default("") @db.Text
+  attemptCount  Int       @default(0) @map("attempt_count")
+  maxAttempts   Int       @default(6) @map("max_attempts")
+  nextAttemptAt DateTime  @default(now()) @map("next_attempt_at") @db.Timestamptz(6)
+  lastError     String    @default("") @map("last_error") @db.Text
   lockedAt      DateTime? @map("locked_at") @db.Timestamptz(6)
   sentAt        DateTime? @map("sent_at") @db.Timestamptz(6)
-  createdAt     DateTime  @map("created_at") @default(now()) @db.Timestamptz(6)
-  updatedAt     DateTime  @map("updated_at") @default(now()) @db.Timestamptz(6)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
 
   @@map("admin_audit_outbox")
 }
 
 model Organization {
-  id            String   @id @db.VarChar(80)
-  code          String   @db.VarChar(80)
-  level         String   @db.VarChar(20)
-  name          String   @db.VarChar(180)
-  county        String   @db.VarChar(120)
-  membersCount  Int      @map("members_count") @default(0)
-  status        String   @default("forming") @db.VarChar(20)
-  parentId      String?  @map("parent_id") @db.VarChar(80)
-  parent        Organization? @relation("OrganizationHierarchy", fields: [parentId], references: [id], onDelete: Restrict)
-  children      Organization[] @relation("OrganizationHierarchy")
-  officialEmail String   @map("official_email") @default("") @db.VarChar(180)
-  phone         String   @default("") @db.VarChar(40)
-  headquarters  String   @default("") @db.VarChar(260)
-  foundedAt     DateTime? @map("founded_at") @db.Date
-  createdBy     BigInt?  @map("created_by") @db.BigInt
-  createdByRef  User?    @relation("OrganizationCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
-  updatedBy     BigInt?  @map("updated_by") @db.BigInt
-  updatedByRef  User?    @relation("OrganizationUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
-  territories   OrganizationTerritory[]
-  mandates      OrganizationLeadershipMandate[]
-  objectives    OrganizationObjective[]
-  memberships   MembershipRecord[]
-  approvedMemberships MembershipRecord[] @relation("MembershipApprovalOrganization")
-  createdAt     DateTime @map("created_at") @default(now()) @db.Timestamptz(6)
-  updatedAt     DateTime @map("updated_at") @default(now()) @db.Timestamptz(6)
+  id                  String                          @id @db.VarChar(80)
+  code                String                          @db.VarChar(80)
+  level               String                          @db.VarChar(20)
+  name                String                          @db.VarChar(180)
+  county              String                          @db.VarChar(120)
+  membersCount        Int                             @default(0) @map("members_count")
+  status              String                          @default("forming") @db.VarChar(20)
+  isDemo              Boolean                         @default(false) @map("is_demo")
+  publicApprovedAt    DateTime?                       @map("public_approved_at") @db.Timestamptz(6)
+  publicApprovedBy    BigInt?                         @map("public_approved_by") @db.BigInt
+  parentId            String?                         @map("parent_id") @db.VarChar(80)
+  parent              Organization?                   @relation("OrganizationHierarchy", fields: [parentId], references: [id], onDelete: Restrict)
+  children            Organization[]                  @relation("OrganizationHierarchy")
+  officialEmail       String                          @default("") @map("official_email") @db.VarChar(180)
+  phone               String                          @default("") @db.VarChar(40)
+  headquarters        String                          @default("") @db.VarChar(260)
+  foundedAt           DateTime?                       @map("founded_at") @db.Date
+  createdBy           BigInt?                         @map("created_by") @db.BigInt
+  createdByRef        User?                           @relation("OrganizationCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedBy           BigInt?                         @map("updated_by") @db.BigInt
+  updatedByRef        User?                           @relation("OrganizationUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+  territories         OrganizationTerritory[]
+  mandates            OrganizationLeadershipMandate[]
+  mandateDecisions    OrganizationMandateDecision[]
+  arbitrationCases    ArbitrationCase[]
+  objectives          OrganizationObjective[]
+  memberships         MembershipRecord[]
+  approvedMemberships MembershipRecord[]              @relation("MembershipApprovalOrganization")
+  createdAt           DateTime                        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime                        @default(now()) @map("updated_at") @db.Timestamptz(6)
 
   @@index([parentId], map: "idx_organizations_parent_id")
   @@index([status, level], map: "idx_organizations_status_level")
@@ -254,7 +264,7 @@ model OrganizationTerritory {
   countyId       Int?         @map("county_id")
   countyRef      County?      @relation(fields: [countyId], references: [id], onDelete: Restrict)
   locality       String       @default("") @db.VarChar(160)
-  createdAt      DateTime     @map("created_at") @default(now()) @db.Timestamptz(6)
+  createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
 
   @@index([organizationId], map: "idx_organization_territories_organization")
   @@index([countyId], map: "idx_organization_territories_county")
@@ -262,22 +272,45 @@ model OrganizationTerritory {
 }
 
 model OrganizationLeadershipMandate {
-  id             BigInt       @id @default(autoincrement()) @db.BigInt
-  organizationId String       @map("organization_id") @db.VarChar(80)
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  userId         BigInt?      @map("user_id") @db.BigInt
-  user           User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
-  fullName       String       @map("full_name") @db.VarChar(160)
-  positionTitle  String       @map("position_title") @db.VarChar(120)
-  startedAt      DateTime     @map("started_at") @db.Date
-  endedAt        DateTime?    @map("ended_at") @db.Date
-  status         String       @default("active") @db.VarChar(20)
-  createdAt      DateTime     @map("created_at") @default(now()) @db.Timestamptz(6)
-  updatedAt      DateTime     @map("updated_at") @default(now()) @db.Timestamptz(6)
+  id               BigInt                       @id @default(autoincrement()) @db.BigInt
+  organizationId   String                       @map("organization_id") @db.VarChar(80)
+  organization     Organization                 @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId           BigInt?                      @map("user_id") @db.BigInt
+  user             User?                        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  fullName         String                       @map("full_name") @db.VarChar(160)
+  positionTitle    String                       @map("position_title") @db.VarChar(120)
+  startedAt        DateTime                     @map("started_at") @db.Date
+  endedAt          DateTime?                    @map("ended_at") @db.Date
+  status           String                       @default("active") @db.VarChar(20)
+  isDemo           Boolean                      @default(false) @map("is_demo")
+  publicApprovedAt DateTime?                    @map("public_approved_at") @db.Timestamptz(6)
+  publicApprovedBy BigInt?                      @map("public_approved_by") @db.BigInt
+  decisionId       BigInt?                      @map("decision_id") @db.BigInt
+  decision         OrganizationMandateDecision? @relation(fields: [decisionId], references: [id], onDelete: Restrict)
+  createdAt        DateTime                     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime                     @default(now()) @map("updated_at") @db.Timestamptz(6)
 
   @@index([organizationId, status], map: "idx_organization_mandates_org_status")
   @@index([userId], map: "idx_organization_mandates_user")
   @@map("organization_leadership_mandates")
+}
+
+model OrganizationMandateDecision {
+  expiresOn      DateTime?                       @map("expires_on") @db.Date
+  id             BigInt                          @id @default(autoincrement()) @db.BigInt
+  organizationId String                          @map("organization_id") @db.VarChar(80)
+  organization   Organization                    @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  decisionNumber String                          @map("decision_number") @db.VarChar(80)
+  decisionDate   DateTime                        @map("decision_date") @db.Date
+  issuingBody    String                          @map("issuing_body") @db.VarChar(180)
+  minutesPath    String                          @map("minutes_path") @db.VarChar(320)
+  createdBy      BigInt                          @map("created_by") @db.BigInt
+  createdAt      DateTime                        @default(now()) @map("created_at") @db.Timestamptz(6)
+  mandates       OrganizationLeadershipMandate[]
+
+  @@unique([organizationId, decisionNumber])
+  @@index([organizationId, decisionDate])
+  @@map("organization_mandate_decisions")
 }
 
 model OrganizationObjective {
@@ -286,50 +319,145 @@ model OrganizationObjective {
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   title          String       @db.VarChar(180)
   description    String       @default("") @db.Text
-  metricName     String       @map("metric_name") @default("") @db.VarChar(120)
+  metricName     String       @default("") @map("metric_name") @db.VarChar(120)
   targetValue    Decimal      @map("target_value") @db.Decimal(14, 2)
-  currentValue   Decimal      @map("current_value") @default(0) @db.Decimal(14, 2)
+  currentValue   Decimal      @default(0) @map("current_value") @db.Decimal(14, 2)
   unit           String       @default("număr") @db.VarChar(40)
   dueDate        DateTime     @map("due_date") @db.Date
   status         String       @default("planned") @db.VarChar(20)
-  createdAt      DateTime     @map("created_at") @default(now()) @db.Timestamptz(6)
-  updatedAt      DateTime     @map("updated_at") @default(now()) @db.Timestamptz(6)
+  isDemo         Boolean      @default(false) @map("is_demo")
+  createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime     @default(now()) @map("updated_at") @db.Timestamptz(6)
 
   @@index([organizationId, status], map: "idx_organization_objectives_org_status")
   @@index([dueDate], map: "idx_organization_objectives_due_date")
   @@map("organization_objectives")
 }
 
+model ArbitrationCase {
+  id             BigInt                @id @default(autoincrement()) @db.BigInt
+  caseNumber     String                @unique @map("case_number") @db.VarChar(80)
+  organizationId String?               @map("organization_id") @db.VarChar(80)
+  organization   Organization?         @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  caseType       String                @map("case_type") @db.VarChar(30)
+  subject        String                @db.VarChar(180)
+  facts          String                @db.Text
+  legalBasis     String                @default("") @map("legal_basis") @db.Text
+  status         String                @default("submitted") @db.VarChar(24)
+  filedBy        BigInt                @map("filed_by") @db.BigInt
+  filedAt        DateTime              @default(now()) @map("filed_at") @db.Timestamptz(6)
+  responseDueAt  DateTime?             @map("response_due_at") @db.Timestamptz(6)
+  decidedAt      DateTime?             @map("decided_at") @db.Timestamptz(6)
+  createdAt      DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime              @default(now()) @map("updated_at") @db.Timestamptz(6)
+  parties        ArbitrationParty[]
+  evidence       ArbitrationEvidence[]
+  conflicts      ArbitrationConflict[]
+  decisions      ArbitrationDecision[]
+  appeals        ArbitrationAppeal[]
+
+  @@map("arbitration_cases")
+}
+
+model ArbitrationParty {
+  id                 BigInt          @id @default(autoincrement()) @db.BigInt
+  caseId             BigInt          @map("case_id") @db.BigInt
+  case               ArbitrationCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  userId             BigInt?         @map("user_id") @db.BigInt
+  fullName           String          @map("full_name") @db.VarChar(160)
+  partyRole          String          @map("party_role") @db.VarChar(20)
+  notifiedAt         DateTime?       @map("notified_at") @db.Timestamptz(6)
+  responseReceivedAt DateTime?       @map("response_received_at") @db.Timestamptz(6)
+  createdAt          DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("arbitration_parties")
+}
+
+model ArbitrationEvidence {
+  id           BigInt          @id @default(autoincrement()) @db.BigInt
+  caseId       BigInt          @map("case_id") @db.BigInt
+  case         ArbitrationCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  submittedBy  BigInt          @map("submitted_by") @db.BigInt
+  title        String          @db.VarChar(180)
+  documentPath String          @map("document_path") @db.VarChar(320)
+  description  String          @default("") @db.Text
+  submittedAt  DateTime        @default(now()) @map("submitted_at") @db.Timestamptz(6)
+
+  @@map("arbitration_evidence")
+}
+
+model ArbitrationConflict {
+  id               BigInt          @id @default(autoincrement()) @db.BigInt
+  caseId           BigInt          @map("case_id") @db.BigInt
+  case             ArbitrationCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  arbitratorUserId BigInt          @map("arbitrator_user_id") @db.BigInt
+  reason           String          @db.Text
+  status           String          @default("declared") @db.VarChar(20)
+  declaredAt       DateTime        @default(now()) @map("declared_at") @db.Timestamptz(6)
+  resolvedAt       DateTime?       @map("resolved_at") @db.Timestamptz(6)
+
+  @@unique([caseId, arbitratorUserId])
+  @@map("arbitration_conflicts")
+}
+
+model ArbitrationDecision {
+  expiresOn DateTime?        @map("expires_on") @db.Date
+  id        BigInt          @id @default(autoincrement()) @db.BigInt
+  caseId    BigInt          @map("case_id") @db.BigInt
+  case      ArbitrationCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  decidedBy BigInt          @map("decided_by") @db.BigInt
+  outcome   String          @db.VarChar(24)
+  reasoning String          @db.Text
+  decidedAt DateTime        @default(now()) @map("decided_at") @db.Timestamptz(6)
+
+  @@map("arbitration_decisions")
+}
+
+model ArbitrationAppeal {
+  id         BigInt          @id @default(autoincrement()) @db.BigInt
+  caseId     BigInt          @map("case_id") @db.BigInt
+  case       ArbitrationCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  appealedBy BigInt          @map("appealed_by") @db.BigInt
+  grounds    String          @db.Text
+  status     String          @default("submitted") @db.VarChar(20)
+  filedAt    DateTime        @default(now()) @map("filed_at") @db.Timestamptz(6)
+  dueAt      DateTime?       @map("due_at") @db.Timestamptz(6)
+  decidedAt  DateTime?       @map("decided_at") @db.Timestamptz(6)
+
+  @@map("arbitration_appeals")
+}
+
 model MembershipRecord {
-  id             BigInt        @id @default(autoincrement()) @db.BigInt
-  userId         BigInt?       @unique @map("user_id") @db.BigInt
-  user           User?         @relation("MembershipSubjectUser", fields: [userId], references: [id], onDelete: SetNull)
-  volunteerId    BigInt?       @unique @map("volunteer_id") @db.BigInt
-  volunteer      Volunteer?    @relation(fields: [volunteerId], references: [id], onDelete: SetNull)
-  fullName       String        @map("full_name") @db.VarChar(160)
-  email          String        @db.VarChar(180)
-  status         String        @default("application") @db.VarChar(20)
-  organizationId String?       @map("organization_id") @db.VarChar(80)
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Restrict)
-  memberNumber   String?       @unique(map: "idx_membership_records_member_number_unique") @map("member_number") @db.VarChar(32)
-  applicationAt  DateTime      @map("application_at") @default(now()) @db.Timestamptz(6)
-  validatedAt    DateTime?     @map("validated_at") @db.Timestamptz(6)
-  approvedAt     DateTime?     @map("approved_at") @db.Timestamptz(6)
-  approvalOrganizationId String? @map("approval_organization_id") @db.VarChar(80)
-  approvalOrganization Organization? @relation("MembershipApprovalOrganization", fields: [approvalOrganizationId], references: [id], onDelete: Restrict)
-  approvalBody   String        @map("approval_body") @default("") @db.VarChar(180)
-  joinedAt       DateTime?     @map("joined_at") @db.Timestamptz(6)
-  suspendedAt    DateTime?     @map("suspended_at") @db.Timestamptz(6)
-  endedAt        DateTime?     @map("ended_at") @db.Timestamptz(6)
-  statusReason   String        @map("status_reason") @default("") @db.Text
-  version        Int           @default(1)
-  createdBy      BigInt?       @map("created_by") @db.BigInt
-  createdByRef   User?         @relation("MembershipCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
-  updatedBy      BigInt?       @map("updated_by") @db.BigInt
-  updatedByRef   User?         @relation("MembershipUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
-  events         MembershipEvent[]
-  createdAt      DateTime      @map("created_at") @default(now()) @db.Timestamptz(6)
-  updatedAt      DateTime      @map("updated_at") @default(now()) @db.Timestamptz(6)
+  id                     BigInt            @id @default(autoincrement()) @db.BigInt
+  userId                 BigInt?           @unique @map("user_id") @db.BigInt
+  user                   User?             @relation("MembershipSubjectUser", fields: [userId], references: [id], onDelete: SetNull)
+  volunteerId            BigInt?           @unique @map("volunteer_id") @db.BigInt
+  volunteer              Volunteer?        @relation(fields: [volunteerId], references: [id], onDelete: SetNull)
+  fullName               String            @map("full_name") @db.VarChar(160)
+  email                  String            @db.VarChar(180)
+  status                 String            @default("application") @db.VarChar(20)
+  isDemo                 Boolean           @default(false) @map("is_demo")
+  organizationId         String?           @map("organization_id") @db.VarChar(80)
+  organization           Organization?     @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  memberNumber           String?           @unique(map: "idx_membership_records_member_number_unique") @map("member_number") @db.VarChar(32)
+  applicationAt          DateTime          @default(now()) @map("application_at") @db.Timestamptz(6)
+  validatedAt            DateTime?         @map("validated_at") @db.Timestamptz(6)
+  approvedAt             DateTime?         @map("approved_at") @db.Timestamptz(6)
+  approvalOrganizationId String?           @map("approval_organization_id") @db.VarChar(80)
+  approvalOrganization   Organization?     @relation("MembershipApprovalOrganization", fields: [approvalOrganizationId], references: [id], onDelete: Restrict)
+  approvalBody           String            @default("") @map("approval_body") @db.VarChar(180)
+  joinedAt               DateTime?         @map("joined_at") @db.Timestamptz(6)
+  suspendedAt            DateTime?         @map("suspended_at") @db.Timestamptz(6)
+  endedAt                DateTime?         @map("ended_at") @db.Timestamptz(6)
+  statusReason           String            @default("") @map("status_reason") @db.Text
+  version                Int               @default(1)
+  createdBy              BigInt?           @map("created_by") @db.BigInt
+  createdByRef           User?             @relation("MembershipCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedBy              BigInt?           @map("updated_by") @db.BigInt
+  updatedByRef           User?             @relation("MembershipUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+  events                 MembershipEvent[]
+  createdAt              DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt              DateTime          @default(now()) @map("updated_at") @db.Timestamptz(6)
 
   @@index([status, updatedAt], map: "idx_membership_records_status_updated")
   @@index([organizationId, status], map: "idx_membership_records_organization_status")
@@ -339,19 +467,20 @@ model MembershipRecord {
 }
 
 model MembershipEvent {
-  id                     BigInt            @id @default(autoincrement()) @db.BigInt
-  membershipId           BigInt            @map("membership_id") @db.BigInt
-  membership             MembershipRecord  @relation(fields: [membershipId], references: [id], onDelete: Cascade)
-  action                 String            @db.VarChar(30)
-  previousStatus         String?           @map("previous_status") @db.VarChar(20)
-  nextStatus             String            @map("next_status") @db.VarChar(20)
-  previousOrganizationId String?           @map("previous_organization_id") @db.VarChar(80)
-  nextOrganizationId     String?           @map("next_organization_id") @db.VarChar(80)
-  reason                 String            @default("") @db.Text
-  actorUserId            BigInt?           @map("actor_user_id") @db.BigInt
-  actorUser              User?             @relation("MembershipEventActor", fields: [actorUserId], references: [id], onDelete: SetNull)
-  effectiveAt            DateTime           @map("effective_at") @default(now()) @db.Timestamptz(6)
-  createdAt              DateTime           @map("created_at") @default(now()) @db.Timestamptz(6)
+  id                     BigInt           @id @default(autoincrement()) @db.BigInt
+  membershipId           BigInt           @map("membership_id") @db.BigInt
+  membership             MembershipRecord @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+  action                 String           @db.VarChar(30)
+  previousStatus         String?          @map("previous_status") @db.VarChar(20)
+  nextStatus             String           @map("next_status") @db.VarChar(20)
+  previousOrganizationId String?          @map("previous_organization_id") @db.VarChar(80)
+  nextOrganizationId     String?          @map("next_organization_id") @db.VarChar(80)
+  reason                 String           @default("") @db.Text
+  isDemo                 Boolean          @default(false) @map("is_demo")
+  actorUserId            BigInt?          @map("actor_user_id") @db.BigInt
+  actorUser              User?            @relation("MembershipEventActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  effectiveAt            DateTime         @default(now()) @map("effective_at") @db.Timestamptz(6)
+  createdAt              DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
 
   @@index([membershipId, createdAt], map: "idx_membership_events_membership_created")
   @@index([actorUserId], map: "idx_membership_events_actor")
@@ -366,73 +495,151 @@ model ExecutiveTarget {
   direction    String   @db.VarChar(20)
   updatedBy    BigInt?  @map("updated_by") @db.BigInt
   updatedByRef User?    @relation("ExecutiveTargetUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
-  createdAt    DateTime @map("created_at") @default(now()) @db.Timestamptz(6)
-  updatedAt    DateTime @map("updated_at") @default(now()) @db.Timestamptz(6)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
 
   @@map("executive_targets")
 }
 
 model MobilizationAction {
-  id                BigInt   @id @default(autoincrement()) @db.BigInt
-  slug              String   @unique @db.VarChar(120)
-  actionType        String   @map("action_type") @db.VarChar(30)
-  title             String   @db.VarChar(180)
-  summary           String   @db.VarChar(360)
-  description       String   @default("") @db.Text
-  status            String   @default("open") @db.VarChar(20)
-  scope             String   @default("national") @db.VarChar(20)
-  county            String   @default("") @db.VarChar(120)
-  locality          String   @default("") @db.VarChar(120)
-  startsAt          DateTime? @map("starts_at") @db.Timestamptz(6)
-  endsAt            DateTime? @map("ends_at") @db.Timestamptz(6)
-  participationMode String   @map("participation_mode") @default("") @db.VarChar(120)
-  commitment        String   @default("") @db.VarChar(220)
-  capacity          Int?
-  sortOrder         Int      @map("sort_order") @default(0)
-  organizationId    String?  @map("organization_id") @db.VarChar(80)
-  coordinatorUserId BigInt?  @map("coordinator_user_id") @db.BigInt
-  objective         String   @default("") @db.Text
-  targetMetric      String   @map("target_metric") @default("") @db.VarChar(120)
-  targetValue       Decimal? @map("target_value") @db.Decimal(14, 2)
-  resultValue       Decimal? @map("result_value") @db.Decimal(14, 2)
-  resultSummary     String   @map("result_summary") @default("") @db.Text
-  visibility        String   @default("public") @db.VarChar(20)
-  createdBy         BigInt?  @map("created_by") @db.BigInt
-  version           Int      @default(1)
-  createdAt         DateTime @map("created_at") @default(now()) @db.Timestamptz(6)
-  updatedAt         DateTime @map("updated_at") @default(now()) @db.Timestamptz(6)
-  responses         MobilizationResponse[]
+  id                      BigInt                 @id @default(autoincrement()) @db.BigInt
+  slug                    String                 @unique @db.VarChar(120)
+  actionType              String                 @map("action_type") @db.VarChar(30)
+  title                   String                 @db.VarChar(180)
+  summary                 String                 @db.VarChar(360)
+  description             String                 @default("") @db.Text
+  status                  String                 @default("open") @db.VarChar(20)
+  scope                   String                 @default("national") @db.VarChar(20)
+  county                  String                 @default("") @db.VarChar(120)
+  locality                String                 @default("") @db.VarChar(120)
+  startsAt                DateTime?              @map("starts_at") @db.Timestamptz(6)
+  endsAt                  DateTime?              @map("ends_at") @db.Timestamptz(6)
+  participationMode       String                 @default("") @map("participation_mode") @db.VarChar(120)
+  commitment              String                 @default("") @db.VarChar(220)
+  capacity                Int?
+  sortOrder               Int                    @default(0) @map("sort_order")
+  organizationId          String?                @map("organization_id") @db.VarChar(80)
+  coordinatorUserId       BigInt?                @map("coordinator_user_id") @db.BigInt
+  objective               String                 @default("") @db.Text
+  targetMetric            String                 @default("") @map("target_metric") @db.VarChar(120)
+  targetValue             Decimal?               @map("target_value") @db.Decimal(14, 2)
+  resultValue             Decimal?               @map("result_value") @db.Decimal(14, 2)
+  resultSummary           String                 @default("") @map("result_summary") @db.Text
+  visibility              String                 @default("public") @db.VarChar(20)
+  isDemo                  Boolean                @default(false) @map("is_demo")
+  publicApprovedAt        DateTime?              @map("public_approved_at") @db.Timestamptz(6)
+  publicApprovedBy        BigInt?                @map("public_approved_by") @db.BigInt
+  publicResponseCount     Int?                   @map("public_response_count")
+  responseCountApprovedAt DateTime?              @map("response_count_approved_at") @db.Timestamptz(6)
+  responseCountApprovedBy BigInt?                @map("response_count_approved_by") @db.BigInt
+  createdBy               BigInt?                @map("created_by") @db.BigInt
+  version                 Int                    @default(1)
+  createdAt               DateTime               @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt               DateTime               @default(now()) @map("updated_at") @db.Timestamptz(6)
+  responses               MobilizationResponse[]
 
   @@map("mobilization_actions")
 }
 
 model MobilizationResponse {
-  id               BigInt   @id @default(autoincrement()) @db.BigInt
-  actionId         BigInt   @map("action_id") @db.BigInt
-  action           MobilizationAction @relation(fields: [actionId], references: [id], onDelete: Cascade)
-  fullName         String   @map("full_name") @db.VarChar(160)
-  email            String   @db.VarChar(180)
-  phone            String   @default("") @db.VarChar(40)
-  county           String   @db.VarChar(120)
-  locality         String   @default("") @db.VarChar(120)
-  interests        Json     @default("[]")
-  availability     String   @default("") @db.VarChar(30)
-  message          String   @default("") @db.Text
-  updatesConsent   Boolean  @map("updates_consent") @default(false)
-  emailConsent     Boolean  @map("email_consent") @default(false)
-  smsConsent       Boolean  @map("sms_consent") @default(false)
-  whatsappConsent  Boolean  @map("whatsapp_consent") @default(false)
-  consentVersion   String   @map("consent_version") @default("mobilizare-v1") @db.VarChar(40)
-  privacyConsent   Boolean  @map("privacy_consent")
-  createdAt        DateTime @map("created_at") @default(now()) @db.Timestamptz(6)
+  id              BigInt             @id @default(autoincrement()) @db.BigInt
+  actionId        BigInt             @map("action_id") @db.BigInt
+  action          MobilizationAction @relation(fields: [actionId], references: [id], onDelete: Cascade)
+  fullName        String             @map("full_name") @db.VarChar(160)
+  email           String             @db.VarChar(180)
+  phone           String             @default("") @db.VarChar(40)
+  county          String             @db.VarChar(120)
+  locality        String             @default("") @db.VarChar(120)
+  interests       Json               @default("[]")
+  availability    String             @default("") @db.VarChar(30)
+  message         String             @default("") @db.Text
+  updatesConsent  Boolean            @default(false) @map("updates_consent")
+  emailConsent    Boolean            @default(false) @map("email_consent")
+  smsConsent      Boolean            @default(false) @map("sms_consent")
+  whatsappConsent Boolean            @default(false) @map("whatsapp_consent")
+  consentVersion  String             @default("mobilizare-v1") @map("consent_version") @db.VarChar(40)
+  privacyConsent  Boolean            @map("privacy_consent")
+  isDemo          Boolean            @default(false) @map("is_demo")
+  createdAt       DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
 
   @@map("mobilization_responses")
 }
 
+model Congress {
+  id             BigInt    @id @default(autoincrement()) @db.BigInt
+  organizationId String    @map("organization_id") @db.VarChar(80)
+  title          String    @db.VarChar(180)
+  purpose        String    @db.VarChar(40)
+  status         String    @default("draft") @db.VarChar(24)
+  startsAt       DateTime  @map("starts_at") @db.Timestamptz(6)
+  endsAt         DateTime  @map("ends_at") @db.Timestamptz(6)
+  quorum         Int
+  openedAt       DateTime? @map("opened_at") @db.Timestamptz(6)
+  closedAt       DateTime? @map("closed_at") @db.Timestamptz(6)
+  validatedAt    DateTime? @map("validated_at") @db.Timestamptz(6)
+  createdBy      BigInt    @map("created_by") @db.BigInt
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("congresses")
+}
+
+model CongressDelegate {
+  id                BigInt    @id @default(autoincrement()) @db.BigInt
+  congressId        BigInt    @map("congress_id") @db.BigInt
+  userId            BigInt?   @map("user_id") @db.BigInt
+  fullName          String    @map("full_name") @db.VarChar(160)
+  organizationId    String    @map("organization_id") @db.VarChar(80)
+  selectedBy        String    @default("") @map("selected_by") @db.VarChar(180)
+  eligibilityStatus String    @default("eligible") @map("eligibility_status") @db.VarChar(20)
+  checkedInAt       DateTime? @map("checked_in_at") @db.Timestamptz(6)
+  votedAt           DateTime? @map("voted_at") @db.Timestamptz(6)
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("congress_delegates")
+}
+
+model CongressCandidacy {
+  id              BigInt   @id @default(autoincrement()) @db.BigInt
+  congressId      BigInt   @map("congress_id") @db.BigInt
+  candidateUserId BigInt?  @map("candidate_user_id") @db.BigInt
+  candidateName   String   @map("candidate_name") @db.VarChar(160)
+  office          String   @db.VarChar(120)
+  status          String   @default("submitted") @db.VarChar(20)
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("congress_candidacies")
+}
+
+model CongressVote {
+  id          BigInt   @id @default(autoincrement()) @db.BigInt
+  congressId  BigInt   @map("congress_id") @db.BigInt
+  candidacyId BigInt   @map("candidacy_id") @db.BigInt
+  office      String   @db.VarChar(120)
+  choice      String   @db.VarChar(20)
+  ballotHash  String   @unique @map("ballot_hash") @db.Char(64)
+  castAt      DateTime @default(now()) @map("cast_at") @db.Timestamptz(6)
+
+  @@map("congress_votes")
+}
+
+model CongressDecision {
+  expiresOn    DateTime? @map("expires_on") @db.Date
+  id           BigInt   @id @default(autoincrement()) @db.BigInt
+  congressId   BigInt   @map("congress_id") @db.BigInt
+  decisionType String   @map("decision_type") @db.VarChar(40)
+  decisionText String   @map("decision_text") @db.Text
+  evidence     Json     @default("{}") @db.JsonB
+  createdBy    BigInt   @map("created_by") @db.BigInt
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("congress_decisions")
+}
+
 model MobilizationActionCounty {
-  actionId BigInt   @map("action_id") @db.BigInt
-  countyId Int      @map("county_id")
-  createdAt DateTime @map("created_at") @default(now()) @db.Timestamptz(6)
+  actionId  BigInt   @map("action_id") @db.BigInt
+  countyId  Int      @map("county_id")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   @@id([actionId, countyId])
   @@map("mobilization_action_counties")
@@ -445,9 +652,10 @@ model MobilizationParticipant {
   membershipId      BigInt?   @map("membership_id") @db.BigInt
   fullName          String    @map("full_name") @db.VarChar(160)
   email             String    @db.VarChar(180)
-  participationRole String    @map("participation_role") @default("participant") @db.VarChar(24)
+  participationRole String    @default("participant") @map("participation_role") @db.VarChar(24)
   status            String    @default("invited") @db.VarChar(24)
-  attendanceStatus  String    @map("attendance_status") @default("not_applicable") @db.VarChar(20)
+  attendanceStatus  String    @default("not_applicable") @map("attendance_status") @db.VarChar(20)
+  isDemo            Boolean   @default(false) @map("is_demo")
   dueAt             DateTime? @map("due_at") @db.Timestamptz(6)
   notes             String    @default("") @db.Text
   report            String    @default("") @db.Text
@@ -459,8 +667,8 @@ model MobilizationParticipant {
   reportedAt        DateTime? @map("reported_at") @db.Timestamptz(6)
   reviewedAt        DateTime? @map("reviewed_at") @db.Timestamptz(6)
   assignedBy        BigInt?   @map("assigned_by") @db.BigInt
-  createdAt         DateTime  @map("created_at") @default(now()) @db.Timestamptz(6)
-  updatedAt         DateTime  @map("updated_at") @default(now()) @db.Timestamptz(6)
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
 
   @@index([userId, status, updatedAt], map: "idx_mobilization_participants_user")
   @@index([membershipId, status, updatedAt], map: "idx_mobilization_participants_membership")
@@ -468,26 +676,27 @@ model MobilizationParticipant {
 }
 
 model CommunicationConsent {
-  id                 BigInt    @id @default(autoincrement()) @db.BigInt
-  userId             BigInt?   @map("user_id") @db.BigInt
-  membershipId       BigInt?   @map("membership_id") @db.BigInt
-  fullName           String    @map("full_name") @db.VarChar(160)
-  email              String    @db.VarChar(180)
-  phone              String    @default("") @db.VarChar(40)
-  countyId           Int?      @map("county_id")
-  county             String    @default("") @db.VarChar(120)
-  locality           String    @default("") @db.VarChar(120)
-  interests          Json      @default("[]")
-  emailConsent       Boolean   @map("email_consent") @default(false)
-  smsConsent         Boolean   @map("sms_consent") @default(false)
-  whatsappConsent    Boolean   @map("whatsapp_consent") @default(false)
-  consentVersion     String    @map("consent_version") @db.VarChar(40)
-  source             String    @db.VarChar(80)
-  evidence           Json      @default("{}")
-  grantedAt          DateTime? @map("granted_at") @db.Timestamptz(6)
-  withdrawnAt        DateTime? @map("withdrawn_at") @db.Timestamptz(6)
-  createdAt          DateTime  @map("created_at") @default(now()) @db.Timestamptz(6)
-  updatedAt          DateTime  @map("updated_at") @default(now()) @db.Timestamptz(6)
+  id              BigInt    @id @default(autoincrement()) @db.BigInt
+  userId          BigInt?   @map("user_id") @db.BigInt
+  membershipId    BigInt?   @map("membership_id") @db.BigInt
+  fullName        String    @map("full_name") @db.VarChar(160)
+  email           String    @db.VarChar(180)
+  phone           String    @default("") @db.VarChar(40)
+  countyId        Int?      @map("county_id")
+  county          String    @default("") @db.VarChar(120)
+  locality        String    @default("") @db.VarChar(120)
+  interests       Json      @default("[]")
+  emailConsent    Boolean   @default(false) @map("email_consent")
+  smsConsent      Boolean   @default(false) @map("sms_consent")
+  whatsappConsent Boolean   @default(false) @map("whatsapp_consent")
+  consentVersion  String    @map("consent_version") @db.VarChar(40)
+  source          String    @db.VarChar(80)
+  evidence        Json      @default("{}")
+  isDemo          Boolean   @default(false) @map("is_demo")
+  grantedAt       DateTime? @map("granted_at") @db.Timestamptz(6)
+  withdrawnAt     DateTime? @map("withdrawn_at") @db.Timestamptz(6)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
 
   @@map("communication_consents")
 }
@@ -499,17 +708,17 @@ model CommunicationDispatch {
   message        String    @db.Text
   channel        String    @db.VarChar(20)
   status         String    @default("draft") @db.VarChar(24)
-  countyIds      Json      @map("county_ids") @default("[]")
+  countyIds      Json      @default("[]") @map("county_ids")
   roles          Json      @default("[]")
   interests      Json      @default("[]")
-  recipientCount Int       @map("recipient_count") @default(0)
-  legalBasis     String    @map("legal_basis") @default("consimțământ explicit") @db.VarChar(120)
+  recipientCount Int       @default(0) @map("recipient_count")
+  legalBasis     String    @default("consimțământ explicit") @map("legal_basis") @db.VarChar(120)
   createdBy      BigInt    @map("created_by") @db.BigInt
   approvedBy     BigInt?   @map("approved_by") @db.BigInt
   scheduledAt    DateTime? @map("scheduled_at") @db.Timestamptz(6)
   sentAt         DateTime? @map("sent_at") @db.Timestamptz(6)
-  createdAt      DateTime  @map("created_at") @default(now()) @db.Timestamptz(6)
-  updatedAt      DateTime  @map("updated_at") @default(now()) @db.Timestamptz(6)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
 
   @@index([createdAt], map: "idx_communication_dispatches_created")
   @@map("communication_dispatches")
@@ -522,8 +731,8 @@ model CommunicationDispatchRecipient {
   destination String   @db.VarChar(180)
   status      String   @default("eligible") @db.VarChar(20)
   reason      String   @default("") @db.VarChar(240)
-  createdAt   DateTime @map("created_at") @default(now()) @db.Timestamptz(6)
-  updatedAt   DateTime @map("updated_at") @default(now()) @db.Timestamptz(6)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
 
   @@unique([dispatchId, consentId])
   @@index([dispatchId, status], map: "idx_communication_dispatch_recipients_status")
@@ -531,6 +740,7 @@ model CommunicationDispatchRecipient {
 }
 
 model MemberDocument {
+  expiresOn   DateTime? @map("expires_on") @db.Date
   id          BigInt   @id @default(autoincrement()) @db.BigInt
   title       String   @db.VarChar(180)
   description String   @default("") @db.VarChar(360)
@@ -538,10 +748,10 @@ model MemberDocument {
   path        String   @unique @db.VarChar(320)
   visibility  String   @default("members") @db.VarChar(20)
   status      String   @default("published") @db.VarChar(20)
-  sortOrder   Int      @map("sort_order") @default(0)
-  publishedAt DateTime @map("published_at") @default(now()) @db.Timestamptz(6)
-  createdAt   DateTime @map("created_at") @default(now()) @db.Timestamptz(6)
-  updatedAt   DateTime @map("updated_at") @default(now()) @db.Timestamptz(6)
+  sortOrder   Int      @default(0) @map("sort_order")
+  publishedAt DateTime @default(now()) @map("published_at") @db.Timestamptz(6)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
 
   @@map("member_documents")
 }
@@ -557,41 +767,54 @@ model MembershipDue {
   dueAt        DateTime? @map("due_at") @db.Date
   paidAt       DateTime? @map("paid_at") @db.Timestamptz(6)
   reference    String    @default("") @db.VarChar(120)
-  createdAt    DateTime  @map("created_at") @default(now()) @db.Timestamptz(6)
-  updatedAt    DateTime  @map("updated_at") @default(now()) @db.Timestamptz(6)
+  isDemo       Boolean   @default(false) @map("is_demo")
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
 
   @@unique([membershipId, periodStart, periodEnd])
   @@index([membershipId, periodStart], map: "idx_membership_dues_member_period")
   @@map("membership_dues")
 }
 
+model PublicIndicator {
+  key          String    @id @db.VarChar(80)
+  value        BigInt    @db.BigInt
+  isDemo       Boolean   @default(false) @map("is_demo")
+  calculatedAt DateTime  @map("calculated_at") @db.Timestamptz(6)
+  approvedAt   DateTime? @map("approved_at") @db.Timestamptz(6)
+  approvedBy   BigInt?   @map("approved_by") @db.BigInt
+  updatedAt    DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("public_indicators")
+}
+
 model RegulatedModuleGate {
-  moduleKey      String    @id @map("module_key") @db.VarChar(30)
-  legalStatus    String    @map("legal_status") @default("pending") @db.VarChar(20)
-  dpoStatus      String    @map("dpo_status") @default("pending") @db.VarChar(20)
-  enabled        Boolean   @default(false)
-  legalNotes     String    @map("legal_notes") @default("") @db.Text
-  dpoNotes       String    @map("dpo_notes") @default("") @db.Text
+  moduleKey       String    @id @map("module_key") @db.VarChar(30)
+  legalStatus     String    @default("pending") @map("legal_status") @db.VarChar(20)
+  dpoStatus       String    @default("pending") @map("dpo_status") @db.VarChar(20)
+  enabled         Boolean   @default(false)
+  legalNotes      String    @default("") @map("legal_notes") @db.Text
+  dpoNotes        String    @default("") @map("dpo_notes") @db.Text
   legalApprovedAt DateTime? @map("legal_approved_at") @db.Timestamptz(6)
-  dpoApprovedAt  DateTime? @map("dpo_approved_at") @db.Timestamptz(6)
-  enabledAt      DateTime? @map("enabled_at") @db.Timestamptz(6)
-  updatedAt      DateTime  @map("updated_at") @default(now()) @db.Timestamptz(6)
+  dpoApprovedAt   DateTime? @map("dpo_approved_at") @db.Timestamptz(6)
+  enabledAt       DateTime? @map("enabled_at") @db.Timestamptz(6)
+  updatedAt       DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
 
   @@map("regulated_module_gates")
 }
 
 model FinancialTransparencyRecord {
-  id                BigInt   @id @default(autoincrement()) @db.BigInt
-  recordType        String   @map("record_type") @db.VarChar(20)
-  source            String   @db.VarChar(240)
-  amount            Decimal  @db.Decimal(14, 2)
-  currency          String   @default("RON") @db.Char(3)
-  recordYear        Int      @map("record_year")
+  id                BigInt    @id @default(autoincrement()) @db.BigInt
+  recordType        String    @map("record_type") @db.VarChar(20)
+  source            String    @db.VarChar(240)
+  amount            Decimal   @db.Decimal(14, 2)
+  currency          String    @default("RON") @db.Char(3)
+  recordYear        Int       @map("record_year")
   occurredAt        DateTime? @map("occurred_at") @db.Date
-  documentPath      String   @map("document_path") @default("") @db.VarChar(320)
-  publicationStatus String   @map("publication_status") @default("draft") @db.VarChar(20)
-  createdAt         DateTime @map("created_at") @default(now()) @db.Timestamptz(6)
-  updatedAt         DateTime @map("updated_at") @default(now()) @db.Timestamptz(6)
+  documentPath      String    @default("") @map("document_path") @db.VarChar(320)
+  publicationStatus String    @default("draft") @map("publication_status") @db.VarChar(20)
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
 
   @@map("financial_transparency_records")
 }
@@ -601,11 +824,11 @@ model ElectoralOperation {
   electionType    String   @map("election_type") @db.VarChar(30)
   electionYear    Int      @map("election_year")
   scope           String   @db.VarChar(180)
-  candidatesCount Int      @map("candidates_count") @default(0)
+  candidatesCount Int      @default(0) @map("candidates_count")
   status          String   @default("draft") @db.VarChar(20)
   details         Json     @default("{}")
-  createdAt       DateTime @map("created_at") @default(now()) @db.Timestamptz(6)
-  updatedAt       DateTime @map("updated_at") @default(now()) @db.Timestamptz(6)
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
 
   @@map("electoral_operations")
 }

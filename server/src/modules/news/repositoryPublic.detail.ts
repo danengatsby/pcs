@@ -46,6 +46,9 @@ export async function readPublicNewsDetailById(id: number): Promise<NewsDetailRo
   const row = await prisma.news.findFirst({
     where: {
       id,
+      isDemo: false,
+      publicApprovedAt: { not: null },
+      publicApprovedBy: { not: null },
       OR: [
         { status: "published" },
         { status: "scheduled", publishedAt: { lte: now } },

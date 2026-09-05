@@ -1,0 +1,13 @@
+.executive-interventions { padding: clamp(18px, 3vw, 28px); display: grid; gap: 16px; scroll-margin-top: 100px; }
+.executive-interventions header, .executive-interventions__actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.executive-interventions h2, .executive-interventions h3, .executive-interventions p { margin: 0; }
+.executive-interventions label { display: grid; gap: 8px; }
+.executive-interventions__list { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+.executive-interventions__item { display: grid; gap: 10px; padding: 18px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); overflow-wrap: anywhere; }
+.executive-interventions__item.is-critical { border-left: 4px solid #ff8686; }
+.executive-interventions__item.is-high { border-left: 4px solid #f6c661; }
+.executive-interventions__item.is-normal { border-left: 4px solid var(--accent); }
+.executive-interventions__priority { font-weight: 700; color: var(--text-h); }
+.executive-interventions__item > .btn { justify-self: start; }
+.executive-interventions__expiry-form { display: grid; gap: 12px; }
+.executive-interventions select { width: 100%; }

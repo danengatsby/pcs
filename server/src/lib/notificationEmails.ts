@@ -35,6 +35,7 @@ type NewsPublishedNotificationInput = {
 };
 
 type MobilizationResponseNotificationInput = {
+  registrationStatus?: "confirmed" | "waitlisted";
   fullName: string;
   email: string;
   actionTitle: string;
@@ -185,7 +186,7 @@ export async function sendMobilizationResponseConfirmationEmail(
 ): Promise<void> {
   await queueNotification("mobilization.response_confirmation", {
     to: [input.email],
-    subject: `Confirmare implicare PCS: ${input.actionTitle}`,
+    subject: `${input.registrationStatus === "waitlisted" ? "Lista de asteptare PCS" : "Confirmare implicare PCS"}: ${input.actionTitle}`,
     text: buildMobilizationResponseConfirmationText(input),
   });
 }
@@ -228,7 +229,9 @@ export function buildMobilizationResponseConfirmationText(
     `Judet: ${input.county}`,
     `Interese: ${input.interests.join(", ")}`,
     "",
-    input.commitment,
+    input.registrationStatus === "waitlisted"
+      ? "Esti pe lista de asteptare. Inscrierea nu confirma un loc; organizatorii te vor contacta daca devine disponibil."
+      : input.commitment,
     input.updatesConsent
       ? "Ai ales sa primesti actualizari relevante pentru judetul si interesele selectate."
       : "Nu ai solicitat actualizari suplimentare; acest mesaj confirma doar raspunsul trimis.",

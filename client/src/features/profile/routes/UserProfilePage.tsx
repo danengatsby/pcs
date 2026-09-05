@@ -125,7 +125,7 @@ export function UserProfilePage() {
           </div>
           <div className="profile-page__actions">
             <Link className="btn primary" to="/mobilizare">Centrul de mobilizare</Link>
-            {adminAccess ? <Link className="btn" to="/admin/dashboard">Zona administrativă</Link> : <Link className="btn" to="/">Înapoi la început</Link>}
+            {adminAccess ? <Link className="btn" to="/admin">Zona administrativă</Link> : <Link className="btn" to="/">Înapoi la început</Link>}
           </div>
         </div>
       </section>
@@ -176,10 +176,10 @@ export function UserProfilePage() {
               <article className="card member-portal__action" key={event.participantId}>
                 <h3>{event.title}</h3><p>{event.summary}</p>
                 <p className="muted">{formatDate(event.startsAt)} · {event.participationMode}</p>
-                <p>Răspuns: <strong>{event.status}</strong> · Prezență: <strong>{event.attendanceStatus}</strong></p>
+                <p>Răspuns: <strong>{event.status === 'waitlisted' ? 'Pe lista de așteptare' : event.status}</strong> · Prezență: <strong>{event.attendanceStatus}</strong></p>
                 <div className="member-portal__row-actions">
-                  <Button disabled={saving} variant="primary" onClick={() => void respondEvent(event.actionId, 'confirmed')}>Confirm participarea</Button>
-                  <Button disabled={saving} onClick={() => void respondEvent(event.actionId, 'declined')}>Nu pot participa</Button>
+                  <Button disabled={saving} variant="primary" onClick={() => { void respondEvent(event.actionId, 'confirmed').catch(() => undefined) }}>Confirm participarea</Button>
+                  <Button disabled={saving} onClick={() => { void respondEvent(event.actionId, 'declined').catch(() => undefined) }}>Nu pot participa</Button>
                 </div>
               </article>
             ))}
@@ -221,7 +221,7 @@ export function UserProfilePage() {
       ) : null}
 
       {adminAccess ? (
-        <section className="card member-portal__section"><div className="hero-kicker">Acces administrativ</div><div className="member-portal__row-actions"><Link className="text-link" to="/admin/dashboard">Deschide tabloul de comandă →</Link><Link className="text-link" to="/admin/organizations">Registru teritorial →</Link><Link className="text-link" to="/admin/mobilization">Mobilizare politică →</Link></div></section>
+        <section className="card member-portal__section"><div className="hero-kicker">Acces administrativ</div><Link className="text-link" to="/admin">Deschide administrarea →</Link></section>
       ) : null}
     </div>
   )

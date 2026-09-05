@@ -16,6 +16,13 @@ vi.mock('../hooks/useUpdateExecutiveTarget', () => ({
   useUpdateExecutiveTarget: vi.fn(),
 }))
 
+vi.mock('../hooks/useExecutiveInterventions', () => ({
+  useExecutiveInterventions: () => ({
+    isPending: false, isError: false, isFetching: false, refetch: vi.fn(),
+    data: { rows: [], counts: {}, total: 0, limit: 20, offset: 0, generatedAt: '2026-10-10T12:00:00Z', expiryCoverage: { tracked: 0, missing: 3, windowDays: 30 } },
+  }),
+}))
+
 const updateTarget = vi.fn().mockResolvedValue(undefined)
 
 describe('ExecutiveDashboardPage', () => {
@@ -39,6 +46,9 @@ describe('ExecutiveDashboardPage', () => {
     renderPage('PRESEDINTE')
 
     expect(screen.getByRole('heading', { name: 'Tablou de comandă' })).toBeInTheDocument()
+    const interventions = screen.getByRole('region', { name: 'Intervenții necesare' })
+    const indicators = screen.getByRole('region', { name: 'Indicatori executivi' })
+    expect(interventions.compareDocumentPosition(indicators) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     const contactCard = screen.getByText('Rată de contactare', { selector: '.hero-kicker' }).closest('article')
     expect(contactCard).not.toBeNull()
     expect(within(contactCard as HTMLElement).getByText('50%')).toBeInTheDocument()

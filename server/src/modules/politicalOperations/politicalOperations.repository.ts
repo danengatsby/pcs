@@ -1,4 +1,5 @@
 import { query, withTransaction } from "../../lib/db.js";
+import { withParticipantCapacity } from "../mobilization/mobilization.capacity.js";
 import type { AdminTerritoryScope } from "../../lib/adminAuthorization.js";
 import type {
   AddPoliticalParticipantInput,
@@ -192,6 +193,18 @@ function actionScopeSql(): string {
   )`;
 }
 
+export async function countMobilizationTasks(scope: AdminTerritoryScope): Promise<number> {
+  const result = await query<{ total: number }>(`
+    SELECT COUNT(*)::int AS total FROM mobilization_participants participant
+    JOIN mobilization_actions action ON action.id = participant.action_id
+    WHERE ${actionScopeSql()} AND action.status = 'open'
+      AND (participant.status IN ('waitlisted', 'reported')
+        OR (participant.status IN ('invited', 'confirmed', 'active', 'in_progress')
+          AND participant.due_at < NOW()))
+  `, [scope.national, scope.organizationIds, accessibleCountyIds(scope)]);
+  return result.rows[0].total;
+}
+
 export async function listPoliticalOperationsFromRepository(
   filters: PoliticalOperationsQuery,
   scope: AdminTerritoryScope,
@@ -202,10 +215,11 @@ export async function listPoliticalOperationsFromRepository(
     WHERE ${actionScopeSql()}
       AND ($4::varchar IS NULL OR action.action_type = $4)
       AND ($5::varchar IS NULL OR action.status = $5)
+      AND ($7::bigint IS NULL OR action.id = $7::bigint)
     GROUP BY action.id, organization.name, coordinator.full_name
     ORDER BY action.starts_at DESC NULLS LAST, action.created_at DESC
     LIMIT $6
-  `, [scope.national, scope.organizationIds, countyIds, filters.type ?? null, filters.status ?? null, filters.limit]);
+  `, [scope.national, scope.organizationIds, countyIds, filters.type ?? null, filters.status ?? null, filters.limit, filters.actionId ?? null]);
 
   const actionIds = actionResult.rows.map((row) => row.id);
   const participantResult = actionIds.length > 0
@@ -213,7 +227,9 @@ export async function listPoliticalOperationsFromRepository(
       SELECT *
       FROM mobilization_participants
       WHERE action_id = ANY($1::bigint[])
-      ORDER BY updated_at DESC, id DESC
+      ORDER BY (status = 'waitlisted') DESC,
+        CASE WHEN status = 'waitlisted' THEN created_at END ASC,
+        updated_at DESC, id DESC
     `, [actionIds])
     : { rows: [] as ParticipantRow[] };
   const participantsByAction = new Map<string, ReturnType<typeof mapParticipant>[]>();
@@ -297,12 +313,15 @@ export async function createPoliticalOperationFromRepository(input: {
       INSERT INTO mobilization_actions (
         slug, action_type, title, summary, description, status, scope, starts_at, ends_at,
         participation_mode, commitment, capacity, organization_id, coordinator_user_id,
-        objective, target_metric, target_value, visibility, created_by
+        objective, target_metric, target_value, visibility, created_by, is_demo,
+        public_approved_at, public_approved_by
       )
       VALUES (
         $1, $2, $3, $4, $5, $6,
         CASE WHEN cardinality($7::integer[]) = 0 AND $13::varchar IS NULL THEN 'national' ELSE 'local' END,
-        $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19
+        $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, FALSE,
+        CASE WHEN $6::varchar = 'open' AND $18::varchar = 'public' THEN NOW() ELSE NULL END,
+        CASE WHEN $6::varchar = 'open' AND $18::varchar = 'public' THEN $19::bigint ELSE NULL END
       )
       RETURNING id
     `, [
@@ -352,6 +371,7 @@ export async function readPoliticalOperationInScope(id: bigint, scope: AdminTerr
 export async function updatePoliticalOperationFromRepository(input: {
   id: bigint;
   payload: UpdatePoliticalOperationInput;
+  actorId: bigint;
 }) {
   const result = await query<{ id: string; version: number }>(`
     UPDATE mobilization_actions
@@ -359,6 +379,16 @@ export async function updatePoliticalOperationFromRepository(input: {
       status = COALESCE($2, status),
       result_value = CASE WHEN $3::boolean THEN $4 ELSE result_value END,
       result_summary = COALESCE($5, result_summary),
+      coordinator_user_id = CASE WHEN $8::boolean THEN $9::bigint ELSE coordinator_user_id END,
+      public_approved_at = CASE
+        WHEN $2::varchar = 'open' AND visibility = 'public' THEN NOW()
+        ELSE NULL
+      END,
+      public_approved_by = CASE
+        WHEN $2::varchar = 'open' AND visibility = 'public' THEN $7::bigint
+        ELSE NULL
+      END,
+      is_demo = FALSE,
       version = version + 1,
       updated_at = NOW()
     WHERE id = $1 AND version = $6
@@ -370,6 +400,9 @@ export async function updatePoliticalOperationFromRepository(input: {
     input.payload.resultValue ?? null,
     input.payload.resultSummary ?? null,
     input.payload.expectedVersion,
+    input.actorId.toString(),
+    input.payload.coordinatorUserId !== undefined,
+    input.payload.coordinatorUserId ?? null,
   ]);
   return result.rows[0] ?? null;
 }
@@ -451,7 +484,9 @@ export async function addPoliticalParticipantFromRepository(input: {
   const participationRole = participantRoleForAction(input.actionType);
   const status = input.actionType === "volunteer_task" ? "active" : "invited";
   const attendanceStatus = input.actionType === "event" ? "pending" : "not_applicable";
-  const result = await query<ParticipantRow>(`
+  const result = await withParticipantCapacity(
+    { actionId: input.actionId.toString(), email: input.subject.email }, status,
+    (client) => client.query<ParticipantRow>(`
     INSERT INTO mobilization_participants (
       action_id, user_id, membership_id, full_name, email, participation_role, status,
       attendance_status, due_at, notes, invited_at, assigned_by
@@ -483,8 +518,8 @@ export async function addPoliticalParticipantFromRepository(input: {
     input.payload.dueAt,
     input.payload.notes,
     input.actorId.toString(),
-  ]);
-  const row = result.rows[0];
+  ]));
+  const row = result?.rows[0];
   return row ? mapParticipant(row) : null;
 }
 
@@ -505,7 +540,9 @@ export async function updatePoliticalParticipantFromRepository(input: {
 }) {
   const status = input.payload.status ?? null;
   const attendanceStatus = input.payload.attendanceStatus ?? null;
-  const result = await query<ParticipantRow>(`
+  const result = await withParticipantCapacity(
+    { participantId: input.id.toString() }, input.payload.status,
+    (client) => client.query<ParticipantRow>(`
     UPDATE mobilization_participants
     SET
       status = COALESCE($2, status),
@@ -527,7 +564,7 @@ export async function updatePoliticalParticipantFromRepository(input: {
     input.payload.report ?? null,
     input.payload.result ?? null,
     input.payload.hours ?? null,
-  ]);
-  const row = result.rows[0];
+  ]));
+  const row = result?.rows[0];
   return row ? mapParticipant(row) : null;
 }

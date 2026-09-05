@@ -1,6 +1,8 @@
 import { apiPost } from '@lib/http'
 import type { MobilizationResponse, MobilizationResponseRequest } from '../types'
 
+export class MobilizationActionFullError extends Error {}
+
 function parseResponse(value: unknown): MobilizationResponse {
   if (!value || typeof value !== 'object' || !('accepted' in value) || typeof value.accepted !== 'boolean') {
     throw new Error('Răspuns invalid de la server.')
@@ -9,7 +11,11 @@ function parseResponse(value: unknown): MobilizationResponse {
   if (id !== null && typeof id !== 'string') {
     throw new Error('Identificator de răspuns invalid.')
   }
-  return { accepted: value.accepted, id }
+  const registrationStatus = 'registrationStatus' in value ? value.registrationStatus : null
+  if (registrationStatus !== 'confirmed' && registrationStatus !== 'waitlisted' && !(id === null && registrationStatus === null)) {
+    throw new Error('Starea înscrierii este invalidă.')
+  }
+  return { accepted: value.accepted, id, registrationStatus }
 }
 
 export async function submitMobilizationResponse(
@@ -23,6 +29,9 @@ export async function submitMobilizationResponse(
   )
 
   if (!response.ok) {
+    if (response.error.code === 'MOBILIZATION_ACTION_FULL') {
+      throw new MobilizationActionFullError(response.error.message)
+    }
     if (response.error.code === 'MOBILIZATION_RESPONSE_EXISTS') {
       throw new Error('Ai răspuns deja la această acțiune cu adresa de email introdusă.')
     }

@@ -1,4 +1,5 @@
 import { query } from "../../lib/db.js";
+import { withParticipantCapacity } from "../mobilization/mobilization.capacity.js";
 import type { AuthenticatedUser } from "../../lib/authMiddleware.js";
 import type {
   MemberConsentInput,
@@ -240,7 +241,14 @@ export async function updateOwnEventResponseFromRepository(input: {
   actionId: bigint;
   payload: MemberEventResponseInput;
 }) {
-  const result = await query<{ id: string; status: string; responded_at: Date }>(`
+  const subject = await query<{ id: string }>(`
+    SELECT id FROM mobilization_participants
+    WHERE action_id = $1 AND (user_id = $2 OR LOWER(email) = LOWER($3))
+  `, [input.actionId.toString(), input.actor.id, input.actor.email]);
+  if (!subject.rows[0]) {return null;}
+  const result = await withParticipantCapacity(
+    { participantId: subject.rows[0].id }, input.payload.response,
+    (client) => client.query<{ id: string; status: string; responded_at: Date }>(`
     UPDATE mobilization_participants participant
     SET status = $3, responded_at = NOW(), updated_at = NOW()
     FROM mobilization_actions action
@@ -249,8 +257,8 @@ export async function updateOwnEventResponseFromRepository(input: {
       AND action.action_type = 'event'
       AND (participant.user_id = $2 OR LOWER(participant.email) = LOWER($4))
     RETURNING participant.id, participant.status, participant.responded_at
-  `, [input.actionId.toString(), input.actor.id, input.payload.response, input.actor.email]);
-  const row = result.rows[0];
+  `, [input.actionId.toString(), input.actor.id, input.payload.response, input.actor.email]));
+  const row = result?.rows[0];
   return row ? { id: row.id.toString(), status: row.status, respondedAt: row.responded_at.toISOString() } : null;
 }
 
@@ -259,7 +267,14 @@ export async function updateOwnTaskReportFromRepository(input: {
   participantId: bigint;
   payload: MemberTaskReportInput;
 }) {
-  const result = await query<{ id: string; status: string; reported_at: Date | null }>(`
+  const subject = await query<{ id: string }>(`
+    SELECT id FROM mobilization_participants
+    WHERE id = $1 AND (user_id = $2 OR LOWER(email) = LOWER($3))
+  `, [input.participantId.toString(), input.actor.id, input.actor.email]);
+  if (!subject.rows[0]) {return null;}
+  const result = await withParticipantCapacity(
+    { participantId: input.participantId.toString() }, input.payload.status,
+    (client) => client.query<{ id: string; status: string; reported_at: Date | null }>(`
     UPDATE mobilization_participants participant
     SET status = $3::varchar, report = $4, result = $5, hours = $6,
       reported_at = CASE WHEN $3::varchar = 'reported' THEN NOW() ELSE reported_at END,
@@ -270,8 +285,8 @@ export async function updateOwnTaskReportFromRepository(input: {
       AND action.action_type IN ('volunteer_task', 'campaign')
       AND (participant.user_id = $2 OR LOWER(participant.email) = LOWER($7))
     RETURNING participant.id, participant.status, participant.reported_at
-  `, [input.participantId.toString(), input.actor.id, input.payload.status, input.payload.report, input.payload.result, input.payload.hours, input.actor.email]);
-  const row = result.rows[0];
+  `, [input.participantId.toString(), input.actor.id, input.payload.status, input.payload.report, input.payload.result, input.payload.hours, input.actor.email]));
+  const row = result?.rows[0];
   return row ? { id: row.id.toString(), status: row.status, reportedAt: row.reported_at?.toISOString() ?? null } : null;
 }
 

@@ -1,4 +1,5 @@
 import type { PrismaTx } from "../../lib/prismaTransaction.js";
+import type { UserRole } from "../../lib/authToken.js";
 
 export const volunteerStatusValues = ["nou", "validat", "contactat", "activ"] as const;
 export const volunteerContactChannelValues = [
@@ -27,16 +28,6 @@ export function mapVolunteerStatusToAccountRole(
   return "SUSTINATOR";
 }
 
-export type VolunteerPublicRole =
-  | "SUSTINATOR"
-  | "ADERENT"
-  | "MEMBRU"
-  | "CONSILIER"
-  | "SECRETAR"
-  | "VICEPRESEDINTE"
-  | "PRESEDINTE"
-  | "FARA_CONT";
-
 export type VolunteerInsertRow = {
   id: number;
 };
@@ -48,20 +39,6 @@ export type ExistingVolunteerRow = {
 export type ExistingUserAuthRow = {
   id: number;
   passwordHash: string;
-};
-
-export type VolunteerPublicRow = {
-  id: string;
-  fullName: string;
-  email: string;
-  password: "protejata" | "nesetata";
-  status: VolunteerWorkflowStatus;
-  role: VolunteerPublicRole;
-};
-
-export type VolunteerCountyCountRow = {
-  county: string;
-  count: number;
 };
 
 export type VolunteerAdminRow = {
@@ -84,7 +61,7 @@ export type VolunteerAdminRow = {
   ownerUserId: string | null;
   ownerName: string | null;
   ownerEmail: string | null;
-  ownerRole: Exclude<VolunteerPublicRole, "FARA_CONT"> | null;
+  ownerRole: UserRole | null;
   followUpAt: string | null;
   reminderAt: string | null;
   lastContactAt: string | null;
@@ -93,7 +70,7 @@ export type VolunteerAdminRow = {
   rejectionReason: string | null;
   tags: string[];
   skillTags: string[];
-  accountRole: Exclude<VolunteerPublicRole, "FARA_CONT"> | null;
+  accountRole: UserRole | null;
   recordSource: "volunteer" | "user" | "both";
 };
 
@@ -101,7 +78,7 @@ export type VolunteerOwnerOption = {
   id: string;
   fullName: string;
   email: string;
-  role: Exclude<VolunteerPublicRole, "FARA_CONT">;
+  role: UserRole;
 };
 
 export type VolunteerCountRow = {

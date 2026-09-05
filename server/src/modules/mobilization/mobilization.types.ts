@@ -40,5 +40,6 @@ export type MobilizationAction = {
   participationMode: string;
   commitment: string;
   capacity: number | null;
-  responseCount: number;
+  availableSpots: number | null;
+  responseCount: number | null;
 };

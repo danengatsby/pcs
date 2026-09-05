@@ -4,6 +4,8 @@ import { NotFoundPage, RouteErrorBoundary } from './components/RouteFallbacks'
 import { AppLayout } from './layout/AppLayout'
 import RequireAuth from './components/RequireAuth'
 import RequireAdmin from './components/RequireAdmin'
+import { AdminLayout } from '@features/adminShell/AdminLayout'
+import { AdminHomePage, RequireCapability } from '@features/adminShell/AdminPages'
 import {
   loadAdminMembersDashboardPage,
   loadAuthPolicyPage,
@@ -21,6 +23,8 @@ import {
   loadTerritorialOrganizationsPage,
   loadUserProfilePage,
   loadVolunteersAdminPage,
+  loadCongressPage,
+  loadArbitrationPage,
 } from './routeModules'
 
 const routeFallback = <div style={{ padding: 24 }}>Se încarcă...</div>
@@ -68,6 +72,8 @@ const DocumentPage = lazyNamed(loadDocumentPage, 'DocumentPage')
 const ManifestPage = lazyNamed(loadManifestPage, 'ManifestPage')
 const MobilizationPage = lazyNamed(loadMobilizationPage, 'MobilizationPage')
 const PoliticalOperationsPage = lazyNamed(loadPoliticalOperationsPage, 'PoliticalOperationsPage')
+const CongressPage = lazyNamed(loadCongressPage, 'CongressPage')
+const ArbitrationPage = lazyNamed(loadArbitrationPage, 'ArbitrationPage')
 
 export const router = createBrowserRouter([
   {
@@ -98,44 +104,19 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: '/admin/dashboard',
-        element: renderRoute(
-          <RequireAdmin roles={['VICEPRESEDINTE', 'PRESEDINTE']}>
-            <ExecutiveDashboardPage />
-          </RequireAdmin>
-        ),
-      },
-      {
-        path: '/admin/mobilization',
-        element: renderRoute(
-          <RequireAdmin roles={['SECRETAR', 'VICEPRESEDINTE', 'PRESEDINTE']}>
-            <PoliticalOperationsPage />
-          </RequireAdmin>
-        ),
-      },
-      {
-        path: '/admin/organizations',
-        element: renderRoute(
-          <RequireAdmin>
-            <TerritorialOrganizationsPage />
-          </RequireAdmin>
-        ),
-      },
-      {
-        path: '/admin/members',
-        element: renderRoute(
-          <RequireAdmin>
-            <AdminMembersDashboardPage />
-          </RequireAdmin>
-        ),
-      },
-      {
-        path: '/admin/volunteers',
-        element: renderRoute(
-          <RequireAdmin>
-            <VolunteersAdminPage />
-          </RequireAdmin>
-        ),
+        path: '/admin',
+        element: <RequireAdmin><AdminLayout /></RequireAdmin>,
+        children: [
+          { index: true, element: <AdminHomePage /> },
+          { path: 'dashboard', element: <RequireCapability capability="executive.read">{renderRoute(<ExecutiveDashboardPage />)}</RequireCapability> },
+          { path: 'mobilization', element: <RequireCapability capability="mobilization.read">{renderRoute(<PoliticalOperationsPage />)}</RequireCapability> },
+          { path: 'organizations', element: <RequireCapability capability="organization.read">{renderRoute(<TerritorialOrganizationsPage />)}</RequireCapability> },
+          { path: 'members', element: <RequireCapability capability="membership.read">{renderRoute(<AdminMembersDashboardPage />)}</RequireCapability> },
+          { path: 'volunteers', element: <RequireCapability capability="recruitment.read">{renderRoute(<VolunteersAdminPage />)}</RequireCapability> },
+          { path: 'congresses', element: <RequireCapability capability="congress.read">{renderRoute(<CongressPage />)}</RequireCapability> },
+          { path: 'arbitration', element: <RequireCapability capability="arbitration.read">{renderRoute(<ArbitrationPage />)}</RequireCapability> },
+          { path: '*', element: <NotFoundPage /> },
+        ],
       },
       { path: '/contact', element: renderRoute(<ContactPage />) },
       { path: '*', element: <NotFoundPage /> },

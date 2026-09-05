@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState, type ChangeEvent, type Dispatch, type SetStateAction } from 'react'
-import { Link } from 'react-router-dom'
 import { Button, Input } from '@components'
 import { Select } from '@components'
 import { useCounties } from '@features/contact/hooks/useCounties'
@@ -49,7 +48,6 @@ type VolunteersAdminToolbarProps = {
   canPromote?: boolean
   canDelete?: boolean
   canExport?: boolean
-  canViewExecutive?: boolean
   loading: boolean
   exporting: boolean
   bulkUpdating: boolean
@@ -74,7 +72,6 @@ export function VolunteersAdminToolbar({
   canPromote = true,
   canDelete = true,
   canExport = true,
-  canViewExecutive = true,
   loading,
   exporting,
   bulkUpdating,
@@ -262,12 +259,6 @@ export function VolunteersAdminToolbar({
             </Button>
           </div>
         ) : null}
-        {canViewExecutive ? <Link className="btn" to="/admin/dashboard">
-          Tablou de comandă
-        </Link> : null}
-        <Link className="btn" to="/admin/members">
-          Dashboard membri
-        </Link>
         {canExport ? <Button onClick={onExport} loading={exporting}>
           Export CSV
         </Button> : null}

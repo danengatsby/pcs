@@ -1,14 +1,13 @@
 import { startTransition, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, Input } from '@components'
-import { prefetchAdminRoutes } from '@app/routeModules'
 import { useAuth } from '../context'
 import { useSignin } from '../hooks/useSignin'
 import { hasAdminAccess } from '../types'
 
 type SigninIntent = 'profile' | 'admin'
 
-export function LoginForm(): JSX.Element {
+export function LoginForm({ onAuthenticatingChange }: { onAuthenticatingChange?: (value: boolean) => void }): JSX.Element {
   const { state, submit, reset } = useSignin()
   const { signout } = useAuth()
   const navigate = useNavigate()
@@ -24,10 +23,14 @@ export function LoginForm(): JSX.Element {
     if (isLoading) return
 
     setIntent(nextIntent)
+    // Keep SigninPage mounted while the auth context updates, so its default
+    // profile redirect cannot race the explicit administrative destination.
+    onAuthenticatingChange?.(true)
     setAdminError(null)
     const result = await submit({ email, password })
 
     if (!result.ok) {
+      onAuthenticatingChange?.(false)
       setIntent(null)
       return
     }
@@ -42,19 +45,14 @@ export function LoginForm(): JSX.Element {
       reset()
       setIntent(null)
       setAdminError('Acest cont nu are drepturi administrative PCS.')
+      onAuthenticatingChange?.(false)
       return
-    }
-
-    if (adminAccess) {
-      prefetchAdminRoutes()
     }
 
     setEmail('')
     setPassword('')
     const destination = nextIntent === 'admin'
-      ? result.data.user.role === 'VICEPRESEDINTE' || result.data.user.role === 'PRESEDINTE'
-        ? '/admin/dashboard'
-        : '/admin/volunteers'
+      ? '/admin'
       : '/profil'
 
     startTransition(() => {

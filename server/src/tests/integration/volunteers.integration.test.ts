@@ -30,26 +30,7 @@ test("volunteers route should create volunteer and reject duplicate email", asyn
     assert.equal(createResponse.body.error, null);
     assert.ok(Number(createResponse.body?.data?.id) > 0);
 
-    const listResponse = await request(app)
-      .get("/api/volunteers")
-      .expect(200);
-
-    const listRows = listResponse.body?.data as Array<{
-      id: string;
-      fullName: string;
-      email: string;
-      password: string;
-      status: string;
-      role: string;
-    }> | undefined;
-    assert.ok(Array.isArray(listRows));
-    const inserted = listRows?.find((item) => item.status === "nou" && item.role === "SUSTINATOR");
-    assert.ok(inserted);
-    assert.equal(inserted?.fullName, "Susținător PCS");
-    assert.match(inserted?.email ?? "", /^ascuns\+\d+@pcs\.invalid$/);
-    assert.equal(inserted?.password, "protejata");
-    assert.equal(inserted?.status, "nou");
-    assert.equal(inserted?.role, "SUSTINATOR");
+    await request(app).get("/api/volunteers").expect(404);
 
     const duplicateResponse = await request(app)
       .post("/api/volunteers")
@@ -75,17 +56,8 @@ test("volunteers route should expose the official county list", async () => {
   assert.ok(counties.includes("Iași"));
 });
 
-test("volunteers route should expose county aggregation", async () => {
-  const response = await request(app)
-    .get("/api/volunteers/by-county")
-    .expect(200);
-
-  const rows = response.body?.data as Array<{ county: string; count: number }> | undefined;
-  assert.ok(Array.isArray(rows));
-  assert.equal(rows.length, 42);
-  const bucuresti = rows.find((item) => item.county === "București");
-  assert.ok(bucuresti);
-  assert.equal(typeof bucuresti?.count, "number");
+test("volunteers route should not expose county aggregation", async () => {
+  await request(app).get("/api/volunteers/by-county").expect(404);
 });
 
 test("volunteers route should reject weak passwords", async () => {

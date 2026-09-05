@@ -28,6 +28,7 @@ export const mobilizationResponseSchema = z.object({
   interests: z.array(z.enum(mobilizationInterestValues)).min(1).max(6),
   availability: z.enum(mobilizationAvailabilityValues).or(z.literal("")).optional().default(""),
   message: z.string().trim().max(1200).optional().default(""),
+  joinWaitlist: z.boolean().optional().default(false),
   updatesConsent: z.boolean().optional().default(false),
   emailConsent: z.boolean().optional().default(false),
   smsConsent: z.boolean().optional().default(false),

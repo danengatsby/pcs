@@ -17,12 +17,16 @@ function filterLabel(filter: ActionFilter): string {
 export function MobilizationPage() {
   const { actions, loading, error } = useMobilizationActions()
   const [filter, setFilter] = useState<ActionFilter>('all')
-  const [selectedAction, setSelectedAction] = useState<MobilizationAction | null>(null)
+  const [selectedActionId, setSelectedActionId] = useState<string | null>(null)
+  const selectedAction = actions.find((action) => action.id === selectedActionId) ?? null
   const filteredActions = useMemo(
     () => filter === 'all' ? actions : actions.filter((action) => action.type === filter),
     [actions, filter],
   )
-  const totalResponses = actions.reduce((total, action) => total + action.responseCount, 0)
+  const approvedResponseCounts = actions
+    .map((action) => action.responseCount)
+    .filter((count): count is number => count !== null)
+  const totalResponses = approvedResponseCounts.reduce((total, count) => total + count, 0)
 
   useEffect(() => {
     if (!selectedAction) return
@@ -36,7 +40,7 @@ export function MobilizationPage() {
   }, [selectedAction])
 
   function selectAction(action: MobilizationAction) {
-    setSelectedAction(action)
+    setSelectedActionId(action.id)
   }
 
   return (
@@ -56,7 +60,10 @@ export function MobilizationPage() {
         </div>
         <aside className="mobilization-hero__summary" aria-label="Mobilizarea PCS pe scurt">
           <div><strong>{actions.length}</strong><span>acțiuni deschise</span></div>
-          <div><strong>{totalResponses}</strong><span>răspunsuri înregistrate</span></div>
+          <div>
+            <strong>{approvedResponseCounts.length > 0 ? totalResponses : '—'}</strong>
+            <span>{approvedResponseCounts.length > 0 ? 'răspunsuri validate editorial' : 'indicator în curs de validare'}</span>
+          </div>
           <p>Aderarea și participarea punctuală sunt fluxuri separate.</p>
         </aside>
       </section>
@@ -96,7 +103,7 @@ export function MobilizationPage() {
                 aria-pressed={filter === item}
                 onClick={() => {
                   setFilter(item)
-                  setSelectedAction(null)
+                  setSelectedActionId(null)
                 }}
               >
                 {filterLabel(item)} <span>{count}</span>
@@ -132,7 +139,7 @@ export function MobilizationPage() {
         <MobilizationResponseForm
           key={selectedAction.id}
           action={selectedAction}
-          onClose={() => setSelectedAction(null)}
+          onClose={() => setSelectedActionId(null)}
         />
       ) : (
         <section className="mobilization-segmentation" aria-labelledby="mobilization-segmentation-title">

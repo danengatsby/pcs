@@ -163,6 +163,13 @@ validate_client_release
 log "Aplic migrațiile DB."
 NODE_ENV=production node server/dist/scripts/migrateDb.js
 
+log "Elimin datele marcate explicit ca demonstrative."
+PURGE_DEMO_DATA_CONFIRM=DELETE_SYNTHETIC_DATA \
+NODE_ENV=production node server/dist/scripts/purgeDemoData.js
+
+log "Verific fail-closed integritatea datelor de producție."
+NODE_ENV=production node server/dist/scripts/assertProductionDataIntegrity.js
+
 log "Reporneasc obligatoriu API-ul și workerii pe noul release."
 NEWS_MEDIA_CLAMAV_ENABLED=1 \
 NEWS_MEDIA_CLAMAV_MODE=clamd \

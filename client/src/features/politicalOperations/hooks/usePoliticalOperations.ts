@@ -9,7 +9,7 @@ import {
   updatePoliticalAction,
   updatePoliticalParticipant,
 } from '../api/politicalOperations'
-import type { CommunicationAudience, CreatePoliticalActionInput } from '../types'
+import type { CommunicationAudience, CreatePoliticalActionInput, UpdatePoliticalActionInput } from '../types'
 
 const operationsKey = ['admin', 'political-operations'] as const
 
@@ -21,14 +21,14 @@ async function unwrap<T>(request: Promise<{ ok: true; data: T } | { ok: false; e
 
 type OperationMutation =
   | { kind: 'create'; input: CreatePoliticalActionInput }
-  | { kind: 'update-action'; id: string; input: { status?: string; resultValue?: number | null; resultSummary?: string; expectedVersion: number } }
+  | { kind: 'update-action'; id: string; input: UpdatePoliticalActionInput }
   | { kind: 'add-participant'; id: string; email: string; dueAt: string | null; notes: string }
   | { kind: 'update-participant'; id: string; input: { status?: string; attendanceStatus?: string } }
   | { kind: 'dispatch'; input: CommunicationAudience & { title: string; message: string; mode: 'draft' | 'send'; confirmConsentSelection: boolean } }
 
-export function usePoliticalOperations() {
+export function usePoliticalOperations(actionId?: string | null) {
   const queryClient = useQueryClient()
-  const query = useQuery({ queryKey: operationsKey, queryFn: () => unwrap(getPoliticalOperations()) })
+  const query = useQuery({ queryKey: [...operationsKey, actionId ?? null], queryFn: () => unwrap(getPoliticalOperations(actionId)) })
   const mutation = useMutation<unknown, Error, OperationMutation>({
     mutationFn: (action: OperationMutation) => {
       if (action.kind === 'create') return unwrap(createPoliticalAction(action.input))
@@ -37,7 +37,10 @@ export function usePoliticalOperations() {
       if (action.kind === 'update-participant') return unwrap(updatePoliticalParticipant(action.id, action.input))
       return unwrap(createCommunicationDispatch(action.input))
     },
-    onSuccess: async () => { await queryClient.invalidateQueries({ queryKey: operationsKey }) },
+    onSuccess: async () => { await Promise.all([
+      queryClient.invalidateQueries({ queryKey: operationsKey }),
+      queryClient.invalidateQueries({ queryKey: ['admin', 'executive-interventions'] }),
+    ]) },
   })
 
   return {
@@ -49,7 +52,7 @@ export function usePoliticalOperations() {
       : mutation.error ? readQueryError(mutation.error, 'Modificarea nu a putut fi salvată.') : null,
     reload: () => void query.refetch(),
     createAction: (input: CreatePoliticalActionInput) => mutation.mutateAsync({ kind: 'create', input }),
-    updateAction: (id: string, input: { status?: string; resultValue?: number | null; resultSummary?: string; expectedVersion: number }) => mutation.mutateAsync({ kind: 'update-action', id, input }),
+    updateAction: (id: string, input: UpdatePoliticalActionInput) => mutation.mutateAsync({ kind: 'update-action', id, input }),
     addParticipant: (id: string, email: string, dueAt: string | null, notes: string) => mutation.mutateAsync({ kind: 'add-participant', id, email, dueAt, notes }),
     updateParticipant: (id: string, input: { status?: string; attendanceStatus?: string }) => mutation.mutateAsync({ kind: 'update-participant', id, input }),
     preview: (audience: CommunicationAudience) => unwrap(previewCommunication(audience)),

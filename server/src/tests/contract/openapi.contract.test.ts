@@ -14,6 +14,7 @@ import {
   membershipStatuses,
 } from "../../modules/members/adminDashboard.schema.js";
 import { updateExecutiveTargetSchema } from "../../modules/executiveDashboard/executiveDashboard.schema.js";
+import { expiryUpdateSchema } from "../../modules/executiveDashboard/interventions.schema.js";
 import { mobilizationResponseSchema } from "../../modules/mobilization/mobilization.schema.js";
 import {
   memberConsentSchema,
@@ -64,6 +65,19 @@ type OpenApiComponentSchema = {
 };
 
 const httpMethods = new Set(["get", "post", "put", "patch", "delete"]);
+
+test("openapi contract: administrative task counts are authenticated and contain no individual records", () => {
+  const operation = readOperation("/admin/tasks", "get");
+  assert.deepEqual(operation.security, [{ BearerAuth: [] }]);
+  assert.deepEqual(operation.parameters, []);
+  const schema = openApiSpec.components.schemas.AdminTasks;
+  assert.deepEqual(schema.required, ["generatedAt", "counts", "total"]);
+  assert.deepEqual(Object.keys(schema.properties.counts.properties).sort(), ["arbitration", "congresses", "members", "mobilization", "organizations", "volunteers"]);
+  for (const path of ["/admin/congresses", "/admin/arbitration/cases"]) {
+    assert.deepEqual(readOperation(path, "get").security, [{ BearerAuth: [] }]);
+    assert.deepEqual(readOperation(path, "post").security, [{ BearerAuth: [] }]);
+  }
+});
 
 function normalizeRoutePath(path: string): string {
   return path.replace(/^\/api/, "").replace(/:([A-Za-z0-9_]+)/g, "{$1}");
@@ -223,13 +237,22 @@ test("openapi contract: political operations, member portal and consent schemas 
   assertPositiveIntegerPathParameter("/member-portal/events/{id}/response", "post");
   assertPositiveIntegerPathParameter("/member-portal/tasks/{id}", "patch");
   assertParameterNames("/member-portal/consents", "patch", []);
-  assertParameterNames("/admin/mobilization", "get", ["type", "status", "limit"]);
+  assertParameterNames("/admin/mobilization", "get", ["actionId", "type", "status", "limit"]);
   assertParameterNames("/admin/mobilization/actions", "post", []);
   assertPositiveIntegerPathParameter("/admin/mobilization/actions/{id}", "patch");
   assertPositiveIntegerPathParameter("/admin/mobilization/actions/{id}/participants", "post");
   assertPositiveIntegerPathParameter("/admin/mobilization/participants/{id}", "patch");
   assertParameterNames("/admin/communications/preview", "post", []);
   assertParameterNames("/admin/communications/dispatches", "post", []);
+});
+
+test("openapi contract: executive interventions expose scoped pagination and explicit expiration edits", () => {
+  assertParameterNames("/admin/executive-dashboard/interventions", "get", ["limit", "offset", "kind"]);
+  assertParameterNames("/admin/executive-dashboard/expirations", "get", ["limit", "offset", "record"]);
+  assertComponentMatchesZodObject("ExecutiveExpirationUpdate", expiryUpdateSchema);
+  for (const path of ["/admin/executive-dashboard/interventions", "/admin/executive-dashboard/expirations"]) {
+    assert.deepEqual(readOperation(path, "get").security, [{ BearerAuth: [] }]);
+  }
 });
 
 test("openapi contract: auth endpoints should expose implemented parameters and bodies", () => {
@@ -248,10 +271,15 @@ test("openapi contract: auth endpoints should expose implemented parameters and 
 });
 
 test("openapi contract: volunteer endpoints should expose implemented parameters and bodies", () => {
-  assertParameterNames("/volunteers", "get", ["limit"]);
   assertParameterNames("/volunteers/counties", "get", []);
   assertParameterNames("/meta/counties", "get", []);
-  assertParameterNames("/volunteers/by-county", "get", []);
+  const paths = openApiSpec.paths as Record<string, Record<string, OpenApiOperation>>;
+  assert.equal(paths["/volunteers"]?.get, undefined);
+  assert.equal(paths["/volunteers/by-county"], undefined);
+  const schemas = openApiSpec.components.schemas as Record<string, unknown>;
+  assert.equal(schemas.VolunteerPublicItem, undefined);
+  assert.equal(schemas.VolunteerCountyCountItem, undefined);
+  assert.equal(schemas.VolunteerPublicRole, undefined);
   assertParameterNames("/admin/volunteers", "get", ["limit", "cursor", "status", "search", "county", "locality", "skills"]);
   assertParameterNames("/admin/volunteers/export.csv", "get", ["status", "search", "county", "locality", "skills"]);
   assertParameterNames("/admin/volunteers/owners", "get", []);
@@ -266,6 +294,17 @@ test("openapi contract: volunteer endpoints should expose implemented parameters
   assertRequestBodyRef("/admin/volunteers/{id}/workflow", "patch", "#/components/schemas/VolunteerWorkflowUpdateInput");
   assertRequestBodyRef("/admin/volunteers/workflow/bulk", "patch", "#/components/schemas/VolunteerBulkWorkflowUpdateInput");
   assertRequestBodyRef("/admin/volunteers/bulk", "delete", "#/components/schemas/VolunteerBulkDeleteInput");
+});
+
+test("openapi contract: public statistics describe suppression and rounding without personal fields", () => {
+  assertParameterNames("/stats", "get", []);
+  const stats = openApiSpec.components.schemas.PublicStatsData;
+  assert.deepEqual(stats.required, ["volunteers", "news"]);
+  assert.equal(stats.additionalProperties, false);
+  assert.deepEqual(Object.keys(stats.properties).sort(), ["news", "volunteers"]);
+  assert.equal(stats.properties.volunteers.minimum, 10);
+  assert.equal(stats.properties.volunteers.multipleOf, 10);
+  assert.equal(stats.properties.volunteers.nullable, true);
 });
 
 test("openapi contract: members and admin endpoints should expose implemented parameters and bodies", () => {

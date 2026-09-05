@@ -42,6 +42,7 @@ test("territorial registry should persist hierarchy, territories, mandates and o
   const organizationIds: string[] = [];
 
   try {
+    await query("DELETE FROM organizations WHERE level = 'national' AND status IN ('active', 'forming')");
     const president = await signupWithRole({
       fullName: "Președinte Registru Test",
       email: presidentEmail,
@@ -161,6 +162,12 @@ test("territorial registry should persist hierarchy, territories, mandates and o
         positionTitle: "Președinte filială",
         startedAt: "2026-02-01",
         status: "active",
+        decision: {
+          decisionNumber: `DEC-${suffix}`,
+          decisionDate: "2026-02-01",
+          issuingBody: "Congresul organizației județene",
+          minutesPath: `/test/decisions/DEC-${suffix}.pdf`,
+        },
       })
       .expect(201);
 
@@ -173,6 +180,12 @@ test("territorial registry should persist hierarchy, territories, mandates and o
         positionTitle: "Consilier județean",
         startedAt: "2026-02-01",
         status: "active",
+        decision: {
+          decisionNumber: `DEC-CONS-${suffix}`,
+          decisionDate: "2026-02-01",
+          issuingBody: "Consiliul organizației județene",
+          minutesPath: `/test/decisions/DEC-CONS-${suffix}.pdf`,
+        },
       })
       .expect(201);
 
@@ -252,6 +265,34 @@ test("territorial registry should persist hierarchy, territories, mandates and o
       { fullName: "Consilier Filială Test", positionTitle: "Consilier județean" },
     ]);
 
+    await query(`
+      UPDATE organization_leadership_mandates
+      SET public_approved_at = NULL, public_approved_by = NULL
+      WHERE organization_id = $1 AND full_name = 'Consilier Filială Test'
+    `, [countyId]);
+    const leadersAfterApprovalRevoked = await request(app)
+      .get(`/api/organizations?search=${suffix}&limit=20`)
+      .expect(200);
+    const reviewedCounty = leadersAfterApprovalRevoked.body?.data?.find(
+      (row: { id: string }) => row.id === countyId,
+    );
+    assert.deepEqual(reviewedCounty?.leaders, [
+      { fullName: "Președinte Filială Test", positionTitle: "Președinte filială" },
+    ]);
+
+    await query(`
+      UPDATE organizations
+      SET public_approved_at = NULL, public_approved_by = NULL
+      WHERE id = $1
+    `, [countyId]);
+    const organizationsAfterApprovalRevoked = await request(app)
+      .get(`/api/organizations?search=${suffix}&limit=20`)
+      .expect(200);
+    assert.equal(
+      organizationsAfterApprovalRevoked.body?.data?.some((row: { id: string }) => row.id === countyId),
+      false,
+    );
+
     const auditRows = await query<{ action: string }>(
       `
         SELECT action
@@ -270,6 +311,8 @@ test("territorial registry should persist hierarchy, territories, mandates and o
       "organization.objective.update",
     ]);
   } finally {
+    await query("DELETE FROM organization_leadership_mandates WHERE organization_id = ANY($1::varchar[])", [organizationIds]);
+    await query("DELETE FROM organization_mandate_decisions WHERE organization_id = ANY($1::varchar[])", [organizationIds]);
     for (const id of organizationIds.reverse()) {
       await query("DELETE FROM organizations WHERE id = $1", [id]);
     }

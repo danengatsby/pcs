@@ -6,6 +6,7 @@ export const politicalOperationVisibilities = ["public", "members", "internal"] 
 export const participantStatuses = [
   "invited",
   "confirmed",
+  "waitlisted",
   "declined",
   "active",
   "in_progress",
@@ -20,6 +21,7 @@ const nullableDateTime = z.union([z.string().datetime({ offset: true }), z.liter
   .transform((value) => value || null);
 
 export const politicalOperationsQuerySchema = z.object({
+  actionId: z.string().regex(/^[1-9]\d*$/).optional(),
   type: z.enum(politicalOperationTypes).optional(),
   status: z.enum(politicalOperationStatuses).optional(),
   limit: z.coerce.number().int().min(1).max(100).optional().default(50),
@@ -61,12 +63,13 @@ export const politicalParticipantIdSchema = z.object({
 }).strict();
 
 export const updatePoliticalOperationSchema = z.object({
+  coordinatorUserId: z.string().regex(/^[1-9]\d*$/).nullable().optional(),
   status: z.enum(politicalOperationStatuses).optional(),
   resultValue: z.number().finite().min(0).max(1_000_000_000).nullable().optional(),
   resultSummary: z.string().trim().max(5000).optional(),
   expectedVersion: z.number().int().positive(),
 }).strict().refine(
-  (value) => value.status !== undefined || value.resultValue !== undefined || value.resultSummary !== undefined,
+  (value) => value.status !== undefined || value.resultValue !== undefined || value.resultSummary !== undefined || value.coordinatorUserId !== undefined,
   "Trimite cel puțin un câmp de actualizat.",
 );
 

@@ -4,6 +4,7 @@ import { Button, Input } from '@components'
 import { useAuth } from '@features/auth/context'
 import { useExecutiveDashboard } from '../hooks/useExecutiveDashboard'
 import { useUpdateExecutiveTarget } from '../hooks/useUpdateExecutiveTarget'
+import { InterventionsPanel } from '../components/InterventionsPanel'
 import type {
   ExecutiveDashboardSummary,
   ExecutiveObjective,
@@ -134,6 +135,7 @@ function ObjectiveCard({ objective, canEdit }: { objective: ExecutiveObjective; 
         </form>
       ) : null}
       {error ? <div className="alert error">{error}</div> : null}
+
     </article>
   )
 }
@@ -162,16 +164,14 @@ export function ExecutiveDashboardPage() {
             ) : null}
           </div>
           <div className="executive-dashboard__actions">
-            <Link className="btn" to="/admin/organizations">Organizații teritoriale</Link>
-            <Link className="btn" to="/admin/members">Registru membri</Link>
-            <Link className="btn" to="/admin/volunteers">CRM voluntari</Link>
-            <Link className="btn primary" to="/admin/mobilization">Mobilizare politică</Link>
             <Button onClick={reload} loading={loading}>Reîncarcă</Button>
           </div>
         </div>
       </section>
 
       {error ? <div className="alert error">{error}</div> : null}
+
+      <InterventionsPanel />
 
       <section className="executive-dashboard__summary" aria-label="Indicatori executivi">
         {summaryCards.map((card) => {
@@ -180,7 +180,7 @@ export function ExecutiveDashboardPage() {
           return (
             <article className={`card executive-dashboard__summary-card${isAlert ? ' is-alert' : ''}`} key={card.key}>
               <div className="hero-kicker">{card.label}</div>
-              <strong>{loading && !dashboard ? '…' : formatMetric(value, card.format)}</strong>
+              <strong>{!dashboard ? (loading ? '…' : '—') : formatMetric(value, card.format)}</strong>
               <p>{card.helper}</p>
             </article>
           )

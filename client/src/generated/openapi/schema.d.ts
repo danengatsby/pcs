@@ -403,11 +403,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /**
-         * List public volunteers
-         * @description Retrieve list of active volunteers (public data only)
-         */
-        get: operations["listPublicVolunteers"];
+        get?: never;
         put?: never;
         /**
          * Create volunteer
@@ -460,7 +456,126 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/volunteers/by-county": {
+    "/mobilization/actions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List open mobilization actions */
+        get: operations["listMobilizationActions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/mobilization/actions/{slug}/responses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Respond to a mobilization action */
+        post: operations["createMobilizationResponse"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/member-portal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read the authenticated member workspace */
+        get: operations["getMemberPortal"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/member-portal/events/{id}/response": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Confirm or decline an event invitation owned by the member */
+        post: operations["respondToMemberEvent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/member-portal/tasks/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Report progress or completion details for an assigned task */
+        patch: operations["reportMemberTask"];
+        trace?: never;
+    };
+    "/member-portal/consents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update channel-specific communication consent */
+        patch: operations["updateMemberCommunicationConsent"];
+        trace?: never;
+    };
+    "/congresses/{id}/results": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read aggregate results for a validated congress */
+        get: operations["getCongressResults"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/congresses": {
         parameters: {
             query?: never;
             header?: never;
@@ -468,12 +583,473 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * List volunteers by county
-         * @description Group volunteers by county with counts
+         * List congresses in authorized organizations
+         * @description Requires congress.read and an active territorial mandate.
          */
-        get: operations["listVolunteersByCounty"];
+        get: operations["listCongresses"];
+        put?: never;
+        /**
+         * Create a draft congress
+         * @description Requires congress.manage and an active territorial mandate.
+         */
+        post: operations["createCongress"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/congresses/{id}/delegates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Register a delegate
+         * @description Requires congress.manage and an active territorial mandate.
+         */
+        post: operations["addCongressDelegate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/congresses/{id}/candidacies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Register a candidacy
+         * @description Requires congress.manage and an active territorial mandate.
+         */
+        post: operations["addCongressCandidacy"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/congresses/{id}/candidacies/{candidacyId}/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Validate a candidacy
+         * @description Requires congress.manage and an active territorial mandate.
+         */
+        post: operations["validateCongressCandidacy"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/congresses/{id}/delegates/{delegateId}/check-in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Check in an eligible delegate
+         * @description Requires congress.manage and an active territorial mandate.
+         */
+        post: operations["checkInCongressDelegate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/congresses/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Open, close or validate a congress
+         * @description Requires congress.manage and an active territorial mandate.
+         */
+        post: operations["transitionCongress"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/congresses/{id}/votes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cast the authenticated delegate's vote
+         * @description Requires congress.vote and an active territorial mandate.
+         */
+        post: operations["castCongressVote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/arbitration/cases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List arbitration cases in authorized scope
+         * @description Requires arbitration.read and an active territorial mandate.
+         */
+        get: operations["listArbitrationCases"];
+        put?: never;
+        /**
+         * Register a confidential case
+         * @description Requires arbitration.manage and an active territorial mandate.
+         */
+        post: operations["createArbitrationCase"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/arbitration/cases/{id}/parties": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Register a party
+         * @description Requires arbitration.manage and an active territorial mandate.
+         */
+        post: operations["addArbitrationParty"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/arbitration/cases/{id}/evidence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Register evidence
+         * @description Requires arbitration.manage and an active territorial mandate.
+         */
+        post: operations["addArbitrationEvidence"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/arbitration/cases/{id}/conflicts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Declare an arbitrator conflict
+         * @description Requires arbitration.manage and an active territorial mandate.
+         */
+        post: operations["declareArbitrationConflict"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/arbitration/cases/{id}/decision": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Record a reasoned decision
+         * @description Requires arbitration.adjudicate and an active territorial mandate.
+         */
+        post: operations["decideArbitrationCase"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/arbitration/cases/{id}/appeals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Appeal a decided case
+         * @description Requires arbitration.manage and an active territorial mandate.
+         */
+        post: operations["appealArbitrationCase"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/executive-dashboard/interventions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List prioritized operational interventions before statistics
+         * @description Requires executive.read. Source capabilities and territory apply to each queue. More than 48h uncontacted; current active mandates; overdue unfinished objectives; draft/open events without coordinator; reported activity without subsequent review; explicit record expirations within 30 calendar days UTC, including expired records. Counts are computed before pagination.
+         */
+        get: operations["listExecutiveInterventions"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/executive-dashboard/expirations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read explicit expiration metadata, including records with no recorded date */
+        get: operations["listExecutiveExpirations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/executive-dashboard/expirations/{source}/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Record an explicit expiration date with audit and optimistic concurrency
+         * @description Requires executive.targets (national presidency). Null means no recorded deadline, not unlimited validity. Does not change publication or legal effect.
+         */
+        patch: operations["updateExecutiveExpiration"];
+        trace?: never;
+    };
+    "/admin/tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Count pending administrative queues within effective capabilities and territory
+         * @description Counts are not paginated. One record is counted once per queue; CRM and membership may represent distinct tasks for the same application. No executive duplicate is included in total.
+         */
+        get: operations["getAdminTasks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/access": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read effective administrative permissions and territorial scope */
+        get: operations["getAdminAccess"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/mobilization": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List territorial events, campaigns and volunteer tasks */
+        get: operations["listPoliticalOperations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/mobilization/actions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a territorial political operation */
+        post: operations["createPoliticalOperation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/mobilization/actions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update results or lifecycle of an operation */
+        patch: operations["updatePoliticalOperation"];
+        trace?: never;
+    };
+    "/admin/mobilization/actions/{id}/participants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Invite a member or assign a volunteer */
+        post: operations["addPoliticalParticipant"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/mobilization/participants/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Record attendance or review activity */
+        patch: operations["updatePoliticalParticipant"];
+        trace?: never;
+    };
+    "/admin/communications/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preview consent-eligible audience as aggregate counts */
+        post: operations["previewCommunicationAudience"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/communications/dispatches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a draft or consent-controlled dispatch */
+        post: operations["createCommunicationDispatch"];
         delete?: never;
         options?: never;
         head?: never;
@@ -653,7 +1229,7 @@ export interface paths {
         };
         /**
          * List organizations
-         * @description Retrieve list of partner or affiliated organizations
+         * @description Retrieve active party organizations from the territorial registry
          */
         get: operations["listOrganizations"];
         put?: never;
@@ -662,6 +1238,110 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/admin/organizations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List territorial organizations */
+        get: operations["listAdminOrganizations"];
+        put?: never;
+        /** Create a real organization or branch */
+        post: operations["createAdminOrganization"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/organizations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get organization, territories, mandates and objectives */
+        get: operations["getAdminOrganization"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update organization identity, hierarchy and territories */
+        patch: operations["updateAdminOrganization"];
+        trace?: never;
+    };
+    "/admin/organizations/{id}/mandates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Register a leadership mandate */
+        post: operations["createOrganizationMandate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/organizations/{id}/mandates/{childId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update or close a leadership mandate */
+        patch: operations["updateOrganizationMandate"];
+        trace?: never;
+    };
+    "/admin/organizations/{id}/objectives": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Register an organization objective */
+        post: operations["createOrganizationObjective"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/organizations/{id}/objectives/{childId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update organization objective progress */
+        patch: operations["updateOrganizationObjective"];
         trace?: never;
     };
     "/finance": {
@@ -704,6 +1384,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/governance/journal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the public governance journal
+         * @description Retrieve published decisions with issuing body, date, quorum, and result.
+         */
+        get: operations["listGovernanceJournal"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/stats": {
         parameters: {
             query?: never;
@@ -713,7 +1413,7 @@ export interface paths {
         };
         /**
          * Get platform statistics
-         * @description Retrieve aggregated platform statistics
+         * @description National editorially approved snapshots only; filters are rejected. Volunteer counts below 10 (including zero) are null; larger counts are rounded down to multiples of 10. Metadata describes this policy without exposing raw counts or cohort details.
          */
         get: operations["getStats"];
         put?: never;
@@ -722,6 +1422,46 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/admin/executive-dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the executive dashboard
+         * @description Retrieve operational trends, county distribution, conversion, overdue cases, organizations and objectives.
+         */
+        get: operations["getExecutiveDashboard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/executive-dashboard/targets/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update an executive target
+         * @description Update an operational target (president and vice-president only).
+         */
+        patch: operations["updateExecutiveTarget"];
         trace?: never;
     };
     "/admin/members/dashboard": {
@@ -738,6 +1478,26 @@ export interface paths {
         get: operations["listAdminMembersDashboard"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/members/{id}/actions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Apply a membership decision
+         * @description Verify, approve, activate, suspend, reactivate, transfer or terminate a membership with history and audit
+         */
+        post: operations["applyMembershipAction"];
         delete?: never;
         options?: never;
         head?: never;
@@ -940,7 +1700,10 @@ export interface components {
             password: string;
         };
         AuthSigninInput: {
-            /** @description Email complet sau numele de utilizator (partea dinainte de @). */
+            /**
+             * @description Email complet sau numele de utilizator (partea dinainte de @).
+             * @example admin
+             */
             email: string;
             /** Format: password */
             password: string;
@@ -998,21 +1761,24 @@ export interface components {
         VolunteerContactChannel: "telefon" | "email" | "whatsapp" | "telegram" | "facebook" | "intalnire" | "altul";
         /** @enum {string} */
         VolunteerPriority: "scazuta" | "medie" | "ridicata" | "critica";
-        /** @enum {string} */
-        VolunteerPublicRole: "SUSTINATOR" | "ADERENT" | "MEMBRU" | "CONSILIER" | "SECRETAR" | "VICEPRESEDINTE" | "PRESEDINTE" | "FARA_CONT";
-        VolunteerPublicItem: {
-            id: string;
-            fullName: string;
-            /** Format: email */
-            email: string;
-            /** @enum {string} */
-            password: "protejata" | "nesetata";
-            status: components["schemas"]["VolunteerWorkflowStatus"];
-            role: components["schemas"]["VolunteerPublicRole"];
+        AdminTasks: {
+            /** Format: date-time */
+            generatedAt: string;
+            total: number;
+            counts: {
+                volunteers?: number;
+                members?: number;
+                organizations?: number;
+                mobilization?: number;
+                congresses?: number;
+                arbitration?: number;
+            };
         };
-        VolunteerCountyCountItem: {
-            county: string;
-            count: number;
+        PublicStatsData: {
+            /** @description National lower bound rounded down to tens; null for fewer than 10 people or an unavailable/unapproved snapshot. */
+            volunteers: number | null;
+            /** @description Editorially approved news count; null when unavailable. */
+            news: number | null;
         };
         VolunteerSignupInput: {
             fullName: string;
@@ -1035,6 +1801,192 @@ export interface components {
         VolunteerSignupResponseData: {
             message: string;
             id: number;
+        };
+        MobilizationAction: {
+            id: string;
+            slug: string;
+            /** @enum {string} */
+            type: "event" | "campaign" | "volunteer_task" | "petition" | "consultation";
+            title: string;
+            summary: string;
+            description: string;
+            /** @enum {string} */
+            scope: "national" | "local" | "online";
+            county: string;
+            locality: string;
+            /** Format: date-time */
+            startsAt: string | null;
+            /** Format: date-time */
+            endsAt: string | null;
+            participationMode: string;
+            commitment: string;
+            capacity: number | null;
+            /** @description Live availability; null means unlimited. Independent of the editorial response-count snapshot. */
+            availableSpots: number | null;
+            responseCount: number | null;
+        };
+        MobilizationResponseInput: {
+            fullName: string;
+            /** Format: email */
+            email: string;
+            /** @default  */
+            phone: string;
+            county: string;
+            /** @default  */
+            locality: string;
+            interests: ("pensii" | "sanatate" | "servicii_locale" | "combaterea_izolarii" | "comunicare" | "organizare")[];
+            /**
+             * @default
+             * @enum {string}
+             */
+            availability: "" | "dimineata" | "dupa_amiaza" | "seara" | "weekend" | "flexibil";
+            /** @default  */
+            message: string;
+            /**
+             * @description Consent to a waiting-list entry if no seat remains. If a seat is available, participation is confirmed.
+             * @default false
+             */
+            joinWaitlist: boolean;
+            /** @default false */
+            updatesConsent: boolean;
+            /** @default false */
+            emailConsent: boolean;
+            /** @default false */
+            smsConsent: boolean;
+            /** @default false */
+            whatsappConsent: boolean;
+            /**
+             * @default mobilizare-v2
+             * @enum {string}
+             */
+            consentVersion: "mobilizare-v2";
+            /** @enum {boolean} */
+            privacyConsent: true;
+            /** @default  */
+            website: string;
+        };
+        MobilizationResponseData: {
+            accepted: boolean;
+            id: string | null;
+            /** @enum {string|null} */
+            registrationStatus: "confirmed" | "waitlisted" | null;
+        };
+        MemberEventResponseInput: {
+            /** @enum {string} */
+            response: "confirmed" | "declined";
+        };
+        MemberTaskReportInput: {
+            /** @enum {string} */
+            status: "in_progress" | "reported";
+            report: string;
+            /** @default  */
+            result: string;
+            hours: number;
+        };
+        MemberConsentInput: {
+            emailConsent: boolean;
+            smsConsent: boolean;
+            whatsappConsent: boolean;
+            /** @default  */
+            phone: string;
+            /** @default [] */
+            interests: ("pensii" | "sanatate" | "servicii_locale" | "combaterea_izolarii" | "comunicare" | "organizare")[];
+            /**
+             * @default portal-membru-v1
+             * @enum {string}
+             */
+            consentVersion: "portal-membru-v1";
+        };
+        PoliticalOperationInput: {
+            /** @enum {string} */
+            type: "event" | "campaign" | "volunteer_task";
+            title: string;
+            summary: string;
+            /** @default  */
+            description: string;
+            objective: string;
+            /**
+             * @default draft
+             * @enum {string}
+             */
+            status: "draft" | "open" | "closed" | "archived";
+            /**
+             * @default members
+             * @enum {string}
+             */
+            visibility: "public" | "members" | "internal";
+            organizationId?: string | null;
+            coordinatorUserId?: string | null;
+            /** @default [] */
+            countyIds: number[];
+            /** Format: date-time */
+            startsAt?: string | null;
+            /** Format: date-time */
+            endsAt?: string | null;
+            /** @default  */
+            participationMode: string;
+            /** @default  */
+            commitment: string;
+            capacity?: number | null;
+            /** @default  */
+            targetMetric: string;
+            targetValue?: number | null;
+        };
+        PoliticalOperationUpdateInput: {
+            coordinatorUserId?: string | null;
+            /** @enum {string} */
+            status?: "draft" | "open" | "closed" | "archived";
+            resultValue?: number | null;
+            resultSummary?: string;
+            expectedVersion: number;
+        };
+        PoliticalParticipantInput: {
+            /** Format: email */
+            email: string;
+            /** Format: date-time */
+            dueAt?: string | null;
+            /** @default  */
+            notes: string;
+        };
+        PoliticalParticipantUpdateInput: {
+            /** @enum {string} */
+            status?: "invited" | "confirmed" | "waitlisted" | "declined" | "active" | "in_progress" | "reported" | "completed" | "cancelled";
+            /** @enum {string} */
+            attendanceStatus?: "not_applicable" | "pending" | "present" | "absent" | "excused";
+            report?: string;
+            result?: string;
+            hours?: number;
+        };
+        CommunicationAudienceInput: {
+            /** @enum {string} */
+            channel: "email" | "sms" | "whatsapp";
+            organizationId?: string | null;
+            /** @default [] */
+            countyIds: number[];
+            /** @default [] */
+            roles: components["schemas"]["UserRole"][];
+            /** @default [] */
+            interests: ("pensii" | "sanatate" | "servicii_locale" | "combaterea_izolarii" | "comunicare" | "organizare")[];
+        };
+        CommunicationDispatchInput: {
+            /** @enum {string} */
+            channel: "email" | "sms" | "whatsapp";
+            organizationId?: string | null;
+            /** @default [] */
+            countyIds: number[];
+            /** @default [] */
+            roles: components["schemas"]["UserRole"][];
+            /** @default [] */
+            interests: ("pensii" | "sanatate" | "servicii_locale" | "combaterea_izolarii" | "comunicare" | "organizare")[];
+            title: string;
+            message: string;
+            /**
+             * @default draft
+             * @enum {string}
+             */
+            mode: "draft" | "send";
+            /** @default false */
+            confirmConsentSelection: boolean;
         };
         /** @enum {string} */
         VolunteerAdminRecordSource: "volunteer" | "user" | "both";
@@ -1170,38 +2122,344 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
         };
-        AdminDashboardMember: {
+        /** @enum {string} */
+        OrganizationLevel: "national" | "county" | "municipal" | "local";
+        /** @enum {string} */
+        OrganizationStatus: "forming" | "active" | "inactive" | "dissolved";
+        OrganizationTerritoryInput: {
+            /** @enum {string} */
+            type: "national" | "county" | "locality";
+            countyId?: number | null;
+            /** @default  */
+            locality: string;
+        };
+        OrganizationWriteInput: {
+            code: string;
+            name: string;
+            level: components["schemas"]["OrganizationLevel"];
+            status: components["schemas"]["OrganizationStatus"];
+            parentId?: string | null;
+            /** @default 0 */
+            membersCount: number;
+            /** Format: email */
+            officialEmail?: string;
+            phone?: string;
+            headquarters?: string;
+            /** Format: date */
+            foundedAt?: string | null;
+            territories: components["schemas"]["OrganizationTerritoryInput"][];
+        };
+        OrganizationPatchInput: {
+            code?: string;
+            name?: string;
+            level?: components["schemas"]["OrganizationLevel"];
+            status?: components["schemas"]["OrganizationStatus"];
+            parentId?: string | null;
+            membersCount?: number;
+            /** Format: email */
+            officialEmail?: string;
+            phone?: string;
+            headquarters?: string;
+            /** Format: date */
+            foundedAt?: string | null;
+            territories?: components["schemas"]["OrganizationTerritoryInput"][];
+        };
+        OrganizationMandateInput: {
+            userId?: number | null;
+            fullName: string;
+            positionTitle: string;
+            /** Format: date */
+            startedAt: string;
+            /** Format: date */
+            endedAt?: string | null;
+            /**
+             * @default active
+             * @enum {string}
+             */
+            status: "planned" | "active" | "completed" | "suspended";
+            decision: components["schemas"]["OrganizationMandateDecision"];
+        };
+        OrganizationMandatePatchInput: {
+            userId?: number | null;
+            fullName?: string;
+            positionTitle?: string;
+            /** Format: date */
+            startedAt?: string;
+            /** Format: date */
+            endedAt?: string | null;
+            /** @enum {string} */
+            status?: "planned" | "active" | "completed" | "suspended";
+            decision?: components["schemas"]["OrganizationMandateDecision"];
+        };
+        OrganizationMandateDecision: {
+            decisionNumber: string;
+            /** Format: date */
+            decisionDate: string;
+            issuingBody: string;
+            minutesPath: string;
+        };
+        OrganizationObjectiveInput: {
+            title: string;
+            description?: string;
+            metricName?: string;
+            targetValue: number;
+            /** @default 0 */
+            currentValue: number;
+            /** @default număr */
+            unit: string;
+            /** Format: date */
+            dueDate: string;
+            /**
+             * @default planned
+             * @enum {string}
+             */
+            status: "planned" | "in_progress" | "achieved" | "at_risk" | "cancelled";
+        };
+        OrganizationObjectivePatchInput: {
+            title?: string;
+            description?: string;
+            metricName?: string;
+            targetValue?: number;
+            currentValue?: number;
+            unit?: string;
+            /** Format: date */
+            dueDate?: string;
+            /** @enum {string} */
+            status?: "planned" | "in_progress" | "achieved" | "at_risk" | "cancelled";
+        };
+        ExecutiveInterventions: {
+            /** Format: date-time */
+            generatedAt: string;
+            total: number;
+            limit: number;
+            offset: number;
+            counts: {
+                uncontacted?: number;
+                unled_branches?: number;
+                overdue_objectives?: number;
+                uncoordinated_events?: number;
+                unreviewed_reports?: number;
+                expiring_records?: number;
+            };
+            expiryCoverage: {
+                tracked: number;
+                missing: number;
+                /** @enum {integer} */
+                windowDays: 30;
+            };
+            rows: {
+                key: string;
+                /** @enum {string} */
+                kind: "uncontacted" | "unled_branches" | "overdue_objectives" | "uncoordinated_events" | "unreviewed_reports" | "expiring_records";
+                title: string;
+                context: string;
+                /** @enum {string} */
+                priority: "critical" | "high" | "normal";
+                /** Format: date-time */
+                dueAt: string | null;
+                href: string;
+                targetId: string;
+                parentId: string | null;
+            }[];
+        };
+        ExecutiveExpirationUpdate: {
+            /** Format: date */
+            expiresOn: string | null;
+            /** Format: date */
+            expectedExpiresOn: string | null;
+        };
+        ExecutiveDashboardSummary: {
+            applicationsTotal: number;
+            applicationsLast30Days: number;
+            contactedTotal: number;
+            uncontactedCases: number;
+            membersTotal: number;
+            contactRate: number;
+            memberConversionRate: number;
+            overdueCases: number;
+            activeOrganizations: number;
+            countiesWithoutResponsible: number;
+        };
+        ExecutiveDashboardTrend: {
+            /** Format: date */
+            month: string;
+            applications: number;
+            contacted: number;
+            members: number;
+        };
+        ExecutiveDashboardCounty: {
+            county: string;
+            applications: number;
+            contacted: number;
+            members: number;
+            organizers: number;
+            overdue: number;
+            hasResponsible: boolean;
+        };
+        ExecutiveDashboardWorkflow: {
+            status: components["schemas"]["VolunteerWorkflowStatus"];
+            count: number;
+        };
+        ExecutiveDashboardObjective: {
+            /** @enum {string} */
+            key: "contact_rate" | "member_conversion_rate" | "overdue_cases" | "active_organizations";
+            label: string;
+            targetValue: number;
+            currentValue: number;
+            /** @enum {string} */
+            unit: "percent" | "count";
+            /** @enum {string} */
+            direction: "at_least" | "at_most";
+            /** @enum {string} */
+            status: "achieved" | "on_track" | "at_risk";
+            progressPercent: number;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        ExecutiveDashboardDefinitions: {
+            contactRate: string;
+            memberConversionRate: string;
+            overdueCases: string;
+            activeOrganizations: string;
+            uncontactedCases: string;
+            countiesWithoutResponsible: string;
+            trends: string;
+        };
+        ExecutiveDashboardData: {
+            /** Format: date-time */
+            generatedAt: string;
+            summary: components["schemas"]["ExecutiveDashboardSummary"];
+            trends: components["schemas"]["ExecutiveDashboardTrend"][];
+            counties: components["schemas"]["ExecutiveDashboardCounty"][];
+            workflow: components["schemas"]["ExecutiveDashboardWorkflow"][];
+            countiesWithoutResponsible: string[];
+            objectives: components["schemas"]["ExecutiveDashboardObjective"][];
+            definitions: components["schemas"]["ExecutiveDashboardDefinitions"];
+        };
+        ExecutiveTargetUpdateInput: {
+            targetValue: number;
+        };
+        ExecutiveTarget: {
+            /** @enum {string} */
+            key: "contact_rate" | "member_conversion_rate" | "overdue_cases" | "active_organizations";
+            label: string;
+            targetValue: number;
+            /** @enum {string} */
+            unit: "percent" | "count";
+            /** @enum {string} */
+            direction: "at_least" | "at_most";
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        ExecutiveTargetUpdateResponseData: {
+            message: string;
+            target: components["schemas"]["ExecutiveTarget"];
+        };
+        /** @enum {string} */
+        MembershipStatus: "supporter" | "application" | "verified" | "approved" | "active" | "suspended" | "terminated";
+        /** @enum {string} */
+        MembershipAction: "verify" | "approve" | "activate" | "suspend" | "reactivate" | "transfer" | "terminate";
+        MembershipOrganization: {
             id: string;
+            code: string;
+            name: string;
+            level: string;
+            status: string;
+        };
+        MembershipEvent: {
+            id: string;
+            action: string;
+            previousStatus: components["schemas"]["MembershipStatus"] | null;
+            nextStatus: components["schemas"]["MembershipStatus"];
+            previousOrganizationId: string | null;
+            nextOrganizationId: string | null;
+            reason: string;
+            /** Format: date-time */
+            effectiveAt: string;
+            actorName: string | null;
+        };
+        AdminMembershipRow: {
+            id: string;
+            userId: string | null;
+            volunteerId: string | null;
             fullName: string;
             /** Format: email */
             email: string;
             role: components["schemas"]["UserRole"];
+            membershipStatus: components["schemas"]["MembershipStatus"];
+            memberNumber: string | null;
+            organization: components["schemas"]["MembershipOrganization"] | null;
+            approvalOrganization: components["schemas"]["MembershipOrganization"] | null;
+            county: string;
+            locality: string;
+            /** Format: date-time */
+            applicationAt: string;
+            /** Format: date-time */
+            verifiedAt: string | null;
+            /** Format: date-time */
+            approvedAt: string | null;
+            /** Format: date-time */
+            activatedAt: string | null;
+            approvalBody: string;
+            /** Format: date-time */
+            suspendedAt: string | null;
+            /** Format: date-time */
+            endedAt: string | null;
+            statusReason: string;
+            version: number;
             /** Format: date-time */
             createdAt: string;
-        };
-        AdminDashboardGroup: {
-            label: string;
-            count: number;
-            rows: components["schemas"]["AdminDashboardMember"][];
+            /** Format: date-time */
+            updatedAt: string;
+            history: components["schemas"]["MembershipEvent"][];
+            availableActions: components["schemas"]["MembershipAction"][];
         };
         AdminMembersDashboardSummary: {
             total: number;
-            aderenti: number;
-            membri: number;
-            organizatori: number;
+            supporters: number;
+            applications: number;
+            verified: number;
+            approved: number;
+            active: number;
+            suspended: number;
+            terminated: number;
+            organizers: number;
+            unassigned: number;
         };
         AdminMembersDashboardFilters: {
             search: string;
+            status: components["schemas"]["MembershipStatus"] | null;
+            organizationId: string | null;
+        };
+        AdminMembersDashboardPagination: {
+            total: number;
             limit: number;
+            offset: number;
+            hasPrevious: boolean;
+            hasNext: boolean;
         };
         AdminMembersDashboardData: {
+            /** Format: date-time */
+            generatedAt: string;
             summary: components["schemas"]["AdminMembersDashboardSummary"];
-            groups: {
-                aderenti: components["schemas"]["AdminDashboardGroup"];
-                membri: components["schemas"]["AdminDashboardGroup"];
-                organizatori: components["schemas"]["AdminDashboardGroup"];
-            };
+            rows: components["schemas"]["AdminMembershipRow"][];
+            organizations: components["schemas"]["MembershipOrganization"][];
+            pagination: components["schemas"]["AdminMembersDashboardPagination"];
             filters: components["schemas"]["AdminMembersDashboardFilters"];
+        };
+        MembershipActionInput: {
+            action: components["schemas"]["MembershipAction"];
+            organizationId?: string;
+            approvalOrganizationId?: string;
+            /** @default  */
+            reason: string;
+            /** Format: date-time */
+            effectiveAt?: string;
+            expectedVersion: number;
+        };
+        MembershipActionResponseData: {
+            message: string;
+            membership: components["schemas"]["AdminMembershipRow"];
         };
         AdminEmailTestInput: {
             /** Format: email */
@@ -1275,20 +2533,6 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ApiSuccessResponse"];
                 };
-            };
-            /** @description Unauthorized */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Insufficient permissions */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
         };
     };
@@ -2408,37 +3652,6 @@ export interface operations {
             };
         };
     };
-    listPublicVolunteers: {
-        parameters: {
-            query?: {
-                /** @description Maximum number of public volunteer rows to return. */
-                limit?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description List of volunteers */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["VolunteerPublicItem"][];
-                        /**
-                         * @description Always null for success responses
-                         * @example null
-                         */
-                        error: unknown;
-                        meta: components["schemas"]["ApiMeta"];
-                    };
-                };
-            };
-        };
-    };
     createVolunteer: {
         parameters: {
             query?: never;
@@ -2554,7 +3767,7 @@ export interface operations {
             };
         };
     };
-    listVolunteersByCounty: {
+    listMobilizationActions: {
         parameters: {
             query?: never;
             header?: never;
@@ -2563,14 +3776,14 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Volunteers grouped by county */
+            /** @description Open events, campaigns, volunteer tasks, petitions and consultations */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        data: components["schemas"]["VolunteerCountyCountItem"][];
+                        data: components["schemas"]["MobilizationAction"][];
                         /**
                          * @description Always null for success responses
                          * @example null
@@ -2579,6 +3792,1709 @@ export interface operations {
                         meta: components["schemas"]["ApiMeta"];
                     };
                 };
+            };
+        };
+    };
+    createMobilizationResponse: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MobilizationResponseInput"];
+            };
+        };
+        responses: {
+            /** @description Participation response recorded */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["MobilizationResponseData"];
+                        /**
+                         * @description Always null for success responses
+                         * @example null
+                         */
+                        error: unknown;
+                        meta: components["schemas"]["ApiMeta"];
+                    };
+                };
+            };
+            /** @description Invalid response */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Action unavailable */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Duplicate response (MOBILIZATION_RESPONSE_EXISTS) or no seats remaining (MOBILIZATION_ACTION_FULL); retry with joinWaitlist=true only with explicit consent */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Too many responses */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    getMemberPortal: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Membership, branch, activities, documents, dues and communication preferences */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    respondToMemberEvent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MemberEventResponseInput"];
+            };
+        };
+        responses: {
+            /** @description Response recorded */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invitation does not belong to the member */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    reportMemberTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MemberTaskReportInput"];
+            };
+        };
+        responses: {
+            /** @description Report recorded */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Task does not belong to the member */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateMemberCommunicationConsent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MemberConsentInput"];
+            };
+        };
+        responses: {
+            /** @description Preferences updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid preferences */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getCongressResults: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Aggregate candidacy results; empty until congress validation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+        };
+    };
+    listCongresses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid input */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Capability or territorial mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Record unavailable in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid procedure, transition, quorum or incompatibility */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    createCongress: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    organizationId: string;
+                    title: string;
+                    /** @enum {string} */
+                    purpose: "ordinary" | "extraordinary" | "founding";
+                    /** Format: date-time */
+                    startsAt: string;
+                    /** Format: date-time */
+                    endsAt: string;
+                    quorum: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Success */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid input */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Capability or territorial mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Record unavailable in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid procedure, transition, quorum or incompatibility */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    addCongressDelegate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    userId?: number | null;
+                    fullName: string;
+                    organizationId: string;
+                    selectedBy?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Success */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid input */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Capability or territorial mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Record unavailable in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid procedure, transition, quorum or incompatibility */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    addCongressCandidacy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    candidateUserId?: number | null;
+                    candidateName: string;
+                    office: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Success */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid input */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Capability or territorial mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Record unavailable in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid procedure, transition, quorum or incompatibility */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    validateCongressCandidacy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+                candidacyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid input */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Capability or territorial mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Record unavailable in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid procedure, transition, quorum or incompatibility */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    checkInCongressDelegate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+                delegateId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid input */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Capability or territorial mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Record unavailable in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid procedure, transition, quorum or incompatibility */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    transitionCongress: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    status: "open" | "closed" | "validated";
+                };
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid input */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Capability or territorial mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Record unavailable in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid procedure, transition, quorum or incompatibility */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    castCongressVote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    candidacyId: number;
+                    /** @enum {string} */
+                    choice: "yes" | "no" | "abstain";
+                };
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid input */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Capability or territorial mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Record unavailable in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid procedure, transition, quorum or incompatibility */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listArbitrationCases: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid input */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Capability or territorial mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Record unavailable in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid procedure, transition, quorum or incompatibility */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    createArbitrationCase: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    organizationId?: string | null;
+                    /** @enum {string} */
+                    caseType: "disciplinary" | "member_dispute" | "competence" | "election" | "other";
+                    subject: string;
+                    facts: string;
+                    legalBasis?: string;
+                    /** Format: date-time */
+                    responseDueAt?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Success */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid input */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Capability or territorial mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Record unavailable in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid procedure, transition, quorum or incompatibility */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    addArbitrationParty: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    userId?: number | null;
+                    fullName: string;
+                    /** @enum {string} */
+                    partyRole: "claimant" | "respondent" | "witness";
+                };
+            };
+        };
+        responses: {
+            /** @description Success */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid input */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Capability or territorial mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Record unavailable in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid procedure, transition, quorum or incompatibility */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    addArbitrationEvidence: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    title: string;
+                    documentPath: string;
+                    description?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Success */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid input */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Capability or territorial mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Record unavailable in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid procedure, transition, quorum or incompatibility */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    declareArbitrationConflict: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    arbitratorUserId: number;
+                    reason: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Success */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid input */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Capability or territorial mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Record unavailable in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid procedure, transition, quorum or incompatibility */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    decideArbitrationCase: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    outcome: "upheld" | "rejected" | "partially_upheld" | "dismissed";
+                    reasoning: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid input */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Capability or territorial mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Record unavailable in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid procedure, transition, quorum or incompatibility */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    appealArbitrationCase: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    grounds: string;
+                    /** Format: date-time */
+                    dueAt?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Success */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid input */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Capability or territorial mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Record unavailable in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid procedure, transition, quorum or incompatibility */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listExecutiveInterventions: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                kind?: "uncontacted" | "unled_branches" | "overdue_objectives" | "uncoordinated_events" | "unreviewed_reports" | "expiring_records";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Private, territorially scoped data */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ExecutiveInterventions"];
+                        error: unknown;
+                        meta: components["schemas"]["ApiMeta"];
+                    };
+                };
+            };
+            /** @description Invalid filter */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Executive capability and active mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listExecutiveExpirations: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                record?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Private, territorially scoped data */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            total: number;
+                            limit: number;
+                            offset: number;
+                            record?: string;
+                            canManage: boolean;
+                            rows: {
+                                /** @enum {string} */
+                                source: "document" | "mandate_decision" | "congress_decision" | "arbitration_decision";
+                                id: string;
+                                title: string;
+                                /** Format: date */
+                                expiresOn: string | null;
+                            }[];
+                        };
+                        error: unknown;
+                        meta: components["schemas"]["ApiMeta"];
+                    };
+                };
+            };
+            /** @description Invalid filter */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Executive capability required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateExecutiveExpiration: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                source: "document" | "mandate_decision" | "congress_decision" | "arbitration_decision";
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExecutiveExpirationUpdate"];
+            };
+        };
+        responses: {
+            /** @description Private, territorially scoped data */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            source?: string;
+                            id?: string;
+                            /** Format: date */
+                            expiresOn?: string | null;
+                        };
+                        error: unknown;
+                        meta: components["schemas"]["ApiMeta"];
+                    };
+                };
+            };
+            /** @description Invalid date or input */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description National target-management capability required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Record outside authorized registry */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Concurrent expiration update */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getAdminTasks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Private, non-cacheable queue counts */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AdminTasks"];
+                        /**
+                         * @description Always null for success responses
+                         * @example null
+                         */
+                        error: unknown;
+                        meta: components["schemas"]["ApiMeta"];
+                    };
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Administrative capability and active mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getAdminAccess: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Effective function capabilities and territorial mandate scope */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing function permission or active territorial mandate */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listPoliticalOperations: {
+        parameters: {
+            query?: {
+                actionId?: string;
+                type?: "event" | "campaign" | "volunteer_task";
+                status?: "draft" | "open" | "closed" | "archived";
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Territorially scoped operations workspace */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing mobilization permission or mandate */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    createPoliticalOperation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PoliticalOperationInput"];
+            };
+        };
+        responses: {
+            /** @description Operation created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid operation */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Territory outside mandate */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updatePoliticalOperation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PoliticalOperationUpdateInput"];
+            };
+        };
+        responses: {
+            /** @description Operation updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Operation not found in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Optimistic concurrency conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    addPoliticalParticipant: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PoliticalParticipantInput"];
+            };
+        };
+        responses: {
+            /** @description Participant assigned; email is queued only with explicit consent */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid participant */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Outside authorized territory */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updatePoliticalParticipant: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PoliticalParticipantUpdateInput"];
+            };
+        };
+        responses: {
+            /** @description Participant updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Participant not found in authorized scope */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    previewCommunicationAudience: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CommunicationAudienceInput"];
+            };
+        };
+        responses: {
+            /** @description Aggregate eligible audience; no personal data returned */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Audience outside authorized territory */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    createCommunicationDispatch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CommunicationDispatchInput"];
+            };
+        };
+        responses: {
+            /** @description Dispatch materialized from current explicit consents */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid or empty audience */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Actual delivery requires national authorization */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -3041,6 +5957,337 @@ export interface operations {
             };
         };
     };
+    listAdminOrganizations: {
+        parameters: {
+            query?: {
+                search?: string;
+                level?: components["schemas"]["OrganizationLevel"];
+                status?: components["schemas"]["OrganizationStatus"];
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Territorial registry */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    createAdminOrganization: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrganizationWriteInput"];
+            };
+        };
+        responses: {
+            /** @description Organization created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid organization */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Organization conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getAdminOrganization: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization identifier */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Organization detail */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Organization not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateAdminOrganization: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization identifier */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrganizationPatchInput"];
+            };
+        };
+        responses: {
+            /** @description Organization updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid organization */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Organization not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Organization conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    createOrganizationMandate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization identifier */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrganizationMandateInput"];
+            };
+        };
+        responses: {
+            /** @description Mandate registered */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid mandate */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Organization not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateOrganizationMandate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization identifier */
+                id: string;
+                /** @description Mandate or objective identifier */
+                childId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrganizationMandatePatchInput"];
+            };
+        };
+        responses: {
+            /** @description Mandate updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid mandate */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Mandate not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    createOrganizationObjective: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization identifier */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrganizationObjectiveInput"];
+            };
+        };
+        responses: {
+            /** @description Objective registered */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid objective */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Organization not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateOrganizationObjective: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Organization identifier */
+                id: string;
+                /** @description Mandate or objective identifier */
+                childId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrganizationObjectivePatchInput"];
+            };
+        };
+        responses: {
+            /** @description Objective updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid objective */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Objective not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     listFinance: {
         parameters: {
             query?: never;
@@ -3081,6 +6328,26 @@ export interface operations {
             };
         };
     };
+    listGovernanceJournal: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Public governance journal */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+        };
+    };
     getStats: {
         parameters: {
             query?: never;
@@ -3096,8 +6363,129 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                    "application/json": {
+                        data: components["schemas"]["PublicStatsData"];
+                        /**
+                         * @description Always null for success responses
+                         * @example null
+                         */
+                        error: unknown;
+                        meta: components["schemas"]["ApiMeta"];
+                    };
                 };
+            };
+            /** @description Public statistics do not accept query filters */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    getExecutiveDashboard: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Executive dashboard data */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ExecutiveDashboardData"];
+                        /**
+                         * @description Always null for success responses
+                         * @example null
+                         */
+                        error: unknown;
+                        meta: components["schemas"]["ApiMeta"];
+                    };
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateExecutiveTarget: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: "contact_rate" | "member_conversion_rate" | "overdue_cases" | "active_organizations";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExecutiveTargetUpdateInput"];
+            };
+        };
+        responses: {
+            /** @description Executive target updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ExecutiveTargetUpdateResponseData"];
+                        /**
+                         * @description Always null for success responses
+                         * @example null
+                         */
+                        error: unknown;
+                        meta: components["schemas"]["ApiMeta"];
+                    };
+                };
+            };
+            /** @description Invalid target */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Target not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -3105,7 +6493,10 @@ export interface operations {
         parameters: {
             query?: {
                 search?: string;
+                status?: components["schemas"]["MembershipStatus"];
+                organizationId?: string;
                 limit?: number;
+                offset?: number;
             };
             header?: never;
             path?: never;
@@ -3139,6 +6530,75 @@ export interface operations {
             };
             /** @description Insufficient permissions */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    applyMembershipAction: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MembershipActionInput"];
+            };
+        };
+        responses: {
+            /** @description Membership decision recorded */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["MembershipActionResponseData"];
+                        /**
+                         * @description Always null for success responses
+                         * @example null
+                         */
+                        error: unknown;
+                        meta: components["schemas"]["ApiMeta"];
+                    };
+                };
+            };
+            /** @description Invalid decision */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Membership not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid or concurrent transition */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

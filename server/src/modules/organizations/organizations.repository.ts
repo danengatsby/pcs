@@ -34,12 +34,20 @@ const organizationListSelect = {
   phone: true,
   headquarters: true,
   status: true,
+  isDemo: true,
+  publicApprovedAt: true,
+  publicApprovedBy: true,
   foundedAt: true,
   createdAt: true,
   parent: { select: { id: true, code: true, name: true } },
   territories: { select: territorySelect, orderBy: { id: "asc" } },
   mandates: {
-    where: { status: "active" },
+    where: {
+      status: "active",
+      isDemo: false,
+      publicApprovedAt: { not: null },
+      publicApprovedBy: { not: null },
+    },
     orderBy: [{ startedAt: "asc" }, { id: "asc" }],
     select: { fullName: true, positionTitle: true },
   },
@@ -66,8 +74,20 @@ const organizationDetailSelect = {
       startedAt: true,
       endedAt: true,
       status: true,
+      isDemo: true,
+      publicApprovedAt: true,
+      publicApprovedBy: true,
       createdAt: true,
       updatedAt: true,
+      decision: {
+        select: {
+          id: true,
+          decisionNumber: true,
+          decisionDate: true,
+          issuingBody: true,
+          minutesPath: true,
+        },
+      },
       user: { select: { email: true, role: true } },
     },
   },
@@ -130,6 +150,9 @@ function mapOrganizationListRow(row: OrganizationListDbRow) {
     county: row.county,
     membersCount: row.membersCount,
     status: row.status,
+    isDemo: row.isDemo,
+    publicApprovedAt: row.publicApprovedAt?.toISOString() ?? null,
+    publicApprovedBy: row.publicApprovedBy?.toString() ?? null,
     foundedAt: toDateOnly(row.foundedAt),
     createdAt: row.createdAt.toISOString(),
     parent: row.parent,
@@ -158,10 +181,20 @@ function mapOrganizationDetail(row: OrganizationDetailDbRow) {
       startedAt: toDateOnly(mandate.startedAt),
       endedAt: toDateOnly(mandate.endedAt),
       status: mandate.status,
+      isDemo: mandate.isDemo,
+      publicApprovedAt: mandate.publicApprovedAt?.toISOString() ?? null,
+      publicApprovedBy: mandate.publicApprovedBy?.toString() ?? null,
       accountEmail: mandate.user?.email ?? null,
       accountRole: mandate.user?.role ?? null,
       createdAt: mandate.createdAt.toISOString(),
       updatedAt: mandate.updatedAt.toISOString(),
+      decision: mandate.decision ? {
+        id: mandate.decision.id.toString(),
+        decisionNumber: mandate.decision.decisionNumber,
+        decisionDate: toDateOnly(mandate.decision.decisionDate),
+        issuingBody: mandate.decision.issuingBody,
+        minutesPath: mandate.decision.minutesPath,
+      } : null,
     })),
     objectives: row.objectives.map((objective) => ({
       id: objective.id.toString(),
@@ -205,6 +238,9 @@ export async function listOrganizationsRepository(filters: ListOrganizationsQuer
   const where: Prisma.OrganizationWhereInput = {
     ...buildOrganizationWhere({ ...filters, status: "active" }),
     status: "active",
+    isDemo: false,
+    publicApprovedAt: { not: null },
+    publicApprovedBy: { not: null },
   };
   const [records, total] = await prisma.$transaction([
     prisma.organization.findMany({
@@ -224,7 +260,6 @@ export async function listOrganizationsRepository(filters: ListOrganizationsQuer
       level: row.level as OrganizationRecord["level"],
       name: row.name,
       county: row.county,
-      membersCount: row.membersCount,
       foundedAt: toDateOnly(row.foundedAt),
       territories: row.territories.map(territoryLabel),
       officialEmail: row.officialEmail,
@@ -405,6 +440,9 @@ export async function createOrganizationRepository(input: CreateOrganizationInpu
       foundedAt: toDate(input.foundedAt),
       createdBy: input.actorId,
       updatedBy: input.actorId,
+      isDemo: false,
+      publicApprovedAt: input.status === "active" ? new Date() : null,
+      publicApprovedBy: input.status === "active" ? input.actorId : null,
       territories: { create: buildTerritoryWrites(input.territories) },
     },
   });
@@ -437,6 +475,9 @@ export async function updateOrganizationRepository(id: string, input: UpdateOrga
           },
         }
         : {}),
+      isDemo: false,
+      publicApprovedAt: input.status === "active" ? new Date() : null,
+      publicApprovedBy: input.status === "active" ? input.actorId : null,
       updatedBy: input.actorId,
       updatedAt: new Date(),
     },
@@ -450,19 +491,36 @@ export async function userExists(userId: number): Promise<boolean> {
 
 export async function createOrganizationMandateRepository(
   organizationId: string,
-  input: CreateOrganizationMandateInput
+  input: CreateOrganizationMandateInput & { actorId: bigint }
 ) {
-  const row = await prisma.organizationLeadershipMandate.create({
-    data: {
-      organizationId,
-      userId: input.userId ? BigInt(input.userId) : null,
-      fullName: input.fullName,
-      positionTitle: input.positionTitle,
-      startedAt: toDate(input.startedAt) as Date,
-      endedAt: toDate(input.endedAt),
-      status: input.status,
-    },
-    select: { id: true },
+  const row = await prisma.$transaction(async (tx) => {
+    const decision = await tx.organizationMandateDecision.create({
+      data: {
+        organizationId,
+        decisionNumber: input.decision.decisionNumber,
+        decisionDate: toDate(input.decision.decisionDate) as Date,
+        issuingBody: input.decision.issuingBody,
+        minutesPath: input.decision.minutesPath,
+        createdBy: input.actorId,
+      },
+      select: { id: true },
+    });
+    return tx.organizationLeadershipMandate.create({
+      data: {
+        organizationId,
+        userId: input.userId ? BigInt(input.userId) : null,
+        fullName: input.fullName,
+        positionTitle: input.positionTitle,
+        startedAt: toDate(input.startedAt) as Date,
+        endedAt: toDate(input.endedAt),
+        status: input.status,
+        isDemo: false,
+        publicApprovedAt: input.status === "active" ? new Date() : null,
+        publicApprovedBy: input.status === "active" ? input.actorId : null,
+        decisionId: decision.id,
+      },
+      select: { id: true },
+    });
   });
   return { id: row.id.toString() };
 }
@@ -470,11 +528,11 @@ export async function createOrganizationMandateRepository(
 export async function updateOrganizationMandateRepository(
   organizationId: string,
   mandateId: number,
-  input: UpdateOrganizationMandateInput
+  input: UpdateOrganizationMandateInput & { actorId: bigint }
 ) {
   const existing = await prisma.organizationLeadershipMandate.findFirst({
     where: { id: BigInt(mandateId), organizationId },
-    select: { id: true },
+    select: { id: true, decisionId: true },
   });
   if (!existing) {
     return null;
@@ -482,12 +540,42 @@ export async function updateOrganizationMandateRepository(
   await prisma.organizationLeadershipMandate.update({
     where: { id: existing.id },
     data: {
-      ...(input.userId !== undefined ? { userId: input.userId ? BigInt(input.userId) : null } : {}),
+      ...(input.userId !== undefined
+        ? {
+          user: input.userId
+            ? { connect: { id: BigInt(input.userId) } }
+            : { disconnect: true },
+        }
+        : {}),
       ...(input.fullName !== undefined ? { fullName: input.fullName } : {}),
       ...(input.positionTitle !== undefined ? { positionTitle: input.positionTitle } : {}),
       ...(input.startedAt !== undefined ? { startedAt: toDate(input.startedAt) as Date } : {}),
       ...(input.endedAt !== undefined ? { endedAt: toDate(input.endedAt) } : {}),
       ...(input.status !== undefined ? { status: input.status } : {}),
+      ...(input.decision ? {
+        decision: existing.decisionId
+          ? {
+            update: {
+              decisionNumber: input.decision.decisionNumber,
+              decisionDate: toDate(input.decision.decisionDate) as Date,
+              issuingBody: input.decision.issuingBody,
+              minutesPath: input.decision.minutesPath,
+            },
+          }
+          : {
+            create: {
+              organizationId,
+              decisionNumber: input.decision.decisionNumber,
+              decisionDate: toDate(input.decision.decisionDate) as Date,
+              issuingBody: input.decision.issuingBody,
+              minutesPath: input.decision.minutesPath,
+              createdBy: input.actorId,
+            },
+          },
+      } : {}),
+      isDemo: false,
+      publicApprovedAt: input.status === "active" ? new Date() : null,
+      publicApprovedBy: input.status === "active" ? input.actorId : null,
       updatedAt: new Date(),
     },
   });

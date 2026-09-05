@@ -38,6 +38,9 @@ export async function createAdminNews(req: Request, res: Response, next: NextFun
           publishedAt: payload.publishedAt,
           status: payload.status,
           tags,
+          publicApprovedBy: authUser && ["published", "scheduled"].includes(payload.status)
+            ? BigInt(authUser.id)
+            : null,
         },
         tx
       );

@@ -69,7 +69,6 @@ describe('ContactPage', () => {
         level: 'county',
         name: 'Filiala Județeană Cluj',
         county: 'Cluj',
-        membersCount: 20,
         foundedAt: '2026-01-15',
         territories: ['Cluj'],
         officialEmail: 'cluj@example.test',

@@ -12,6 +12,7 @@ import { buildInfo } from "./lib/buildInfo.js";
 import { closePrisma } from "./lib/prisma.js";
 import { closeRedisClient, ensureRedisConnected } from "./lib/redisClient.js";
 import { setRuntimeDraining } from "./lib/runtimeState.js";
+import { assertNoDemoDataInProduction } from "./lib/productionDataIntegrity.js";
 
 let shutdownStarted = false;
 let forcedExitTimer: ReturnType<typeof setTimeout> | null = null;
@@ -101,6 +102,8 @@ process.on("uncaughtException", (error) => {
 });
 
 async function bootstrap(): Promise<void> {
+  await assertNoDemoDataInProduction(env.nodeEnv);
+
   if (env.authRefreshEnabled && env.authRefreshStore === "redis") {
     await ensureRedisConnected();
   }
