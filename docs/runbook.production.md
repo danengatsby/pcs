@@ -6,7 +6,7 @@ Acest runbook standardizeaza release-ul pentru productie cu aceeasi ordine folos
 
 Preconditii:
 - `server/.env` actualizat pentru mediul tinta
-- `CAPTCHA_MODE=required`, `CAPTCHA_SECRET_KEY`, `VITE_CAPTCHA_SITE_KEY` si `VITE_CAPTCHA_ACTION` configurate in `server/.env`; cheile Cloudflare dummy sunt interzise de preflight
+- formularul de aderare nu necesita chei CAPTCHA; limitarea cererilor si campul-capcana raman active pe server
 - `NEWS_MEDIA_CLAMAV_ENABLED=1`, `NEWS_MEDIA_CLAMAV_MODE=clamd` si profilul Docker `production` pornit pentru serviciul ClamAV
 - `server/.env.production.example` copiat ca `server/.env` și completat cu valori reale
 - Chromium pentru Playwright instalat pe host (`npx playwright install --with-deps chromium`, o singura data sau dupa actualizari Playwright)
@@ -63,12 +63,11 @@ Ordine importanta:
 - `npm run db:seed` functioneaza numai cu `NODE_ENV=test`, `DEMO_DATA_ALLOWED=1` si un `TEST_DATABASE_URL` al carui nume contine `test`/`testing`
 - `pcs-server`, `pcs-email-outbox-worker` si `pcs-admin-audit-outbox-worker` sunt procese PM2 separate; workerii nu ruleaza in procesul API
 - `npm run predeploy` verifică secretele obligatorii, alinierea PM2/Docker/aplicație și răspunsul `PONG` al `clamd`
-- preflight-ul verifica prezenta cheii publice Turnstile si egalitatea `VITE_CAPTCHA_ACTION` / `CAPTCHA_EXPECTED_ACTION`; Vite repeta validarea cheii la build
-- deploy-ul transmite catre Vite numai valorile publice `VITE_CAPTCHA_*` citite din `server/.env`
+- build-ul frontend nu citeste secretele din `server/.env` si nu necesita chei de verificare externe
 - `npm run deploy:production` execută aceeași secvență reproductibilă: ClamAV, preflight, build într-un release imutabil, migrații, restart PM2 și smoke checks
 - dupa smoke-ul bundle-ului, deploy-ul ruleaza Playwright contra instantei repornite si cere titlul public plus CTA-ul principal
 - nu rula `npm run build --workspace client` direct peste directorul indicat de `CLIENT_DIST_PATH`
-- configuratia PM2 seteaza explicit `NODE_ENV=production`; aplicatia trebuie sa porneasca fail-closed daca lipsesc secretele sau CAPTCHA obligatoriu
+- configuratia PM2 seteaza explicit `NODE_ENV=production`; aplicatia trebuie sa porneasca fail-closed daca lipsesc configuratia obligatorie de autentificare sau protectiile de productie
 - API-ul refuza pornirea in production daca exista orice rand `is_demo=true`
 
 Publicarea este separata de starea operationala:
@@ -163,7 +162,7 @@ Rollback complet (schema incompatibila):
 4. reruleaza smoke tests din sectiunea 4
 
 Nota:
-- `server/.env` trebuie sa respecte validarile de productie, inclusiv `CAPTCHA_MODE=required` si cheia Turnstile corespunzatoare frontend-ului
+- `server/.env` trebuie sa respecte validarile de productie pentru autentificare, baza de date si antivirus; variabilele istorice `CAPTCHA_*` / `VITE_CAPTCHA_*` nu mai sunt utilizate
 
 ## 7) Incident notes
 

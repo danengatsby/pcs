@@ -4,16 +4,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useSubmitJoin } from '../hooks/useSubmitJoin'
 import { JoinRequestForm } from './JoinRequestForm'
 
-vi.mock('../captchaConfig', () => ({
-  isCaptchaEnabled: false,
-}))
-
 vi.mock('../hooks/useSubmitJoin', () => ({
   useSubmitJoin: vi.fn(),
-}))
-
-vi.mock('./TurnstileField', () => ({
-  TurnstileField: () => <div data-testid="turnstile-field" />,
 }))
 
 const submit = vi.fn()
@@ -95,7 +87,6 @@ describe('JoinRequestForm', () => {
         locality: 'Cluj-Napoca',
         motivation: 'Vreau să ajut comunitatea locală.',
         skills: 'organizare',
-        captchaToken: '',
         website: '',
       })
     })

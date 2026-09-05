@@ -3,11 +3,8 @@ import type { NextFunction, Request, Response } from "express";
 import { AppError, isDbError } from "../../../../lib/errors.js";
 import { sendSuccess } from "../../../../lib/http.js";
 import { sendVolunteerSignupNotificationEmail } from "../../../../lib/notificationEmails.js";
-import { env } from "../../../../lib/env.js";
 import { hashPassword, verifyPassword } from "../../../../lib/password.js";
 import { withPrismaTransaction } from "../../../../lib/prismaTransaction.js";
-import { readClientIp } from "../../../auth/requestContext.js";
-import { verifyCaptchaToken } from "../../captcha.js";
 import { volunteerSchema } from "../../schema.js";
 import { normalizeCountyKey } from "../../counties.js";
 import {
@@ -25,44 +22,6 @@ function readHoneypot(body: unknown): string {
 
   const record = body as Record<string, unknown>;
   return typeof record.website === "string" ? record.website.trim() : "";
-}
-
-function isCaptchaServiceIssue(reason: string): boolean {
-  return reason === "captcha_response_invalid" || reason === "captcha_secret_missing";
-}
-
-async function assertVolunteerCaptcha(req: Request, captchaToken: string): Promise<void> {
-  if (env.captchaMode === "disabled") {
-    return;
-  }
-
-  const normalizedToken = captchaToken.trim();
-  if (!normalizedToken) {
-    if (env.captchaMode === "required") {
-      throw new AppError(400, "VOLUNTEER_CAPTCHA_REQUIRED", "Confirma verificarea anti-abuz.");
-    }
-
-    return;
-  }
-
-  if (!env.captchaSecret) {
-    return;
-  }
-
-  const verification = await verifyCaptchaToken(normalizedToken, readClientIp(req));
-  if (verification.valid) {
-    return;
-  }
-
-  if (isCaptchaServiceIssue(verification.reason)) {
-    throw new AppError(
-      503,
-      "VOLUNTEER_CAPTCHA_UNAVAILABLE",
-      "Verificarea anti-abuz este indisponibila temporar. Incearca din nou."
-    );
-  }
-
-  throw new AppError(400, "VOLUNTEER_CAPTCHA_INVALID", "Verificarea anti-abuz a esuat. Incearca din nou.");
 }
 
 export async function createVolunteerHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -97,8 +56,6 @@ export async function createVolunteerHandler(req: Request, res: Response, next: 
   const normalizedEmail = payload.email.toLowerCase();
 
   try {
-    await assertVolunteerCaptcha(req, payload.captchaToken);
-
     const createdVolunteerId = await withPrismaTransaction(async (tx) => {
       const countyRow = await tx.county.findUnique({
         where: {

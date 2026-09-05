@@ -44,20 +44,20 @@ describe('submitJoin', () => {
     await expect(submitJoin(payload)).rejects.toThrow('Există deja o cerere/înscriere cu acest email.')
   })
 
-  it('keeps the server message for captcha errors', async () => {
+  it('keeps the server message when signup is rate limited', async () => {
     fetchMock.mockResolvedValue(
       jsonResponse(
         {
           error: {
-            message: 'Verificarea CAPTCHA a eșuat. Încearcă din nou.',
-            code: 'VOLUNTEER_CAPTCHA_INVALID',
+            message: 'Prea multe solicitări. Încearcă din nou peste câteva minute.',
+            code: 'RATE_LIMITED',
           },
         },
-        { status: 400 },
+        { status: 429 },
       ),
     )
 
-    await expect(submitJoin(payload)).rejects.toThrow('Verificarea CAPTCHA a eșuat. Încearcă din nou.')
+    await expect(submitJoin(payload)).rejects.toThrow('Prea multe solicitări. Încearcă din nou peste câteva minute.')
   })
 
   it('rejects invalid success payloads', async () => {

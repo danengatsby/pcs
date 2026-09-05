@@ -73,7 +73,6 @@ export const volunteerSchema = z.object({
   locality: z.string().trim().min(2).max(120),
   skills: z.string().trim().max(220).optional().default(""),
   motivation: z.string().trim().min(10).max(1500),
-  captchaToken: z.string().trim().max(4096).optional().default(""),
   website: z.string().trim().max(2048).optional().default(""),
 }).strict();
 

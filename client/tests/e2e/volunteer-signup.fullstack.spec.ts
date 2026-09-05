@@ -9,7 +9,14 @@ import {
   query,
 } from "./helpers/testDb";
 
-test("visitor can submit the volunteer signup form and create account records", async ({ page }) => {
+test("visitor can submit the volunteer signup form without Cloudflare and create account records", async ({ page }) => {
+  const externalRequests: string[] = [];
+  const pageErrors: string[] = [];
+  page.on("request", (request) => {
+    if (/cloudflare\.com|turnstile/i.test(request.url())) externalRequests.push(request.url());
+  });
+  page.on("pageerror", (error) => pageErrors.push(error.message));
+  await page.route(/cloudflare\.com|turnstile/i, (route) => route.abort());
   const token = randomUUID().replaceAll("-", "").slice(0, 12);
   const email = buildTestEmail(`playwright.join.${token}`);
   const fullName = `Aderent Public ${token}`;
@@ -40,8 +47,9 @@ test("visitor can submit the volunteer signup form and create account records", 
 
     await page.getByRole("button", { name: "Trimite cererea" }).click();
     const response = await submitResponse;
-    const requestPayload = response.request().postDataJSON() as { captchaToken?: unknown };
-    expect(requestPayload.captchaToken).toEqual(expect.stringMatching(/\S+/));
+    const requestPayload = response.request().postDataJSON();
+    expect(requestPayload).not.toHaveProperty("captchaToken");
+    expect(requestPayload.website).toBe("");
     expect(response.status(), await response.text()).toBe(201);
 
     await expect(page.getByText("Cererea de înscriere a fost trimisă. Mulțumim!")).toBeVisible();
@@ -76,6 +84,8 @@ test("visitor can submit the volunteer signup form and create account records", 
         ? `${row.volunteer_status}|${row.volunteer_county}|${row.volunteer_locality}|${row.user_role}`
         : null;
     }).toBe(`nou|Cluj|${locality}|SUSTINATOR`);
+    expect(externalRequests).toEqual([]);
+    expect(pageErrors).toEqual([]);
   } finally {
     await deleteMembershipByEmail(email);
     await deleteVolunteerByEmail(email);

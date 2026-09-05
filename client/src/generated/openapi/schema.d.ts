@@ -1794,8 +1794,6 @@ export interface components {
             skills: string;
             motivation: string;
             /** @default  */
-            captchaToken: string;
-            /** @default  */
             website: string;
         };
         VolunteerSignupResponseData: {

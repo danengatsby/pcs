@@ -2,10 +2,40 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import request from "supertest";
 import { createApp } from "../../app.js";
-import { env } from "../../lib/env.js";
+import { createFastifyServer } from "../../fastifyServer.js";
+import { query } from "../../lib/db.js";
 import { buildTestEmail, deleteUserByEmail, deleteVolunteerByEmail } from "../helpers/dbTestUtils.js";
 
 const app = createApp();
+
+test("signup works without an external verification service and retains the honeypot on both adapters", async (context) => {
+  const outbound = context.mock.method(globalThis, "fetch", async () => { throw new Error("Signup must not call an external verification service"); });
+  const fastify = await createFastifyServer();
+  await fastify.ready();
+  try {
+    for (const [name, server] of [["express", app], ["fastify", fastify.server]] as const) {
+      const email = buildTestEmail(`signup-local-${name}`);
+      const botEmail = buildTestEmail(`signup-honeypot-${name}`);
+      const payload = { fullName: "Cerere fără serviciu extern", email, password: "ParolaFoarteBuna#2026", county: "Cluj", locality: "Cluj-Napoca", motivation: "Vreau sa particip la activitati comunitare.", website: "" };
+      try {
+        const created = await request(server).post("/api/volunteers").send(payload).expect(201);
+        assert.ok(created.body.data.id > 0);
+        assert.ok(Number(created.headers["ratelimit-limit"]) > 0);
+        assert.equal(outbound.mock.callCount(), 0);
+        const bot = await request(server).post("/api/volunteers").send({ ...payload, email: botEmail, website: "https://spam.example.test" }).expect(202);
+        assert.equal(bot.body.data.ignored, true);
+        const count = await query<{ total: number }>("SELECT ((SELECT COUNT(*) FROM volunteers WHERE email = $1) + (SELECT COUNT(*) FROM users WHERE email = $1) + (SELECT COUNT(*) FROM membership_records WHERE email = $1))::int AS total", [botEmail]);
+        assert.equal(count.rows[0].total, 0);
+        assert.equal(outbound.mock.callCount(), 0);
+      } finally {
+        for (const address of [email, botEmail]) {
+          await deleteVolunteerByEmail(address);
+          await deleteUserByEmail(address);
+        }
+      }
+    }
+  } finally { await fastify.close(); }
+});
 
 test("volunteers route should create volunteer and reject duplicate email", async () => {
   const email = buildTestEmail("volunteer");
@@ -77,98 +107,4 @@ test("volunteers route should reject weak passwords", async () => {
 
   assert.equal(response.body?.error?.code, "VOLUNTEER_VALIDATION_FAILED");
   assert.match(response.body?.error?.message ?? "", /Parola trebuie/i);
-});
-
-test("volunteers route should require captcha when configured as required", async () => {
-  const previousCaptchaMode = env.captchaMode;
-  const previousCaptchaSecret = env.captchaSecret;
-
-  try {
-    env.captchaMode = "required";
-    env.captchaSecret = "test_secret";
-
-    const response = await request(app)
-      .post("/api/volunteers")
-      .send({
-        fullName: "Voluntar Fara Captcha",
-        email: buildTestEmail("volunteer-captcha-required"),
-        password: "ParolaFoarteBuna#2026",
-        phone: "0712345678",
-        county: "Cluj",
-        locality: "Cluj-Napoca",
-        skills: "organizare",
-        motivation: "Vreau sa contribui la proiecte locale si activitati comunitare.",
-      })
-      .expect(400);
-
-    assert.equal(response.body?.error?.code, "VOLUNTEER_CAPTCHA_REQUIRED");
-  } finally {
-    env.captchaMode = previousCaptchaMode;
-    env.captchaSecret = previousCaptchaSecret;
-  }
-});
-
-test("volunteers route should accept a valid captcha token when captcha is required", async () => {
-  const email = buildTestEmail("volunteer-captcha-valid");
-  const previousCaptchaMode = env.captchaMode;
-  const previousCaptchaSecret = env.captchaSecret;
-  const previousCaptchaExpectedAction = env.captchaExpectedAction;
-  const previousCaptchaExpectedHostname = env.captchaExpectedHostname;
-  const previousCaptchaMinScore = env.captchaMinScore;
-  const previousFetch = globalThis.fetch;
-
-  try {
-    env.captchaMode = "required";
-    env.captchaSecret = "test_secret";
-    env.captchaExpectedAction = "volunteer_signup";
-    env.captchaExpectedHostname = "";
-    env.captchaMinScore = null;
-
-    globalThis.fetch = (async (_input, init) => {
-      const body = init?.body;
-      assert.ok(body instanceof URLSearchParams);
-      assert.equal(body.get("response"), "captcha-token-ok");
-      assert.equal(body.get("secret"), "test_secret");
-
-      return new Response(
-        JSON.stringify({
-          success: true,
-          action: "volunteer_signup",
-        }),
-        {
-          status: 200,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    }) as typeof fetch;
-
-    const response = await request(app)
-      .post("/api/volunteers")
-      .send({
-        fullName: "Voluntar Captcha Valid",
-        email,
-        password: "ParolaFoarteBuna#2026",
-        phone: "0712345678",
-        county: "Cluj",
-        locality: "Cluj-Napoca",
-        skills: "organizare",
-        motivation: "Vreau sa contribui la proiecte locale si activitati comunitare.",
-        captchaToken: "captcha-token-ok",
-      })
-      .expect(201);
-
-    assert.equal(response.body?.error, null);
-    assert.ok(Number(response.body?.data?.id) > 0);
-  } finally {
-    globalThis.fetch = previousFetch;
-    env.captchaMode = previousCaptchaMode;
-    env.captchaSecret = previousCaptchaSecret;
-    env.captchaExpectedAction = previousCaptchaExpectedAction;
-    env.captchaExpectedHostname = previousCaptchaExpectedHostname;
-    env.captchaMinScore = previousCaptchaMinScore;
-    await deleteVolunteerByEmail(email);
-    await deleteUserByEmail(email);
-  }
 });

@@ -10,7 +10,6 @@ export type SubmitJoinRequest = {
   locality: string
   skills?: string
   motivation: string
-  captchaToken?: string
   website?: string
 }
 
@@ -32,10 +31,6 @@ export async function submitJoin(payload: SubmitJoinRequest): Promise<SubmitJoin
         throw new Error('Există deja un cont pentru acest email. Folosește parola contului existent.')
       case 'VOLUNTEER_INVALID_COUNTY':
         throw new Error('Județ invalid. Alege un județ din listă.')
-      case 'VOLUNTEER_CAPTCHA_REQUIRED':
-      case 'VOLUNTEER_CAPTCHA_INVALID':
-      case 'VOLUNTEER_CAPTCHA_UNAVAILABLE':
-        throw new Error(res.error.message)
       case 'VOLUNTEER_VALIDATION_FAILED':
         // Serverul include deja un mesaj bun; îl păstrăm.
         throw new Error(res.error.message)
@@ -71,7 +66,6 @@ function toVolunteerSignupInput(payload: SubmitJoinRequest): components['schemas
     locality: payload.locality,
     skills: payload.skills ?? '',
     motivation: payload.motivation,
-    captchaToken: payload.captchaToken ?? '',
     website: payload.website ?? '',
   }
 }

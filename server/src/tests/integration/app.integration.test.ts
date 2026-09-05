@@ -79,15 +79,15 @@ test("unknown API routes should return structured 404 response", async () => {
   assert.equal(typeof payload.meta.timestamp, "string");
 });
 
-test("API responses should include CSP directives that allow Turnstile", async () => {
+test("API responses restrict scripts, frames and connections to the application origin", async () => {
   const response = await request(app)
     .get("/api/unknown-route")
     .expect(404);
 
   const cspHeader = String(response.headers["content-security-policy"] ?? "");
-  assert.match(cspHeader, /script-src/i);
-  assert.match(cspHeader, /frame-src/i);
-  assert.match(cspHeader, /challenges\.cloudflare\.com/i);
+  for (const directive of ["script-src", "frame-src", "connect-src"]) {
+    assert.ok(cspHeader.split(";").some((item) => item.trim() === `${directive} 'self'`));
+  }
 });
 
 test("express adapter should expose a browser-compatible permissions policy header", async () => {

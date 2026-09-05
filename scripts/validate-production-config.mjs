@@ -8,8 +8,6 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const envPath = process.argv[2] ?? path.join(root, "server", ".env");
 const required = [
   "AUTH_TOKEN_SECRET",
-  "CAPTCHA_SECRET_KEY",
-  "VITE_CAPTCHA_SITE_KEY",
   "CORS_ORIGIN",
   "POSTGRES_HOST",
   "POSTGRES_DB",
@@ -79,28 +77,6 @@ if (values.TEST_DATABASE_URL?.trim()) {
     if (error.message?.startsWith("Production config invalid:")) throw error;
     fail("TEST_DATABASE_URL este invalid.");
   }
-}
-if (values.CAPTCHA_MODE !== "required") fail("CAPTCHA_MODE trebuie să fie required.");
-if ([
-  "1x00000000000000000000AA",
-  "2x00000000000000000000AB",
-  "1x00000000000000000000BB",
-  "2x00000000000000000000BB",
-  "3x00000000000000000000FF",
-].includes(values.VITE_CAPTCHA_SITE_KEY.trim())) {
-  fail("VITE_CAPTCHA_SITE_KEY nu poate folosi o cheie Cloudflare de test în producție.");
-}
-if ([
-  "1x0000000000000000000000000000000AA",
-  "2x0000000000000000000000000000000AA",
-  "3x0000000000000000000000000000000AA",
-].includes(values.CAPTCHA_SECRET_KEY.trim())) {
-  fail("CAPTCHA_SECRET_KEY nu poate folosi o cheie Cloudflare de test în producție.");
-}
-const clientCaptchaAction = values.VITE_CAPTCHA_ACTION?.trim() || "volunteer_signup";
-const serverCaptchaAction = values.CAPTCHA_EXPECTED_ACTION?.trim() || "volunteer_signup";
-if (clientCaptchaAction !== serverCaptchaAction) {
-  fail("VITE_CAPTCHA_ACTION trebuie să corespundă CAPTCHA_EXPECTED_ACTION.");
 }
 if (values.NEWS_MEDIA_CLAMAV_ENABLED !== "1") fail("ClamAV trebuie activat.");
 if (values.NEWS_MEDIA_CLAMAV_MODE !== "clamd") fail("NEWS_MEDIA_CLAMAV_MODE trebuie să fie clamd.");

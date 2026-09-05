@@ -69,9 +69,9 @@ function buildCspHeaderValue(): string {
     "img-src": ["'self'", "data:", "https:"],
     "font-src": ["'self'", "https:", "data:"],
     "style-src": ["'self'", "https:"],
-    "script-src": ["'self'", "https://challenges.cloudflare.com"],
-    "frame-src": ["'self'", "https://challenges.cloudflare.com"],
-    "connect-src": ["'self'", "https://challenges.cloudflare.com"],
+    "script-src": ["'self'"],
+    "frame-src": ["'self'"],
+    "connect-src": ["'self'"],
     "script-src-attr": ["'none'"],
   };
 

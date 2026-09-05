@@ -1,9 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import { Button, Input, Select } from '@components'
 import type { CountyName } from '../api/getCounties'
-import { isCaptchaEnabled } from '../captchaConfig'
 import { useSubmitJoin } from '../hooks/useSubmitJoin'
-import { TurnstileField } from './TurnstileField'
 
 type JoinFormState = {
   fullName: string
@@ -51,8 +49,6 @@ export function JoinRequestForm({
   const [step, setStep] = useState<JoinFormStep>(1)
   const [joinStatus, setJoinStatus] = useState<string | null>(null)
   const [submitted, setSubmitted] = useState(false)
-  const [captchaToken, setCaptchaToken] = useState('')
-  const [captchaResetSignal, setCaptchaResetSignal] = useState(0)
   const stepHeadingRef = useRef<HTMLHeadingElement | null>(null)
   const shouldFocusStepRef = useRef(false)
 
@@ -100,11 +96,6 @@ export function JoinRequestForm({
       return
     }
 
-    if (isCaptchaEnabled && !captchaToken) {
-      setJoinStatus('Confirmă verificarea anti-abuz înainte de trimitere.')
-      return
-    }
-
     setJoinStatus(null)
     resetSubmitJoin()
 
@@ -118,7 +109,6 @@ export function JoinRequestForm({
         locality: join.locality,
         motivation: join.motivation,
         skills: join.skills,
-        captchaToken,
         website: join.website,
       })
 
@@ -127,8 +117,6 @@ export function JoinRequestForm({
       setSubmitted(true)
     } catch (error) {
       setJoinStatus(error instanceof Error ? error.message : 'Eroare la trimitere. Încearcă din nou.')
-    } finally {
-      setCaptchaResetSignal((current) => current + 1)
     }
   }
 
@@ -288,8 +276,6 @@ export function JoinRequestForm({
                 placeholder="Spune-ne pe scurt ce te motivează (minim 10 caractere)."
               />
             </label>
-
-            <TurnstileField onTokenChange={setCaptchaToken} resetSignal={captchaResetSignal} />
 
             <label className="field checkbox join-form__agreement">
               <input

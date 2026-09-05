@@ -3477,11 +3477,6 @@ export const openApiSpec = {
             minLength: 10,
             maxLength: 1500,
           },
-          captchaToken: {
-            type: "string",
-            maxLength: 4096,
-            default: "",
-          },
           website: {
             type: "string",
             maxLength: 2048,

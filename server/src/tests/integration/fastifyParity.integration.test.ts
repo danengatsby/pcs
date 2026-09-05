@@ -32,6 +32,10 @@ test("fastify adapter should expose health endpoint parity", async () => {
   assert.equal(response.body?.error, null);
   assert.equal(response.body?.data?.status, "live");
   assert.equal(typeof response.body?.meta?.requestId, "string");
+  const csp = String(response.headers["content-security-policy"] ?? "");
+  for (const directive of ["script-src", "frame-src", "connect-src"]) {
+    assert.ok(csp.split(";").some((item) => item.trim() === `${directive} 'self'`));
+  }
 });
 
 test("fastify adapter should expose auth policy parity", async () => {

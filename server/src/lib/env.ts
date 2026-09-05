@@ -26,14 +26,6 @@ import {
   validateAuthTokenPolicy,
 } from "./env/authConfig.js";
 import {
-  readCaptchaExpectedAction,
-  readCaptchaExpectedHostname,
-  readCaptchaMinScore,
-  readCaptchaMode,
-  readCaptchaSecret,
-  readCaptchaVerifyUrl,
-} from "./env/captchaConfig.js";
-import {
   readEmailFrom,
   readEmailNewsPublishRecipients,
   readEmailNotificationsEnabled,
@@ -106,8 +98,6 @@ if (nodeEnv === "production" && instanceCount > 1 && !redisUrl) {
 const metricsEnabled = readMetricsEnabled(nodeEnv);
 const metricsBearerToken = readMetricsBearerToken();
 
-const captchaMode = readCaptchaMode(nodeEnv);
-
 const emailNotificationsEnabled = readEmailNotificationsEnabled();
 const emailSmtpUser = readEmailSmtpUser();
 const emailSmtpPass = readEmailSmtpPass();
@@ -150,12 +140,6 @@ export const env = {
   instanceCount,
   healthcheckDbTimeoutMs: readHealthcheckDbTimeoutMs(),
   shutdownGraceMs: readShutdownGraceMs(),
-  captchaMode,
-  captchaSecret: readCaptchaSecret(captchaMode),
-  captchaVerifyUrl: readCaptchaVerifyUrl(),
-  captchaExpectedAction: readCaptchaExpectedAction(),
-  captchaExpectedHostname: readCaptchaExpectedHostname(publicBaseUrl),
-  captchaMinScore: readCaptchaMinScore(),
   forceHttpsUpgrade: readForceHttpsUpgrade(),
   trustProxy: readTrustProxy(),
   authTokenSecret: readAuthTokenSecret(nodeEnv),

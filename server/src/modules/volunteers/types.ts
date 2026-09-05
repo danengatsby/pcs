@@ -104,20 +104,3 @@ export type QueryRunner = {
   membershipRecord: PrismaTx["membershipRecord"];
   membershipEvent: PrismaTx["membershipEvent"];
 };
-
-export type CaptchaVerifyResponse = {
-  success?: boolean;
-  hostname?: string;
-  action?: string;
-  score?: number;
-  "error-codes"?: unknown;
-};
-
-export type CaptchaVerificationResult = {
-  valid: boolean;
-  reason: string;
-  hostname: string;
-  action: string;
-  score: number | null;
-  errorCodes: string[];
-};

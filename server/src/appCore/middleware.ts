@@ -17,9 +17,9 @@ function buildCspDirectives(): Record<string, string[] | null> {
     imgSrc: ["'self'", "data:", "https:"],
     fontSrc: ["'self'", "https:", "data:"],
     styleSrc: ["'self'", "'unsafe-inline'", "https:"],
-    scriptSrc: ["'self'", "https://challenges.cloudflare.com"],
-    frameSrc: ["'self'", "https://challenges.cloudflare.com"],
-    connectSrc: ["'self'", "https://challenges.cloudflare.com"],
+    scriptSrc: ["'self'"],
+    frameSrc: ["'self'"],
+    connectSrc: ["'self'"],
     upgradeInsecureRequests: env.forceHttpsUpgrade ? [] : null,
   };
 }
