@@ -1,28 +1,129 @@
-.admin-workspace { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 24px; align-items: start; }
-.admin-workspace__sidebar { position: sticky; top: 100px; display: grid; gap: 14px; padding: 20px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
+.container.container--admin { width: min(1520px, 100%); box-sizing: border-box; }
+.site-header--admin .header-inner { width: min(1520px, 100%); box-sizing: border-box; }
+.admin-workspace, .admin-workspace *, .admin-workspace *::before, .admin-workspace *::after { box-sizing: border-box; }
+.admin-workspace { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 28px; align-items: start; font-size: 16px; }
+.admin-workspace__sidebar { position: sticky; top: 100px; display: grid; gap: 20px; padding: 20px 14px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); max-height: calc(100dvh - 120px); overflow-y: auto; }
 .admin-workspace__sidebar p { margin: 0; }
-.admin-workspace__brand { font-weight: 800; color: var(--text-h); }
-.admin-workspace__toggle { display: none; }
-.admin-workspace__sidebar nav { display: grid; gap: 6px; }
-.admin-workspace__sidebar nav a { display: flex; gap: 10px; align-items: center; justify-content: space-between; padding: 10px; border-radius: 8px; text-decoration: none; color: var(--text); }
-.admin-workspace__sidebar nav a.active { background: var(--accent-bg); color: var(--text-h); box-shadow: inset 3px 0 var(--accent); }
-.admin-workspace__badge { min-width: 26px; padding: 0 6px; text-align: center; border: 1px solid var(--border); border-radius: 12px; }
-.admin-workspace__content { min-width: 0; overflow-wrap: anywhere; }
-.admin-workspace__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 16px; }
+.admin-workspace__brand { padding: 0 8px; font-weight: 800; color: var(--text-h); text-decoration: none; }
+.admin-workspace__identity { display: grid; gap: 4px; padding: 0 8px; font-size: 13px; line-height: 1.5; }
+.admin-workspace__identity strong { color: var(--text-h); font-size: 14px; }
+.admin-workspace__eyebrow { display: block; color: var(--text); font-size: 11px; font-weight: 750; letter-spacing: 0.09em; text-transform: uppercase; }
+.admin-workspace .admin-workspace__toggle { display: none; }
+.admin-workspace__sidebar nav { display: grid; gap: 18px; }
+.admin-workspace__nav-group { display: grid; gap: 4px; }
+.admin-workspace__nav-group > .admin-workspace__eyebrow { padding: 0 10px 3px; }
+.admin-workspace__sidebar nav a { display: flex; gap: 10px; align-items: center; justify-content: space-between; padding: 9px 10px; min-height: 42px; border-radius: 8px; text-decoration: none; color: var(--text); font-size: 14px; }
+.admin-workspace__sidebar nav a:hover { background: var(--accent-bg); color: var(--text-h); }
+.admin-workspace__sidebar nav a.active { background: var(--accent-bg); color: var(--text-h); box-shadow: inset 3px 0 var(--accent); font-weight: 700; }
+.admin-workspace__badge { min-width: 26px; padding: 0 6px; text-align: center; border: 1px solid var(--border); border-radius: 6px; font-size: 12px; font-variant-numeric: tabular-nums; }
+.admin-workspace__badge.is-pending { color: #ffe0a5; border-color: #e7b74555; background: #e7b74512; }
+.admin-workspace__sync { display: grid; gap: 8px; padding: 14px 8px 0; border-top: 1px solid var(--border); font-size: 13px; }
+.admin-workspace__sync .btn { font-size: 12px; padding: 8px 10px; }
+.admin-workspace__content { min-width: 0; overflow-wrap: anywhere; container-type: inline-size; }
+.admin-workspace__breadcrumb { display: flex; flex-wrap: wrap; gap: 10px; font-size: 13px; margin: 0 0 18px; }
+.admin-workspace__breadcrumb a { color: var(--text); }
+.admin-workspace__breadcrumb [aria-current] { color: var(--text-h); }
+.admin-workspace__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 12px; }
 .admin-workspace__panel { padding: 20px; }
 .admin-workspace__panel h2 { margin-top: 0; }
+.admin-home, .admin-home__registers { display: grid; gap: 28px; }
+.admin-home__header { padding: 8px 0 0; }
+.admin-home__header h1 { margin: 6px 0 10px; }
+.admin-home__header p { margin: 6px 0 0; }
+.admin-home__section-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+.admin-home__section-heading h2 { font-size: 21px; margin: 3px 0; }
+.admin-home__section-heading p { margin: 4px 0 0; font-size: 14px; }
+.admin-home__attention { padding: 22px; border-top: 3px solid #e7b745; }
+.admin-home__total { padding: 5px 10px; background: #e7b74512; color: #ffe0a5; border-radius: 8px; font-size: 13px; }
+.admin-home__queue { list-style: none; padding: 0; margin: 0; }
+.admin-home__queue li + li { border-top: 1px solid var(--border); }
+.admin-home__queue a { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 14px 6px; border-radius: 8px; color: var(--text-h); text-decoration: none; }
+.admin-home__queue a:hover { background: var(--accent-bg); }
+.admin-home__queue-count { font-size: 22px; font-weight: 750; font-variant-numeric: tabular-nums; text-align: center; color: #ffe0a5; }
+.admin-home__queue small { display: block; color: var(--text); font-size: 13px; line-height: 1.5; margin-top: 2px; }
+.admin-home__help { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 12px; font-size: 13px; }
+.admin-home__help summary, .admin-disclosure > summary { cursor: pointer; color: var(--text-h); }
+.admin-home__register.card { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px; text-decoration: none; color: var(--text-h); box-shadow: none; }
+.admin-home__register:hover { border-color: var(--accent-border); background: color-mix(in srgb, var(--accent-bg) 30%, var(--surface)); }
+.admin-home__register h3 { margin: 0; font-size: 17px; }
+.admin-home__register p { font-size: 14px; margin: 6px 0 0; }
+
+/* Common hierarchy; all overrides stay inside the administrative workspace. */
+.admin-workspace__content h1 { font-size: clamp(26px, 3vw, 34px); line-height: 1.2; }
+.admin-workspace__content .hero { padding: 22px; border-radius: 14px; }
+.admin-workspace__content .hero h1 { margin: 0; }
+.admin-workspace__content .hero p { margin: 6px 0 0; }
+.admin-workspace__content .hero > .hero-kicker { margin: 0 0 12px; }
+.admin-workspace__content .hero .lead { font-size: 16px; line-height: 1.6; }
+.admin-workspace__content .hero .stack-12 { gap: 6px; }
+.admin-workspace__content .hero .muted { font-size: 13px; }
+.admin-workspace__content .hero-kicker { font-size: 11px; letter-spacing: 0.06em; }
+.admin-workspace__content :is(.admin-members__stats, .executive-dashboard__summary, .territorial-org__summary) { grid-template-columns: repeat(auto-fit, minmax(min(100%, 155px), 1fr)); gap: 10px; }
+.admin-workspace__content :is(.admin-members__stat, .executive-dashboard__summary-card, .territorial-org__summary article) { min-height: 0; padding: 16px; gap: 8px; }
+.admin-workspace__content :is(.admin-members__stat-value, .executive-dashboard__summary-card strong, .territorial-org__summary strong) { font-size: 30px; }
+.admin-workspace__content :is(.admin-members__stat, .executive-dashboard__summary-card) p { font-size: 12px; line-height: 1.5; margin: 0; }
+.admin-section-links { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.admin-section-links a { padding: 6px 12px; border-radius: 8px; color: var(--text); text-decoration: none; font-size: 14px; border: 1px solid var(--border); }
+.admin-section-links a:hover { color: var(--text-h); background: var(--accent-bg); }
+.admin-section { display: grid; gap: 16px; scroll-margin-top: 100px; min-width: 0; }
+.admin-section > h2 { font-size: 22px; margin: 6px 0 0; }
+.admin-disclosure { border-top: 1px solid var(--border); padding-top: 12px; }
+.admin-disclosure > summary { font-weight: 650; font-size: 14px; }
+.admin-disclosure[open] > summary { margin-bottom: 16px; }
+.admin-workspace__content .admin-members__facts { margin: 0; }
+.admin-workspace__content .admin-members__filters { padding: 18px; border-bottom: 1px solid var(--border); grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, 1fr)); }
+.admin-workspace__content .admin-members__record { gap: 14px; }
+.admin-workspace__content .volunteer-admin__toolbar { display: grid; gap: 18px; padding: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; }
+.admin-workspace__content .volunteer-admin__filters { grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; }
+.admin-workspace__content .volunteer-admin__actions { justify-content: flex-start; }
+.admin-workspace__content .volunteer-admin__bulk-actions { flex-basis: 100%; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.admin-workspace__content .political-ops__metrics span, .admin-workspace__content .political-ops__audience > * { background: var(--accent-bg); color: var(--text-h); border-radius: 8px; }
+.admin-workspace__content .political-ops__participants span { flex-wrap: wrap; }
+.admin-workspace__content .territorial-org__workspace { grid-template-columns: minmax(230px, 0.7fr) minmax(0, 1.5fr); }
+.admin-workspace__content .territorial-org__workspace > * { min-width: 0; }
+
 .admin-register { display: grid; gap: 20px; }
 .admin-register header { display: flex; flex-wrap: wrap; align-items: start; justify-content: space-between; gap: 12px; }
+.admin-register > header { padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+.admin-register > header h1 { margin: 0 0 10px; }
+.admin-register > header p { margin: 0; }
 .admin-register form, .admin-register label { display: grid; gap: 8px; }
 .admin-register form { gap: 16px; }
 .admin-register__actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
 .admin-register__list { display: grid; gap: 16px; }
+.admin-register__record-header { margin-bottom: 18px; }
+.admin-register__record-header h2 { font-size: 20px; margin: 0 0 4px; }
+.admin-register__record-header p { margin: 0; font-size: 13px; }
+.admin-register__status { padding: 4px 10px; border: 1px solid var(--accent-border); border-radius: 8px; background: var(--accent-bg); color: var(--text-h); font-size: 13px; }
+.admin-register__facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); gap: 16px; margin: 0; }
+.admin-register__facts dt { font-size: 12px; margin-bottom: 3px; }
+.admin-register__facts dd { margin: 0; font-size: 14px; color: var(--text-h); }
+.admin-register__facts strong { display: block; color: #ffe0a5; }
 .admin-register > label span { display: flex; align-items: center; gap: 10px; }
 .admin-register input[type="checkbox"] { flex: 0 0 auto; width: 20px; height: 20px; min-height: 20px; margin: 0; }
+
+@container (max-width: 900px) {
+  .admin-workspace__content :is(.volunteer-admin__content, .territorial-org__workspace, .executive-dashboard__main-grid) { grid-template-columns: minmax(0, 1fr); }
+  .admin-workspace__content :is(.territorial-org__form-grid, .territorial-org__inline-form, .territorial-org__inline-form--objective, .political-ops__form-grid, .political-ops__inline-form) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-workspace__content :is(.executive-dashboard__hero-top, .territorial-org__detail-header) { flex-wrap: wrap; }
+}
+@container (max-width: 600px) {
+  .admin-workspace__content :is(.admin-members__filters, .volunteer-admin__filters, .territorial-org__form-grid, .territorial-org__inline-form, .territorial-org__inline-form--objective, .territorial-org__facts, .political-ops__form-grid, .political-ops__inline-form, .executive-dashboard__objective-grid, .executive-dashboard__coverage) { grid-template-columns: minmax(0, 1fr); }
+  .admin-workspace__content .admin-members__facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 @media (max-width: 1100px) {
-  .admin-workspace { grid-template-columns: minmax(0, 1fr); }
-  .admin-workspace__sidebar { position: static; }
-  .admin-workspace__toggle { display: block; }
-  .admin-workspace__sidebar nav { display: none; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
+  .admin-workspace { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .admin-workspace__sidebar { position: static; max-height: none; padding: 16px; gap: 12px; }
+  .admin-workspace .admin-workspace__toggle { display: block; }
+  .admin-workspace__sidebar nav { display: none; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); align-items: start; }
   .admin-workspace__sidebar nav.is-open { display: grid; }
+  .admin-workspace__sidebar nav > a { grid-column: 1 / -1; }
+  .admin-workspace__sync { grid-template-columns: 1fr auto; align-items: center; padding-top: 12px; }
+  .admin-workspace__sync small, .admin-workspace__sync [role="alert"] { grid-column: 1 / -1; }
+}
+@media (max-width: 600px) {
+  .admin-home__attention, .admin-home__register.card, .admin-workspace__content .hero { padding: 16px; }
+  .admin-home__queue a { grid-template-columns: 30px minmax(0, 1fr) auto; gap: 10px; }
+  .admin-workspace__sync { grid-template-columns: minmax(0, 1fr); }
+  .admin-workspace__content :is(.admin-members__stats, .executive-dashboard__summary, .territorial-org__summary) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

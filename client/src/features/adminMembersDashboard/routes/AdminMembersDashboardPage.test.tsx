@@ -62,6 +62,18 @@ describe('AdminMembersDashboardPage', () => {
     expect(await screen.findByText('Decizia a fost înregistrată.')).toBeInTheDocument()
   })
 
+  it('keeps membership stages in an expandable record while primary actions remain visible', async () => {
+    const user = userEvent.setup()
+    renderPage('PRESEDINTE')
+    const summary = screen.getByText('Etapele aderării și istoricul deciziilor')
+    expect(summary.closest('details')).not.toHaveAttribute('open')
+    expect(screen.getByRole('button', { name: 'Activează membrul' })).toBeVisible()
+    await user.click(summary)
+    expect(summary.closest('details')).toHaveAttribute('open')
+    expect(screen.getByText('Organ aprobator')).toBeVisible()
+    expect(screen.getByText('Filiala Cluj')).toBeVisible()
+  })
+
   it('keeps the registry read-only for advisers', () => {
     const dashboard = buildDashboard()
     dashboard.rows[0].availableActions = []

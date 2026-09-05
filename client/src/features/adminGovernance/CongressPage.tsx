@@ -76,9 +76,14 @@ export function CongressPage() {
     <label><span><input type="checkbox" checked={pendingOnly} onChange={(event) => setPendingOnly(event.target.checked)} /> Numai congrese nefinalizate</span></label>
     {query.isPending ? <p role="status">Se încarcă congresele…</p> : query.isError ? <p role="alert">{query.error.message}</p> : rows.length === 0 ? <p>Nu există congrese pentru selecția curentă.</p> :
       <div className="admin-register__list">{rows.map((item) => <article className="card admin-workspace__panel" key={item.id}>
-        <h2>{item.title}</h2><p>{statuses[item.status]} · {purposes[item.purpose]} · Organizație: {item.organizationId}</p>
-        <p>{new Date(item.startsAt).toLocaleString('ro-RO')} – {new Date(item.endsAt).toLocaleString('ro-RO')}</p>
-        <p>Cvorum: {item.quorum} · Delegați înscriși: {item.delegateCount} · Delegați care au votat: {item.votedDelegateCount}</p>
+        <header className="admin-register__record-header"><div><h2>{item.title}</h2><p>{purposes[item.purpose]} · Organizație: {item.organizationId}</p></div><span className="admin-register__status">{statuses[item.status]}</span></header>
+        <dl className="admin-register__facts">
+          <div><dt>Deschidere</dt><dd>{new Date(item.startsAt).toLocaleString('ro-RO')}</dd></div>
+          <div><dt>Închidere</dt><dd>{new Date(item.endsAt).toLocaleString('ro-RO')}</dd></div>
+          <div><dt>Cvorum</dt><dd>{item.quorum} delegați</dd></div>
+          <div><dt>Delegați înscriși</dt><dd>{item.delegateCount}</dd></div>
+          <div><dt>Delegați care au votat</dt><dd>{item.votedDelegateCount}</dd></div>
+        </dl>
         {canManage && item.status in transitions && <div className="admin-register__actions">
           {confirmation?.id === item.id ? <div role="group" aria-label={`Confirmare pentru ${item.title}`}>
             <p>{item.status === 'closed' ? 'Validarea face rezultatele disponibile public. Confirmi?' : 'Confirmi schimbarea stării congresului? Închiderea necesită cvorumul verificat de server.'}</p>

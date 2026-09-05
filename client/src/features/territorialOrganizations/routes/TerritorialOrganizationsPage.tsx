@@ -437,7 +437,7 @@ function OrganizationDetailPanel({ organization, canEdit, canManageMandates, can
               </div>
             </article>
           ))}
-          {canManageMandates ? <MandateForm saving={saving} onSave={(input) => onAction({ kind: 'create-mandate', id: organization.id, input }).then(() => undefined)} /> : null}
+          {canManageMandates ? <details className="admin-disclosure"><summary>Înregistrează un mandat nou</summary><MandateForm saving={saving} onSave={(input) => onAction({ kind: 'create-mandate', id: organization.id, input }).then(() => undefined)} /></details> : null}
         </div>
       </section>
 
@@ -456,7 +456,7 @@ function OrganizationDetailPanel({ organization, canEdit, canManageMandates, can
         </div>
         {canManageObjectives ? (
           <div className="panel__body">
-            <ObjectiveForm saving={saving} onSave={(input) => onAction({ kind: 'create-objective', id: organization.id, input }).then(() => undefined)} />
+            <details className="admin-disclosure"><summary>Definește un obiectiv nou</summary><ObjectiveForm saving={saving} onSave={(input) => onAction({ kind: 'create-objective', id: organization.id, input }).then(() => undefined)} /></details>
           </div>
         ) : null}
       </section>
@@ -539,7 +539,6 @@ export function TerritorialOrganizationsPage() {
       {error ? <div className="alert error">{error}</div> : null}
       {registry ? (
         <>
-          {registry.access ? <div className="alert success">Arie autorizată: {registry.access.scope}</div> : null}
           <section className="territorial-org__summary" aria-label="Situația registrului">
             <article><span>Total structuri</span><strong>{registry.summary.organizations}</strong></article>
             <article><span>Active</span><strong>{registry.summary.active}</strong></article>
@@ -564,7 +563,7 @@ export function TerritorialOrganizationsPage() {
               <Input label="Caută în registru" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Cod, nume, județ, localitate" />
               <OrganizationList rows={filteredRows} selectedId={effectiveSelectedId} onSelect={(id) => { setSelectedId(id); setEditing(false); mutations.reset() }} />
             </div>
-            <main>
+            <div>
               {detailLoading ? <section className="panel"><div className="panel__body">Se încarcă organizația…</div></section> : null}
               {detailError ? <div className="alert error">{detailError}</div> : null}
               {organization && editing ? (
@@ -594,7 +593,7 @@ export function TerritorialOrganizationsPage() {
               {!organization && !detailLoading && !detailError ? (
                 <section className="panel"><div className="panel__body territorial-org__empty">Selectează o structură sau înregistrează organizația națională pe baza documentelor reale.</div></section>
               ) : null}
-            </main>
+            </div>
           </div>
         </>
       ) : null}

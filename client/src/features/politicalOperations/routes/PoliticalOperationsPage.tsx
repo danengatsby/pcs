@@ -7,6 +7,9 @@ import { mobilizationInterests } from '@features/mobilization/config'
 import { usePoliticalOperations } from '../hooks/usePoliticalOperations'
 import type { CommunicationAudience, PoliticalAction, PoliticalOperationsData, UpdatePoliticalActionInput } from '../types'
 
+const actionStatusLabels = { draft: 'În pregătire', open: 'Deschisă', closed: 'Închisă', archived: 'Arhivată' }
+const visibilityLabels = { public: 'Publică', members: 'Pentru membri', internal: 'Internă' }
+
 function isoOrNull(value: string): string | null {
   return value ? new Date(value).toISOString() : null
 }
@@ -48,7 +51,7 @@ function ActionCard({ action, data, saving, addParticipant, updateParticipant, u
     <article className="card political-ops__action" id={`action-${action.id}`} tabIndex={-1} style={{ scrollMarginTop: '100px' }}>
       <header className="political-ops__action-header">
         <div><span className="hero-kicker">{action.type === 'event' ? 'Eveniment' : action.type === 'campaign' ? 'Campanie' : 'Sarcină'}</span><h2>{action.title}</h2></div>
-        <span className="status-pill">{action.status} · {action.visibility}</span>
+        <span className="admin-register__status">{actionStatusLabels[action.status]} · {visibilityLabels[action.visibility]}</span>
       </header>
       <p>{action.summary}</p>
       <p><strong>Obiectiv:</strong> {action.objective}</p>
@@ -188,11 +191,14 @@ export function PoliticalOperationsPage() {
       {actionId && <p>Acțiune selectată din agenda conducerii. <Link to="/admin/mobilization">Toate acțiunile</Link></p>}
 
       <section className="executive-dashboard__summary" aria-label="Rezumat mobilizare">
-        {[['Evenimente', data?.summary.events], ['Campanii', data?.summary.campaigns], ['Sarcini', data?.summary.tasks], ['Participanți', data?.summary.participants], ['Ore raportate', data?.summary.reportedHours]].map(([label, value]) => <article className="card executive-dashboard__summary-card" key={String(label)}><span>{label}</span><strong>{value ?? 0}</strong></article>)}
+        {[['Evenimente', data?.summary.events], ['Campanii', data?.summary.campaigns], ['Sarcini', data?.summary.tasks], ['Participanți', data?.summary.participants], ['Ore raportate', data?.summary.reportedHours]].map(([label, value]) => <article className="card executive-dashboard__summary-card" key={String(label)}><span>{label}</span><strong>{value ?? (loading ? '…' : '—')}</strong></article>)}
       </section>
+
+      <section className="political-ops__list"><div><span className="hero-kicker">Execuție</span><h2>Acțiuni curente</h2></div>{loading && !data ? <p role="status">Se încarcă acțiunile…</p> : null}{data?.actions.length === 0 ? <p>Nu există acțiuni pentru selecția curentă.</p> : null}{data?.actions.map((action) => <ActionCard key={action.id} action={action} data={data} saving={saving} addParticipant={addParticipant} updateParticipant={updateParticipant} updateAction={updateAction} />)}</section>
 
       <section className="card political-ops__create">
         <div><span className="hero-kicker">Planificare</span><h2>Acțiune nouă</h2></div>
+        <details className="admin-disclosure"><summary>Deschide formularul de planificare</summary>
         <form className="political-ops__form-grid" onSubmit={(event) => void submitAction(event)}>
           <Select label="Tip" value={type} onChange={(event) => setType(event.target.value as typeof type)} options={[{ value: 'event', label: 'Eveniment / ședință' }, { value: 'campaign', label: 'Campanie' }, { value: 'volunteer_task', label: 'Sarcină voluntar' }]} />
           <Input label="Titlu" value={title} required minLength={3} onChange={(event) => setTitle(event.target.value)} />
@@ -207,12 +213,12 @@ export function PoliticalOperationsPage() {
           <Button type="submit" variant="primary" loading={saving}>Creează acțiunea</Button>
         </form>
         {createStatus ? <p role="status">{createStatus}</p> : null}
+        </details>
       </section>
-
-      <section className="political-ops__list"><div><span className="hero-kicker">Execuție</span><h2>Acțiuni curente</h2></div>{data?.actions.map((action) => <ActionCard key={action.id} action={action} data={data} saving={saving} addParticipant={addParticipant} updateParticipant={updateParticipant} updateAction={updateAction} />)}</section>
 
       <section className="card political-ops__communication">
         <div><span className="hero-kicker">Consimțământ verificat</span><h2>Comunicare segmentată</h2><p>Previzualizarea arată numai volume agregate. Destinatarii sunt materializați numai dacă au acord activ pentru canalul ales.</p></div>
+        <details className="admin-disclosure"><summary>Selectează audiența și compune mesajul</summary>
         <div className="political-ops__form-grid">
           <Select label="Canal" value={channel} onChange={(event) => { setChannel(event.target.value as typeof channel); setAudienceResult(null) }} options={[{ value: 'email', label: 'Email' }, { value: 'sms', label: 'SMS' }, { value: 'whatsapp', label: 'WhatsApp' }]} />
           <Select label="Județ" value={communicationCounty} onChange={(event) => setCommunicationCounty(event.target.value)} placeholder="Toate din aria mea" options={(data?.counties ?? []).map((county) => ({ value: String(county.id), label: county.name }))} />
@@ -223,6 +229,7 @@ export function PoliticalOperationsPage() {
         {audienceResult ? <div className="political-ops__audience"><strong>{audienceResult.eligible} destinatari eligibili</strong><span>Pe județe: {Object.entries(audienceResult.byCounty).map(([key, value]) => `${key}: ${value}`).join(', ') || '—'}</span><span>Pe roluri: {Object.entries(audienceResult.byRole).map(([key, value]) => `${key}: ${value}`).join(', ') || '—'}</span></div> : null}
         <div className="political-ops__message"><Input label="Subiect" value={messageTitle} onChange={(event) => setMessageTitle(event.target.value)} /><label className="field"><span>Mesaj</span><textarea rows={5} value={message} onChange={(event) => setMessage(event.target.value)} /></label><div className="political-ops__row-actions"><Button disabled={!audienceResult || messageTitle.length < 3 || message.length < 10} onClick={() => void saveDispatch('draft')}>Salvează draft</Button>{user?.role === 'PRESEDINTE' ? <Button variant="primary" disabled={!audienceResult || messageTitle.length < 3 || message.length < 10} onClick={() => void saveDispatch('send')}>{channel === 'email' ? 'Pune emailurile în coadă' : 'Pregătește pentru furnizor'}</Button> : null}</div></div>
         {communicationStatus ? <p role="status">{communicationStatus}</p> : null}
+        </details>
       </section>
     </div>
   )

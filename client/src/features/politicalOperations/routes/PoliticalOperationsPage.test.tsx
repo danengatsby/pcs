@@ -62,6 +62,7 @@ describe('PoliticalOperationsPage', () => {
     expect(screen.getAllByText(/Ore raportate/).length).toBeGreaterThan(0)
     expect(screen.getByRole('heading', { name: 'Comunicare segmentată' })).toBeInTheDocument()
 
+    await user.click(screen.getByText('Selectează audiența și compune mesajul'))
     await user.click(screen.getByRole('button', { name: 'Calculează audiența' }))
     expect(await screen.findByText('3 destinatari eligibili')).toBeInTheDocument()
     expect(screen.queryByText('membru@example.test')).not.toBeInTheDocument()

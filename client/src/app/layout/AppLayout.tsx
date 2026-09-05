@@ -1,16 +1,17 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet, useMatch } from 'react-router-dom'
 import { useAuth } from '@features/auth/context'
 import { SiteHeader } from './SiteHeader'
 
 export function AppLayout() {
   const { user } = useAuth()
+  const isAdmin = useMatch('/admin/*')
 
   return (
     <div className="app-shell">
-      <SiteHeader />
+      <SiteHeader administrative={!!isAdmin} />
 
       <main className="site-main" id="main-content" tabIndex={-1}>
-        <div className="container">
+        <div className={`container${isAdmin ? ' container--admin' : ''}`}>
           <Outlet />
         </div>
       </main>

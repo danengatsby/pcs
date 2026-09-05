@@ -2,6 +2,14 @@
 
 Punctul unic de intrare este `/admin`, inclusiv pentru butonul „Autentificare ca admin”. Rutele anterioare rămân valide, dar sunt acum copii ai aceluiași shell, cu navigare adaptată pe mobil.
 
+## Organizarea informațiilor
+
+Meniul și pagina de intrare folosesc aceleași patru domenii: **Sinteză**, **Oameni**, **Organizare** și **Guvernanță**. Domeniile fără registre autorizate nu sunt afișate. „Prezentare generală” revine la `/admin`, iar paginile interioare indică poziția curentă în administrare.
+
+Pagina de intrare separă activitățile în așteptare de accesul la registre. Lista „Necesită atenție” include numai contoare pozitive, ordonate descrescător după volum; aceasta nu reprezintă o clasificare după urgență. Registrele fără sarcini rămân accesibile în domeniul lor. Contoarele incomplete sau indisponibile sunt semnalate explicit.
+
+Zona de lucru are o lățime proprie, de maximum 1520px, iar grilele se adaptează și la spațiul rămas lângă meniu. Indicatorii sunt compacți; filtrele membrilor sunt lângă evidența nominală, cronologia aderării este extensibilă, iar filtrele suplimentare ale voluntarilor se deschid automat dacă sunt active. Formularele pentru mandate, obiective, planificare și comunicare se deschid la cerere, păstrând valorile introduse la închidere și redeschidere. Congresul și arbitrajul afișează separat starea, datele și termenele.
+
 ## Acces
 
 Meniul și protecția accesului direct folosesc capabilitățile efective din `GET /api/admin/access`, nu liste de funcții copiate în router. Fiecare API păstrează autorizarea pe server. Un mandat absent, expirat ori suspendat blochează încărcarea shell-ului; o eroare de autorizare nu afișează registre din cache. Verificarea se reia la revenirea în fereastră, după salvări și la 30 de secunde.

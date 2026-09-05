@@ -56,11 +56,14 @@ export function ArbitrationPage() {
     <label><span><input type="checkbox" checked={pendingOnly} onChange={(event) => setPendingOnly(event.target.checked)} /> Numai dosare de soluționat</span></label>
     {query.isPending ? <p role="status">Se încarcă dosarele…</p> : query.isError ? <p role="alert">{query.error.message}</p> : rows.length === 0 ? <p>Nu există dosare pentru selecția curentă.</p> :
       <div className="admin-register__list">{rows.map((item) => <article className="card admin-workspace__panel" key={item.id}>
-        <h2>{item.caseNumber} · {item.subject}</h2><p>{statuses[item.status] ?? item.status} · {types[item.caseType] ?? item.caseType}</p>
-        <p>Organizație: {item.organizationId ?? 'Jurisdicție națională'}</p><p>Depus: {new Date(item.filedAt).toLocaleString('ro-RO')}</p>
-        <p>Termen de răspuns: {item.responseDueAt ? new Date(item.responseDueAt).toLocaleString('ro-RO') : 'Nestabilit'}
-          {item.responseDueAt && Date.parse(item.responseDueAt) < query.dataUpdatedAt && pendingStatuses.includes(item.status) && <strong> · Termen depășit</strong>}</p>
-        {item.decidedAt && <p>Soluționat: {new Date(item.decidedAt).toLocaleString('ro-RO')}</p>}
+        <header className="admin-register__record-header"><div><h2>{item.caseNumber} · {item.subject}</h2><p>{types[item.caseType] ?? item.caseType}</p></div><span className="admin-register__status">{statuses[item.status] ?? item.status}</span></header>
+        <dl className="admin-register__facts">
+          <div><dt>Organizație</dt><dd>{item.organizationId ?? 'Jurisdicție națională'}</dd></div>
+          <div><dt>Depus</dt><dd>{new Date(item.filedAt).toLocaleString('ro-RO')}</dd></div>
+          <div><dt>Termen de răspuns</dt><dd>{item.responseDueAt ? new Date(item.responseDueAt).toLocaleString('ro-RO') : 'Nestabilit'}
+            {item.responseDueAt && Date.parse(item.responseDueAt) < query.dataUpdatedAt && pendingStatuses.includes(item.status) && <strong>Termen depășit</strong>}</dd></div>
+          {item.decidedAt && <div><dt>Soluționat</dt><dd>{new Date(item.decidedAt).toLocaleString('ro-RO')}</dd></div>}
+        </dl>
       </article>)}</div>}
   </section>
 }

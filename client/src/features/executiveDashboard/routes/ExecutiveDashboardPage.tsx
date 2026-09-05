@@ -171,7 +171,17 @@ export function ExecutiveDashboardPage() {
 
       {error ? <div className="alert error">{error}</div> : null}
 
-      <InterventionsPanel />
+      <nav className="admin-section-links" aria-label="Secțiuni tablou de comandă">
+        <a href="#dashboard-interventions">Intervenții</a>
+        <a href="#dashboard-indicators">Indicatori și evoluție</a>
+        <a href="#dashboard-territory">Situație teritorială</a>
+        <a href="#dashboard-objectives">Ținte operaționale</a>
+      </nav>
+
+      <div className="admin-section" id="dashboard-interventions"><InterventionsPanel /></div>
+
+      <div className="admin-section" id="dashboard-indicators">
+      <h2>Indicatori și evoluție</h2>
 
       <section className="executive-dashboard__summary" aria-label="Indicatori executivi">
         {summaryCards.map((card) => {
@@ -186,6 +196,7 @@ export function ExecutiveDashboardPage() {
           )
         })}
       </section>
+      </div>
 
       {dashboard ? (
         <>
@@ -211,6 +222,8 @@ export function ExecutiveDashboardPage() {
             </section>
           </div>
 
+          <div className="admin-section" id="dashboard-territory">
+          <h2>Situație teritorială</h2>
           <section className="panel executive-dashboard__counties">
             <header className="panel__header">
               <div>
@@ -259,7 +272,9 @@ export function ExecutiveDashboardPage() {
             ) : <p className="alert success">Toate județele din aria autorizată au cel puțin un responsabil activ.</p>}
           </section>
 
-          <section className="executive-dashboard__objectives" aria-labelledby="executive-objectives-title">
+          </div>
+
+          <section className="executive-dashboard__objectives admin-section" id="dashboard-objectives" aria-labelledby="executive-objectives-title">
             <div className="executive-dashboard__section-heading">
               <div>
                 <div className="hero-kicker">Obiective asumate</div>

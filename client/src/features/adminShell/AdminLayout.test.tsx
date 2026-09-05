@@ -87,10 +87,30 @@ describe('shared administrative shell', () => {
     await waitFor(() => expect(vi.mocked(apiGet).mock.calls.filter(([path]) => path.endsWith('/tasks')).length).toBeGreaterThan(before))
   })
 
-  it('renders all seven zones when all read capabilities are granted', async () => {
+  it('groups all seven zones and includes a route back to the overview', async () => {
     vi.mocked(apiGet).mockResolvedValue({ ok: true, data: { ...access, capabilities: adminNavigation.map((item) => item.capability) } })
     renderShell('/admin/congresses')
     const nav = await screen.findByRole('navigation', { name: 'Meniu administrativ' })
-    expect(within(nav).getAllByRole('link')).toHaveLength(7)
+    expect(within(nav).getAllByRole('link')).toHaveLength(8)
+    expect(within(nav).getByRole('link', { name: 'Prezentare generală' })).toHaveAttribute('href', '/admin')
+    expect(within(nav).getAllByRole('group').map((group) => group.getAttribute('aria-labelledby'))).toEqual(['admin-nav-overview', 'admin-nav-people', 'admin-nav-operations', 'admin-nav-governance'])
   })
+
+  it('shows pending work by volume, keeps empty registers accessible and omits unauthorized groups', async () => {
+    renderShell()
+    const attention = await screen.findByRole('region', { name: 'Necesită atenție' })
+    await waitFor(() => expect(within(attention).getAllByRole('link')).toHaveLength(3))
+    expect(within(attention).getAllByRole('link').map((link) => link.getAttribute('href'))).toEqual(['/admin/congresses', '/admin/volunteers', '/admin/mobilization'])
+    expect(within(attention).queryByRole('link', { name: /Arbitraj/ })).not.toBeInTheDocument()
+    expect(within(screen.getByRole('region', { name: 'Guvernanță' })).getByRole('link', { name: /Arbitraj/ })).toHaveAttribute('href', '/admin/arbitration')
+    expect(screen.queryByRole('region', { name: 'Sinteză' })).not.toBeInTheDocument()
+  })
+
+  it('does not imply an empty queue when counts are missing', async () => {
+    vi.mocked(apiGet).mockImplementation(async (path) => ({ ok: true, data: path.endsWith('/access') ? access : { generatedAt: '2026-09-05T12:00:00Z', counts: {}, total: 0 } }))
+    renderShell()
+    expect(await screen.findByText(/Situația sarcinilor este incompletă/)).toBeInTheDocument()
+    expect(screen.queryByText(/Nu sunt activități în așteptare/)).not.toBeInTheDocument()
+  })
+
 })

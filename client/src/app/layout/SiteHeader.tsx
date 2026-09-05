@@ -4,7 +4,7 @@ import { useAuth } from '@features/auth/context'
 import { hasAdminAccess } from '@features/auth/types'
 import type { DocumentItem } from '@features/documents/config'
 
-export function SiteHeader() {
+export function SiteHeader({ administrative = false }: { administrative?: boolean }) {
   const navigate = useNavigate()
   const { user, signout } = useAuth()
   const [signingOut, setSigningOut] = useState(false)
@@ -121,14 +121,14 @@ export function SiteHeader() {
   const adminLanding = '/admin'
 
   return (
-    <header className="site-header" ref={headerRef}>
+    <header className={`site-header${administrative ? ' site-header--admin' : ''}`} ref={headerRef}>
       <a className="skip-link" href="#main-content">
         Sari la conținut
       </a>
       <div className="container header-inner">
-        <Link className="brand" to="/" onClick={handleNavigation}>
+        <Link className="brand" to={administrative ? '/admin' : '/'} onClick={handleNavigation}>
           <span className="brand-mark">PCS</span>
-          <span className="brand-name">Partidul Conservator al Seniorilor</span>
+          <span className="brand-name">{administrative ? 'Spațiu administrativ' : 'Partidul Conservator al Seniorilor'}</span>
         </Link>
 
         <button
@@ -151,6 +151,7 @@ export function SiteHeader() {
           id="primary-navigation"
           aria-label="Meniu principal"
         >
+          {administrative ? <Link className="nav-link" to="/" onClick={handleNavigation}>Vezi site-ul</Link> : <>
           <Link className="nav-link" to="/documente/program-politic" onClick={handleNavigation}>
             Program politic
           </Link>
@@ -194,12 +195,13 @@ export function SiteHeader() {
               ) : null}
             </div>
           </div>
-          {!user ? (
+          </>}
+          {!administrative && !user ? (
             <Link className="btn primary nav-join" to="/contact#aderare" onClick={handleNavigation}>
               Aderă la PCS
             </Link>
           ) : null}
-          {hasAdminAccess(user?.role) ? (
+          {!administrative && hasAdminAccess(user?.role) ? (
             <Link
               className="nav-link"
               to={adminLanding}

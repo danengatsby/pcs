@@ -225,7 +225,7 @@ describe('VolunteersAdminPage', () => {
     renderPage()
 
     await user.click(screen.getByLabelText('Selectează Ana Pop'))
-    await user.selectOptions(screen.getByLabelText('Status bulk'), 'activ')
+    await user.selectOptions(screen.getByLabelText('Stare pentru selecție'), 'activ')
     await user.click(screen.getByRole('button', { name: 'Aplică status' }))
 
     await waitFor(() => expect(submit).toHaveBeenCalledWith({
@@ -262,7 +262,7 @@ describe('VolunteersAdminPage', () => {
 
     await user.click(screen.getByRole('button', { name: 'Selectează tot filtrul' }))
     expect(screen.getByText('Selectate: toate rezultatele filtrate')).toBeInTheDocument()
-    await user.selectOptions(screen.getByLabelText('Status bulk'), 'activ')
+    await user.selectOptions(screen.getByLabelText('Stare pentru selecție'), 'activ')
     await user.click(screen.getByRole('button', { name: 'Aplică status' }))
 
     await waitFor(() => expect(submit).toHaveBeenCalledWith({
@@ -375,7 +375,7 @@ describe('VolunteersAdminPage', () => {
 
     renderPage()
 
-    await user.click(screen.getByRole('button', { name: 'Refresh' }))
+    await user.click(screen.getByRole('button', { name: 'Reîncarcă' }))
 
     expect(reload).toHaveBeenCalledTimes(1)
   })

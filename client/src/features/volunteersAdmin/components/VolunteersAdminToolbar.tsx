@@ -181,6 +181,7 @@ export function VolunteersAdminToolbar({
     <header className="volunteer-admin__toolbar">
       <div className="volunteer-admin__heading">
         <h1 className="volunteer-admin__title">Voluntari (Admin)</h1>
+        <p className="muted">Caută un voluntar, selectează dosarul și actualizează etapa de contactare.</p>
 
         <div className="volunteer-admin__filters">
           <Input
@@ -205,19 +206,24 @@ export function VolunteersAdminToolbar({
             placeholder="Toate statusurile"
             options={statusOptions}
           />
-          <Input
-            label="Localitate"
-            value={textFilters.locality}
-            onChange={updateTextFilter('locality')}
-            placeholder="Ex: Iași"
-          />
-          <Input
-            label="Skill-uri"
-            value={textFilters.skills}
-            onChange={updateTextFilter('skills')}
-            placeholder="Ex: organizare"
-          />
         </div>
+        <details className="admin-disclosure" open={query.locality || query.skills ? true : undefined}>
+          <summary>Filtre suplimentare{query.locality || query.skills ? ' · active' : ''}</summary>
+          <div className="volunteer-admin__filters">
+            <Input
+              label="Localitate"
+              value={textFilters.locality}
+              onChange={updateTextFilter('locality')}
+              placeholder="Ex: Iași"
+            />
+            <Input
+              label="Competențe"
+              value={textFilters.skills}
+              onChange={updateTextFilter('skills')}
+              placeholder="Ex: organizare"
+            />
+          </div>
+        </details>
 
         <p className="volunteer-admin__summary">
           Afișate: {visibleCount}{canLoadMore ? '+' : ''} {loading ? '· Se încarcă…' : ''}
@@ -231,7 +237,7 @@ export function VolunteersAdminToolbar({
               {bulkSelectionAllFiltered ? 'Selectate: toate rezultatele filtrate' : `Selectate: ${bulkSelectionCount}`}
             </span>
             <Select
-              label="Status bulk"
+              label="Stare pentru selecție"
               value={bulkStatus}
               onChange={(event) => onBulkStatusChange(event.target.value)}
               placeholder="Alege status"
@@ -266,7 +272,7 @@ export function VolunteersAdminToolbar({
           Resetează filtrele
         </Button>
         <Button onClick={onRefresh} loading={loading}>
-          Refresh
+          Reîncarcă
         </Button>
       </div>
     </header>

@@ -1,6 +1,5 @@
 import { useDeferredValue, useState, type FormEvent } from 'react'
 import { Button, Input, Select } from '@components'
-import { useAuth } from '@features/auth/context'
 import { useAdminMembersDashboard, useMembershipAction } from '../hooks/useAdminMembersDashboard'
 import type {
   AdminMembershipRow,
@@ -227,11 +226,6 @@ function MembershipRow({
         <div><dt>Număr membru</dt><dd>{member.memberNumber ?? 'Se alocă la activare'}</dd></div>
         <div><dt>Data cererii</dt><dd>{formatDate(member.applicationAt)}</dd></div>
         <div><dt>Organizație</dt><dd>{member.organization?.name ?? 'Nerepartizat'}</dd></div>
-        <div><dt>Verificat</dt><dd>{formatDate(member.verifiedAt)}</dd></div>
-        <div><dt>Aprobat</dt><dd>{formatDate(member.approvedAt)}</dd></div>
-        <div><dt>Organ aprobator</dt><dd>{member.approvalOrganization?.name || member.approvalBody || '—'}</dd></div>
-        <div><dt>Membru activ din</dt><dd>{formatDate(member.activatedAt)}</dd></div>
-        <div><dt>Actualizat</dt><dd>{formatDate(member.updatedAt)}</dd></div>
       </dl>
 
       {member.statusReason ? <p className="admin-members__reason"><strong>Motiv:</strong> {member.statusReason}</p> : null}
@@ -266,9 +260,17 @@ function MembershipRow({
         />
       ) : null}
 
-      {member.history.length > 0 ? (
-        <details className="admin-members__history">
-          <summary>Istoric recent ({member.history.length})</summary>
+        <details className="admin-members__history admin-disclosure">
+          <summary>Etapele aderării și istoricul deciziilor</summary>
+          <dl className="admin-members__facts">
+            <div><dt>Verificat</dt><dd>{formatDate(member.verifiedAt)}</dd></div>
+            <div><dt>Aprobat</dt><dd>{formatDate(member.approvedAt)}</dd></div>
+            <div><dt>Organ aprobator</dt><dd>{member.approvalOrganization?.name || member.approvalBody || '—'}</dd></div>
+            <div><dt>Membru activ din</dt><dd>{formatDate(member.activatedAt)}</dd></div>
+            <div><dt>Actualizat</dt><dd>{formatDate(member.updatedAt)}</dd></div>
+          </dl>
+          {member.history.length > 0 && <>
+          <h3>Istoric recent ({member.history.length})</h3>
           <ol>
             {member.history.map((event) => (
               <li key={event.id}>
@@ -279,14 +281,13 @@ function MembershipRow({
               </li>
             ))}
           </ol>
+          </>}
         </details>
-      ) : null}
     </article>
   )
 }
 
 export function AdminMembersDashboardPage() {
-  const { user } = useAuth()
   const [searchInput, setSearchInput] = useState('')
   const [status, setStatus] = useState('')
   const [organizationId, setOrganizationId] = useState('')
@@ -339,13 +340,38 @@ export function AdminMembersDashboardPage() {
             <p className="lead">
               Urmărește separat cererea, verificarea, aprobarea și activarea; fiecare decizie rămâne în istoric.
             </p>
-            <p className="muted">Conectat ca {user?.fullName ?? 'administrator'} · {user ? formatRole(user.role) : '—'}</p>
           </div>
           <div className="admin-members__actions">
             <Button onClick={reload} loading={loading}>Reîncarcă</Button>
           </div>
         </div>
+      </section>
 
+      {error ? <div className="alert error">{error}</div> : null}
+      {successMessage ? <div className="alert success">{successMessage}</div> : null}
+
+      <section className="admin-members__stats" aria-label="Situația membrilor">
+        {summaryCards.map((card) => (
+          <article key={card.key} className="card admin-members__stat">
+            <div className="hero-kicker admin-members__stat-kicker">{card.label}</div>
+            <strong className="admin-members__stat-value">{dashboard?.summary[card.key] ?? (loading ? '…' : '—')}</strong>
+            <p>{card.helper}</p>
+          </article>
+        ))}
+      </section>
+
+      <section className="panel admin-members__registry">
+        <header className="panel__header admin-members__registry-header">
+          <div>
+            <div className="panel__title">Evidența nominală</div>
+            <p className="muted">
+              {dashboard
+                ? `${dashboard.pagination.total} rezultate · pagina ${Math.floor(offset / pageSize) + 1}`
+                : 'Se încarcă evidența…'}
+            </p>
+          </div>
+          <span className="admin-members__count">{dashboard?.pagination.total ?? 0}</span>
+        </header>
         <div className="admin-members__filters">
           <Input
             label="Caută nume, email, județ sau organizație"
@@ -366,34 +392,6 @@ export function AdminMembersDashboardPage() {
             options={organizationOptions(dashboard?.organizations ?? [])}
           />
         </div>
-      </section>
-
-      {error ? <div className="alert error">{error}</div> : null}
-      {dashboard?.access ? <div className="alert success">Arie autorizată: {dashboard.access.scope}</div> : null}
-      {successMessage ? <div className="alert success">{successMessage}</div> : null}
-
-      <section className="admin-members__stats">
-        {summaryCards.map((card) => (
-          <article key={card.key} className="card admin-members__stat">
-            <div className="hero-kicker admin-members__stat-kicker">{card.label}</div>
-            <strong className="admin-members__stat-value">{dashboard?.summary[card.key] ?? (loading ? '…' : 0)}</strong>
-            <p>{card.helper}</p>
-          </article>
-        ))}
-      </section>
-
-      <section className="panel admin-members__registry">
-        <header className="panel__header admin-members__registry-header">
-          <div>
-            <div className="panel__title">Evidența nominală</div>
-            <p className="muted">
-              {dashboard
-                ? `${dashboard.pagination.total} rezultate · pagina ${Math.floor(offset / pageSize) + 1}`
-                : 'Se încarcă evidența…'}
-            </p>
-          </div>
-          <span className="admin-members__count">{dashboard?.pagination.total ?? 0}</span>
-        </header>
         <div className="panel__body admin-members__registry-body">
           {dashboard?.rows.length === 0 && !loading ? (
             <div className="admin-members__empty">Nu există evidențe pentru filtrele selectate.</div>
