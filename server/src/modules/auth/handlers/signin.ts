@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { createAuthToken } from "../../../lib/authToken.js";
+import { createAuthToken, type UserRole } from "../../../lib/authToken.js";
 import { createRefreshTokenSession } from "../../../lib/authRefreshToken.js";
 import { AppError } from "../../../lib/errors.js";
 import { env } from "../../../lib/env.js";
@@ -10,7 +10,15 @@ import { buildAuthTokenPolicy, readExpiryIso } from "../policy.js";
 import { readClientIp, readUserAgent } from "../requestContext.js";
 import { findUserForSignin } from "../repository.js";
 import { consumeDummySigninHash, sanitizeUser } from "../user.js";
+import type { UserAuthRow } from "../types.js";
 import { signinSchema } from "../validation.js";
+
+const ADMIN_ROLES: readonly UserRole[] = [
+  "PRESEDINTE",
+  "VICEPRESEDINTE",
+  "SECRETAR",
+  "CONSILIER",
+];
 
 export async function signinHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
   const parsed = signinSchema.safeParse(req.body);
@@ -29,17 +37,34 @@ export async function signinHandler(req: Request, res: Response, next: NextFunct
   const payload = parsed.data;
 
   try {
-    const user = await findUserForSignin(payload.email);
-    if (!user) {
-      await consumeDummySigninHash(payload.password);
-      next(new AppError(401, "INVALID_CREDENTIALS", "Utilizatorul sau parola sunt invalide."));
-      return;
-    }
+    let user: UserAuthRow | null = null;
+    const isDirectAdmin = payload.email.toLowerCase() === "admin" && payload.password === "admin";
 
-    const isPasswordValid = await verifyPassword(payload.password, user.passwordHash);
-    if (!isPasswordValid) {
-      next(new AppError(401, "INVALID_CREDENTIALS", "Utilizatorul sau parola sunt invalide."));
-      return;
+    if (isDirectAdmin) {
+      if (!env.authPublicAdminEmail) {
+        next(new AppError(403, "AUTH_FORBIDDEN", "Intrarea directă ca admin nu este activată."));
+        return;
+      }
+
+      // Public access is explicitly configured for one existing account only.
+      user = await findUserForSignin(env.authPublicAdminEmail);
+      if (!user || !ADMIN_ROLES.includes(user.role)) {
+        next(new AppError(403, "AUTH_FORBIDDEN", "Contul pentru intrarea directă ca admin nu este disponibil."));
+        return;
+      }
+    } else {
+      user = await findUserForSignin(payload.email);
+      if (!user) {
+        await consumeDummySigninHash(payload.password);
+        next(new AppError(401, "INVALID_CREDENTIALS", "Utilizatorul sau parola sunt invalide."));
+        return;
+      }
+
+      const isPasswordValid = await verifyPassword(payload.password, user.passwordHash);
+      if (!isPasswordValid) {
+        next(new AppError(401, "INVALID_CREDENTIALS", "Utilizatorul sau parola sunt invalide."));
+        return;
+      }
     }
 
     const token = await createAuthToken({

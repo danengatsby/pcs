@@ -24,7 +24,9 @@ test("territorial shell supports direct routes, live task badges, congress and a
     await page.goto("/auth/signin");
     await page.getByLabel("Utilizator").fill(email);
     await page.getByLabel("Parolă", { exact: true }).fill(password);
-    await page.getByRole("button", { name: "Autentificare ca admin" }).click();
+    await page.getByRole("button", { name: "Autentificare", exact: true }).click();
+    await expect(page).toHaveURL(/\/profil$/);
+    await page.goto("/admin");
     await expect(page).toHaveURL(/\/admin$/);
     const nav = page.getByRole("navigation", { name: "Meniu administrativ" });
     await expect(nav.getByRole("link")).toHaveCount(7);

@@ -16,6 +16,7 @@ import {
   readVolunteerRateLimitWindowMs,
 } from "./env/appConfig.js";
 import {
+  readAuthPublicAdminEmail,
   readAuthRefreshEnabled,
   readAuthRefreshStore,
   readAuthRefreshTtlSeconds,
@@ -146,6 +147,7 @@ export const env = {
   authTokenTtlSeconds,
   authTokenIssuer: readAuthTokenIssuer(),
   authTokenAudience: readAuthTokenAudience(),
+  authPublicAdminEmail: readAuthPublicAdminEmail(),
   authRefreshEnabled,
   authRefreshTtlSeconds,
   authRefreshStore,

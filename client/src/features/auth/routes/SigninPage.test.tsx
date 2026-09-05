@@ -53,7 +53,7 @@ describe('SigninPage', () => {
     expect(screen.getByText('Se încarcă...')).toBeInTheDocument()
   })
 
-  it('redirects admins to the user profile page', () => {
+  it('opens the administrative workspace directly for an existing admin session', () => {
     renderSigninPage({
       user: {
         id: '1',
@@ -63,7 +63,7 @@ describe('SigninPage', () => {
       },
     })
 
-    expect(screen.getByText('Profil utilizator')).toBeInTheDocument()
+    expect(screen.getByText('Administrare PCS')).toBeInTheDocument()
   })
 
   it('redirects non-admin users to the user profile page', () => {
@@ -90,20 +90,53 @@ describe('SigninPage', () => {
     expect(screen.getByRole('button', { name: 'Autentificare ca admin' })).toBeInTheDocument()
   })
 
-  it('authenticates an authorized administrator into the shared workspace', async () => {
+  it('opens the configured admin account regardless of credentials in the form', async () => {
     const user = userEvent.setup()
     const signin = vi.fn(async () => signinSuccess('PRESEDINTE'))
     renderSigninPage({ signin })
 
-    await user.type(screen.getByLabelText('Utilizator'), 'admin')
+    await user.type(screen.getByLabelText('Utilizator'), 'alt-utilizator')
     await user.type(screen.getByLabelText('Parolă'), 'ParolaSigura#2026')
     await user.click(screen.getByRole('button', { name: 'Autentificare ca admin' }))
 
     expect(signin).toHaveBeenCalledWith({
       email: 'admin',
-      password: 'ParolaSigura#2026',
+      password: 'admin',
     })
+    expect(signin).toHaveBeenCalledOnce()
     expect(await screen.findByText('Administrare PCS')).toBeInTheDocument()
+  })
+
+  it('keeps ordinary signin tied to the entered credentials without a fallback', async () => {
+    const user = userEvent.setup()
+    const signin = vi.fn(async () => ({
+      ok: false as const,
+      status: 401,
+      error: { code: 'INVALID_CREDENTIALS', message: 'Date de autentificare invalide.' },
+    }))
+    renderSigninPage({ signin })
+
+    await user.type(screen.getByLabelText('Utilizator'), 'cont-personal')
+    await user.type(screen.getByLabelText('Parolă'), 'ParolaGresita')
+    await user.click(screen.getByRole('button', { name: 'Autentificare', exact: true }))
+
+    expect(signin).toHaveBeenCalledExactlyOnceWith({ email: 'cont-personal', password: 'ParolaGresita' })
+    expect(await screen.findByRole('alert')).toHaveTextContent('Date de autentificare invalide.')
+    expect(screen.getByRole('button', { name: 'Autentificare ca admin' })).toBeEnabled()
+  })
+
+  it('shows direct signin errors and allows another attempt', async () => {
+    const user = userEvent.setup()
+    const signin = vi.fn()
+      .mockResolvedValueOnce({ ok: false, error: { code: 'AUTH_FORBIDDEN', message: 'Contul admin nu este disponibil.' } })
+      .mockResolvedValueOnce(signinSuccess('PRESEDINTE'))
+    renderSigninPage({ signin })
+
+    await user.click(screen.getByRole('button', { name: 'Autentificare ca admin' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('Contul admin nu este disponibil.')
+    await user.click(screen.getByRole('button', { name: 'Autentificare ca admin' }))
+    expect(await screen.findByText('Administrare PCS')).toBeInTheDocument()
+    expect(signin).toHaveBeenCalledTimes(2)
   })
 
   it('rejects admin mode for a non-administrative account and clears the session', async () => {
@@ -117,5 +150,19 @@ describe('SigninPage', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Acest cont nu are drepturi administrative PCS.')
     expect(signout).toHaveBeenCalledOnce()
+  })
+
+  it('authenticates directly as admin when clicking admin button without filling credentials', async () => {
+    const user = userEvent.setup()
+    const signin = vi.fn(async () => signinSuccess('PRESEDINTE'))
+    renderSigninPage({ signin })
+
+    await user.click(screen.getByRole('button', { name: 'Autentificare ca admin' }))
+
+    expect(signin).toHaveBeenCalledWith({
+      email: 'admin',
+      password: 'admin',
+    })
+    expect(await screen.findByText('Administrare PCS')).toBeInTheDocument()
   })
 })

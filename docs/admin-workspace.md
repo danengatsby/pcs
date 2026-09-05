@@ -2,6 +2,12 @@
 
 Punctul unic de intrare este `/admin`, inclusiv pentru butonul „Autentificare ca admin”. Rutele anterioare rămân valide, dar sunt acum copii ai aceluiași shell, cu navigare adaptată pe mobil.
 
+Butonul „Autentificare ca admin” folosește contul comun indicat prin `AUTH_PUBLIC_ADMIN_EMAIL` în `server/.env`, indiferent de datele completate în formular. Această opțiune permite oricărui vizitator al site-ului acces fără parolă cu drepturile acelui cont. Valoarea implicită este goală (dezactivat); activarea cere adresa completă a unui cont existent cu rol administrativ. Nu se creează conturi și nu se schimbă roluri automat.
+
+Clientul trimite acțiunea publică prin `POST /api/auth/signin` cu `{ "email": "admin", "password": "admin" }`; perechea identifică acțiunea și nu reprezintă parola contului. Autentificarea obișnuită verifică în continuare parola introdusă. Ambele fluxuri păstrează limitarea cererilor și sesiunile cu refresh/revocare. Sesiunile admin deja deschise intră direct în `/admin` la vizitarea paginii de autentificare.
+
+Pentru oprirea accesului public, goliți `AUTH_PUBLIC_ADMIN_EMAIL` și reporniți API-ul. Aceasta oprește intrările noi; sesiunile deja emise trebuie revocate separat dacă se dorește închiderea lor imediată.
+
 ## Organizarea informațiilor
 
 Meniul și pagina de intrare folosesc aceleași patru domenii: **Sinteză**, **Oameni**, **Organizare** și **Guvernanță**. Domeniile fără registre autorizate nu sunt afișate. „Prezentare generală” revine la `/admin`, iar paginile interioare indică poziția curentă în administrare.

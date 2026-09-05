@@ -2,6 +2,7 @@ import { Navigate } from 'react-router-dom'
 import { useState } from 'react'
 import { LoginForm } from '../components/LoginForm'
 import { useAuth } from '../context'
+import { hasAdminAccess } from '../types'
 
 export function SigninPage(): JSX.Element {
   const { user, loading } = useAuth()
@@ -12,7 +13,7 @@ export function SigninPage(): JSX.Element {
   }
 
   if (user && !authenticating) {
-    return <Navigate to="/profil" replace />
+    return <Navigate to={hasAdminAccess(user.role) ? '/admin' : '/profil'} replace />
   }
 
   return (

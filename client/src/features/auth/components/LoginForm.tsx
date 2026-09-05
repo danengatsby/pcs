@@ -29,11 +29,15 @@ export function LoginForm({ onAuthenticatingChange }: { onAuthenticatingChange?:
     if (isLoading) return
 
     setIntent(nextIntent)
+    setAdminError(null)
     // Keep SigninPage mounted while the auth context updates, so its default
     // profile redirect cannot race the explicit administrative destination.
     onAuthenticatingChange?.(true)
-    setAdminError(null)
-    const result = await submit(credentials ?? { email, password })
+    const result = await submit(credentials ?? (
+      nextIntent === 'admin'
+        ? { email: 'admin', password: 'admin' }
+        : { email, password }
+    ))
 
     if (!result.ok) {
       onAuthenticatingChange?.(false)
@@ -110,7 +114,7 @@ export function LoginForm({ onAuthenticatingChange }: { onAuthenticatingChange?:
         </Button>
       </div>
       <p className="signin-form__admin-hint">
-        Folosește acest buton dacă ai primit acces de administrator PCS.
+        „Autentificare ca admin” deschide direct contul comun de administrare, fără completarea formularului.
       </p>
 
       {devAdminShortcutEnabled ? (

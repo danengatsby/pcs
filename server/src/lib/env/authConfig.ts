@@ -1,7 +1,15 @@
 import { randomBytes } from "node:crypto";
-import { isRelaxedEnvironment, readBooleanFlag, readPositiveInt } from "./shared.js";
+import { isLikelyEmail, isRelaxedEnvironment, readBooleanFlag, readPositiveInt } from "./shared.js";
 
 export type AuthRefreshStore = "sql" | "redis";
+
+export function readAuthPublicAdminEmail(): string {
+  const email = process.env.AUTH_PUBLIC_ADMIN_EMAIL?.trim().toLowerCase() ?? "";
+  if (email && (email.length > 180 || !isLikelyEmail(email))) {
+    throw new Error("AUTH_PUBLIC_ADMIN_EMAIL trebuie sa fie o adresa de email completa.");
+  }
+  return email;
+}
 
 export function readAuthTokenSecret(nodeEnv: string): string {
   const raw = process.env.AUTH_TOKEN_SECRET?.trim();
