@@ -1,0 +1,445 @@
+{
+  "edition": "Ediție extinsă și actualizată",
+  "date": "7 septembrie 2026",
+  "version": "2026-09-07-extins",
+  "title": "MANIFESTUL PCS",
+  "party": "PARTIDUL CONSERVATOR AL SENIORILOR",
+  "subtitle": "Demnitate pentru seniori. Răspundere pentru România.",
+  "horizon": "Orizont de acțiune 2026–2034",
+  "introduction": [
+    "O societate se judecă și după felul în care își respectă oamenii după o viață de muncă. Pentru Partidul Conservator al Seniorilor, demnitatea înseamnă un venit previzibil, îngrijire accesibilă, o locuință sigură, libertatea de a decide și posibilitatea de a participa la viața comunității. Acestea sunt reperele după care cerem să fie evaluate politicile publice.",
+    "PCS propune un contract de solidaritate între generații. Protejarea seniorilor și perspectivele tinerilor trebuie construite împreună: prin muncă declarată, servicii publice competente, folosirea responsabilă a banilor și respect pentru contribuția fiecăruia. Experiența unei generații poate deveni sprijin pentru următoarea, atunci când instituțiile creează condițiile acestei întâlniri.",
+    "Această ediție dezvoltă direcțiile Programului politic PCS 2026–2034 în măsuri, responsabilități și criterii de evaluare. Angajamentele de politică publică descriu ceea ce vom susține; punerea lor în aplicare presupune decizii democratice, fundamentare, finanțare și capacitate administrativă. Vom spune public ce ține de partid, ce depinde de un mandat și ce rezultate pot fi demonstrate."
+  ],
+  "chapters": [
+    {
+      "id": "valori",
+      "title": "Valorile și direcția noastră",
+      "intro": "Conservatorismul social al PCS pornește de la continuitate, familie, comunitate și respect pentru munca cinstită. Aceste valori capătă sens prin instituții care protejează demnitatea fiecărui om și prin reguli care se aplică egal.",
+      "sections": [
+        {
+          "title": "O solidaritate care unește generațiile",
+          "paragraphs": [
+            "Susținem sprijinul dintre copii, părinți și bunici, fără a transfera întreaga răspundere a îngrijirii asupra familiei. Serviciile publice trebuie să ajute inclusiv persoanele singure, familiile cu venituri mici și aparținătorii plecați la muncă în altă localitate sau în străinătate. Accesul se stabilește după nevoi și criterii publice.",
+            "Respectăm dreptul seniorilor de a-și alege modul de viață, de a continua o activitate și de a refuza implicarea politică. Niciun serviciu social, ajutor sau acces la informație nu trebuie condiționat de adeziunea la un partid."
+          ]
+        },
+        {
+          "title": "Democrație, proprietate și responsabilitate socială",
+          "paragraphs": [
+            "Ne asumăm democrația constituțională, pluralismul, proprietatea privată și economia socială de piață. Statul trebuie să asigure reguli previzibile, competiție corectă și protecție pentru oamenii ale căror nevoi esențiale nu sunt acoperite. Respingem discriminarea, intimidarea, abuzul de putere și tratarea cetățenilor ca simple numere într-o evidență.",
+            "Tradiția înseamnă și transmiterea meseriilor, păstrarea memoriei comunității și grija pentru patrimoniu. O punem în dialog cu educația, cercetarea și modernizarea serviciilor, astfel încât continuitatea să ofere resurse pentru viitor."
+          ]
+        },
+        {
+          "title": "Trei priorități care ordonează acțiunea",
+          "paragraphs": [
+            "Pensia demnă, sănătatea accesibilă și incluziunea socială activă rămân prioritățile naționale ale PCS. Fiecare proiect va explica pe cine ajută, ce schimbă, cât costă și cum se verifică rezultatul. În colaborările politice vom susține măsurile favorabile seniorilor, indiferent de inițiator, și vom cere un capitol dedicat acestora în programele de guvernare."
+          ]
+        }
+      ],
+      "monitoring": "Publicarea priorităților, a criteriilor de susținere a proiectelor și a pozițiilor asumate de reprezentanții PCS."
+    },
+    {
+      "id": "pensii",
+      "title": "Pensii previzibile și un trai demn",
+      "intro": "Pensia trebuie administrată prin reguli inteligibile și stabile. Respectul pentru contribuție presupune ca persoana să înțeleagă decizia primită și să aibă o cale accesibilă de clarificare și corectare a erorilor.",
+      "sections": [
+        {
+          "title": "Puterea de cumpărare, reper al deciziei",
+          "paragraphs": [
+            "Susținem un mecanism previzibil de actualizare a pensiilor, raportat la inflația efectivă publicată de INS și explicat înainte de aplicare. Evoluția cheltuielilor esențiale — hrană, energie, locuire și medicamente — trebuie urmărită distinct, pentru a identifica situațiile în care venitul disponibil rămâne insuficient.",
+            "Reperul de 2.500 lei pentru pensia minimă garantată, prevăzut în programul PCS, este o țintă politică de pornire. Valoarea trebuie reevaluată în raport cu costul vieții, iar condițiile de acordare, etapele și impactul bugetar trebuie precizate într-un proiect fundamentat. O sumă nominală nu poate înlocui evaluarea traiului real."
+          ]
+        },
+        {
+          "title": "Contributivitate și corectarea inechităților",
+          "paragraphs": [
+            "Vom susține verificarea situațiilor în care documentele de muncă, perioadele de contribuție sau veniturile recunoscute au fost prelucrate greșit. Persoana trebuie să primească o explicație clară a calculului, o listă exactă a documentelor necesare și informații despre stadiul solicitării, atât la ghișeu, cât și prin mijloace la distanță.",
+            "Orice reformă trebuie evaluată pentru efectele asupra categoriilor de pensionari și pentru respectarea drepturilor. Combaterea privilegiilor și a tratamentului arbitrar cere reguli generale, transparență și analiză juridică, nu promisiuni care ignoră consecințele asupra oamenilor."
+          ]
+        },
+        {
+          "title": "O administrație care rezolvă",
+          "paragraphs": [
+            "Propunem formulare simplificate, confirmarea înregistrării cererilor, comunicarea motivelor întârzierii și sprijin pentru obținerea documentelor din arhive. Informațiile privind contribuțiile și estimările trebuie să poată fi consultate cu ajutorul unui operator, fără ca utilizarea internetului să devină o condiție de acces la un drept."
+          ]
+        }
+      ],
+      "monitoring": "Venitul disponibil după cheltuielile esențiale, durata soluționării cererilor și numărul erorilor de calcul corectate."
+    },
+    {
+      "id": "sanatate",
+      "title": "Sănătate accesibilă și continuitatea tratamentului",
+      "intro": "Un serviciu medical este util când poate fi obținut la timp, în condiții demne și la un cost suportabil. Politica PCS urmărește întregul parcurs al pacientului, de la programare și consultație până la tratament, recuperare și îngrijire.",
+      "sections": [
+        {
+          "title": "Medicamente și servicii esențiale",
+          "paragraphs": [
+            "Susținem extinderea accesului la medicamentele esențiale pentru bolile cronice și reducerea costurilor suportate de persoanele cu venituri mici. Propunerile de compensare trebuie fundamentate medical și financiar, cu evaluarea disponibilității în farmacii. O facilitate anunțată trebuie să poată fi folosită efectiv.",
+            "Cerem programări clare, informarea pacientului când un serviciu nu este disponibil și sprijin pentru identificarea unei alternative. Documentele și rezultatele medicale trebuie să circule între furnizori în condiții de confidențialitate, astfel încât pacientul să nu repete inutil aceleași drumuri."
+          ]
+        },
+        {
+          "title": "Prevenție, geriatrie și recuperare",
+          "paragraphs": [
+            "Vom susține întărirea medicinei de familie, a ambulatoriului, a serviciilor de geriatrie și a îngrijirii la domiciliu. Prevenția și investigațiile trebuie organizate potrivit recomandărilor medicale, riscului și nevoilor fiecărei persoane. Recuperarea, sănătatea orală și accesul la dispozitivele necesare autonomiei trebuie incluse în planificarea serviciilor.",
+            "Investițiile vor fi evaluate și prin accesibilitatea clădirilor, orientarea în interior, condițiile de așteptare și posibilitatea de a primi asistență. Vom cere coordonare între transportul adaptat și programările persoanelor cu mobilitate redusă."
+          ]
+        },
+        {
+          "title": "Sănătatea mintală și sprijinul familiei",
+          "paragraphs": [
+            "Propunem servicii accesibile de evaluare și sprijin pentru sănătatea mintală, precum și trasee de îngrijire pentru persoanele cu tulburări cognitive. Pacienții și aparținătorii au nevoie de informații clare, orientare către specialiști și continuitate. Comunicarea publică trebuie să respecte demnitatea persoanei și să combată stigmatizarea."
+          ]
+        }
+      ],
+      "monitoring": "Timpii de așteptare, costurile suportate de pacienți, continuitatea tratamentelor și acoperirea teritorială a serviciilor."
+    },
+    {
+      "id": "ingrijire",
+      "title": "Îngrijire de lungă durată și sprijin pentru aparținători",
+      "intro": "Nevoia de ajutor în viața de zi cu zi trebuie întâmpinată prin servicii organizate, personal pregătit și respect pentru voința persoanei. Familia are nevoie de sprijin practic, iar responsabilitatea publică trebuie să fie clară.",
+      "sections": [
+        {
+          "title": "Un plan de sprijin pentru fiecare persoană",
+          "paragraphs": [
+            "Propunem evaluarea coordonată a nevoilor sociale și medicale, cu un plan de îngrijire explicat persoanei și, cu acordul acesteia, familiei. Planul va preciza serviciile necesare, cine le oferă, costurile, persoana de contact și momentul reevaluării. Instituțiile trebuie să colaboreze pentru rezolvarea cazului.",
+            "Prioritatea este susținerea vieții în comunitate și la domiciliu atunci când această opțiune este potrivită și dorită. Ea presupune îngrijire profesională, ajutor pentru activitățile zilnice, adaptarea locuinței și intervenție atunci când situația se schimbă."
+          ]
+        },
+        {
+          "title": "Sprijin real pentru cei care îngrijesc",
+          "paragraphs": [
+            "Vom susține recunoașterea rolului îngrijitorilor informali, consiliere, instruire și servicii temporare care le permit să se odihnească sau să rezolve o urgență. Propunerea de sprijin financiar din programul PCS trebuie însoțită de criterii de eligibilitate și de o sursă bugetară stabilă.",
+            "Dezvoltarea serviciilor cere formarea și păstrarea personalului calificat. Vom susține condiții de muncă decente, supraveghere profesională și evaluarea încărcării personalului, pentru ca obligațiile asumate prin contractele de îngrijire să poată fi respectate."
+          ]
+        },
+        {
+          "title": "Siguranță în serviciile rezidențiale",
+          "paragraphs": [
+            "În centrele rezidențiale cerem contracte inteligibile, transparența costurilor, respectarea intimității și căi de sesizare accesibile. Verificarea calității trebuie să urmărească viața de zi cu zi a beneficiarilor. Când un serviciu este suspendat, autoritățile trebuie să asigure continuitatea îngrijirii și informarea familiei, cu respectarea drepturilor persoanei."
+          ]
+        }
+      ],
+      "monitoring": "Persoane cu plan de îngrijire, servicii la domiciliu efectiv acordate, sprijin pentru aparținători și rezolvarea sesizărilor."
+    },
+    {
+      "id": "locuinta",
+      "title": "Locuință sigură și utilități suportabile",
+      "intro": "Locuința trebuie să ofere stabilitate și siguranță. Politicile privind energia, reabilitarea și protecția socială trebuie evaluate împreună, prin efectul asupra cheltuielilor gospodăriei și asupra autonomiei locatarului.",
+      "sections": [
+        {
+          "title": "Protecție față de sărăcia energetică",
+          "paragraphs": [
+            "Susținem ajutoare accesibile pentru gospodăriile vulnerabile, acordate pe criterii clare privind venitul, condițiile locuirii și nevoile persoanei. Procedurile trebuie să poată fi parcurse cu asistență, iar deciziile să fie explicate. Informarea pentru iarnă și pentru perioadele de caniculă trebuie făcută din timp.",
+            "Vom cere facturi ușor de înțeles și orientare către serviciile competente atunci când apar erori, datorii sau riscul întreruperii utilităților. Instituțiile trebuie să poată identifica rapid situațiile grave și să ofere o soluție socială adecvată."
+          ]
+        },
+        {
+          "title": "Renovări care produc economii și autonomie",
+          "paragraphs": [
+            "Propunem prioritizarea gospodăriilor cu venituri mici în programele de eficiență energetică și adaptare a locuinței. Lucrările trebuie selectate după nevoile reale: izolare, instalații sigure, acces în clădire, băi adaptate, iluminat și eliminarea obstacolelor. Cofinanțarea nu trebuie să facă programul inaccesibil tocmai beneficiarilor vizați.",
+            "Un proiect va fi considerat reușit după recepția lucrărilor, verificarea calității și evaluarea efectului asupra cheltuielilor. Vom cere explicații pentru costurile suplimentare, termene depășite și lucrări care nu rezolvă problemele pentru care au fost finanțate."
+          ]
+        },
+        {
+          "title": "Protecția locuirii și a patrimoniului personal",
+          "paragraphs": [
+            "Susținem consiliere independentă pentru persoanele aflate în risc de pierdere a locuinței și pentru cele care încheie contracte cu efecte importante asupra patrimoniului. Prioritare sunt prevenirea înșelăciunii, înțelegerea obligațiilor și orientarea către sprijin juridic și social competent. Persoana trebuie să aibă timp și informații pentru a decide liber."
+          ]
+        }
+      ],
+      "monitoring": "Gospodării sprijinite, locuințe adaptate, economii verificate la utilități și situații de risc locativ soluționate."
+    },
+    {
+      "id": "mobilitate",
+      "title": "Transport accesibil și spațiu public sigur",
+      "intro": "Posibilitatea de a ajunge la medic, la instituții, la piață și la familie susține independența. Transportul trebuie planificat împreună cu traseele pietonale și cu nevoile localităților slab conectate.",
+      "sections": [
+        {
+          "title": "Facilități simple și transport utilizabil",
+          "paragraphs": [
+            "Păstrăm obiectivul programatic al extinderii gratuităților și facilităților de transport pentru seniori. Aplicarea trebuie să prevadă eligibilitatea, finanțarea operatorilor, traseele și frecvența curselor. O legitimație are valoare practică atunci când există o cursă accesibilă la ora necesară.",
+            "Propunem proceduri unitare de informare și validare, inclusiv posibilitatea obținerii documentelor fără aplicație pe telefon. Vom susține vehicule accesibile, informare lizibilă în stații și pregătirea personalului pentru asistarea călătorilor cu mobilitate redusă."
+          ]
+        },
+        {
+          "title": "Trotuare, traversări și întreținere",
+          "paragraphs": [
+            "Cerem auditarea traseelor către spitale, farmacii, instituții și centre comunitare. Trotuarele continue, rampele funcționale, iluminatul, băncile și timpii potriviți de traversare trebuie tratate ca infrastructură de bază. Evaluarea va include participarea persoanelor care folosesc zilnic aceste trasee.",
+            "Administrațiile trebuie să publice modalitatea de sesizare a obstacolelor și stadiul intervențiilor. Întreținerea, curățarea și deszăpezirea au nevoie de responsabilități clare; investițiile noi nu înlocuiesc obligația de a păstra în siguranță infrastructura existentă."
+          ]
+        },
+        {
+          "title": "Legături pentru comunitățile izolate",
+          "paragraphs": [
+            "Susținem cooperarea între localități pentru transport comunitar și curse adaptate accesului la servicii. Planificarea trebuie să țină seama de programările medicale și de zilele de activitate ale instituțiilor, cu informare telefonică și la punctele publice locale."
+          ]
+        }
+      ],
+      "monitoring": "Trasee accesibile, frecvența curselor, timpul de deplasare către servicii și termenul de remediere a obstacolelor."
+    },
+    {
+      "id": "protectie",
+      "title": "Demnitate, protecție și combaterea abuzurilor",
+      "intro": "Vârsta nu justifică umilirea, excluderea sau limitarea arbitrară a dreptului de a decide. Protecția trebuie să fie accesibilă persoanei, inclusiv atunci când aceasta depinde material sau fizic de autorul unui abuz.",
+      "sections": [
+        {
+          "title": "Sesizări care duc la intervenție",
+          "paragraphs": [
+            "Susținem consolidarea mecanismelor de sesizare a abuzului fizic, psihologic, financiar și a neglijării. Propunem puncte clare de contact, inclusiv telefonice, proceduri de evaluare a riscului și cooperare între serviciile sociale, sănătate și autoritățile competente. Responsabilitatea pentru caz trebuie să poată fi identificată.",
+            "Persoana trebuie informată despre pașii care urmează, despre confidențialitate și despre formele de sprijin disponibile. Vom cere protejarea celor care semnalează abuzuri și continuitatea serviciilor pentru beneficiarii aflați în situații de dependență."
+          ]
+        },
+        {
+          "title": "Prevenirea fraudelor și exploatării",
+          "paragraphs": [
+            "Propunem programe locale de informare despre contracte, practici comerciale agresive, înșelăciuni prin telefon și mesaje care pretind urgențe sau solicită bani. Informația trebuie formulată pe înțelesul tuturor, cu exemple practice și orientare către instituțiile competente.",
+            "Susținem accesul la consiliere înaintea deciziilor patrimoniale importante și sprijin pentru victime. Educația preventivă trebuie să încurajeze cererea de ajutor fără rușinare și fără a trata persoanele vârstnice ca fiind incapabile să ia decizii."
+          ]
+        },
+        {
+          "title": "Egalitate în relația cu instituțiile",
+          "paragraphs": [
+            "Vom susține măsuri împotriva discriminării de vârstă și standarde de comunicare respectuoasă în serviciile publice. Reclamațiile trebuie înregistrate și analizate, iar soluțiile comunicate. Evaluarea instituțiilor va include accesibilitatea informației și felul în care răspund persoanelor care au nevoie de asistență suplimentară."
+          ]
+        }
+      ],
+      "monitoring": "Accesul la mecanismele de sesizare, timpul până la evaluarea riscului și măsurile de sprijin acordate, raportate fără date personale."
+    },
+    {
+      "id": "viata-activa",
+      "title": "Viață activă, cultură și relații între generații",
+      "intro": "Participarea socială trebuie să fie o posibilitate reală în fiecare comunitate. Seniorii au interese, competențe și ritmuri diferite; serviciile trebuie construite împreună cu ei, fără a impune un singur model de viață activă.",
+      "sections": [
+        {
+          "title": "Centre de zi care funcționează",
+          "paragraphs": [
+            "Obiectivul de 200 de centre de zi până în 2030, prevăzut în programul PCS, va fi urmărit prin servicii operaționale. Fiecare proiect trebuie să aibă personal, program, buget de funcționare și acces la transport. Construirea sau renovarea unei clădiri reprezintă numai o parte a rezultatului.",
+            "Susținem activități culturale, consiliere, ajutor administrativ și oportunități de socializare, stabilite după consultarea comunității. În localitățile mici pot fi folosite spații existente și echipe comune, dacă sunt asigurate accesibilitatea, siguranța și continuitatea."
+          ]
+        },
+        {
+          "title": "Învățare și acces la cultură",
+          "paragraphs": [
+            "Propunem parteneriate cu biblioteci, muzee, instituții de învățământ și organizații culturale pentru cursuri și activități accesibile. Vom susține facilități de participare și informare prin canale locale, astfel încât oferta să ajungă și la persoanele care nu folosesc internetul.",
+            "Mișcarea, recreerea și turismul social trebuie organizate cu respect pentru opțiunile și posibilitățile participanților. Programele finanțate public vor avea criterii de acces transparente, fără favoritisme sau condiționare politică."
+          ]
+        },
+        {
+          "title": "Experiența transmisă mai departe",
+          "paragraphs": [
+            "Vom susține mentoratul, atelierele de meserii, proiectele de istorie locală și voluntariatul între generații. Participarea trebuie să fie liberă, rolurile clare și cheltuielile explicate. Experiența seniorilor poate sprijini elevi, tineri profesioniști și inițiative comunitare, iar întâlnirea trebuie să ofere beneficii și recunoaștere tuturor participanților."
+          ]
+        }
+      ],
+      "monitoring": "Centre efectiv operaționale, participanți unici, continuitatea activităților și gradul de satisfacție al beneficiarilor."
+    },
+    {
+      "id": "digital",
+      "title": "Tehnologie cu sprijin uman și acces pentru toți",
+      "intro": "Digitalizarea trebuie să simplifice relația cu instituțiile. Un serviciu public rămâne accesibil atunci când poate fi folosit și de persoana fără telefon inteligent, conexiune stabilă sau experiență digitală.",
+      "sections": [
+        {
+          "title": "Canale alternative care rămân funcționale",
+          "paragraphs": [
+            "Vom susține păstrarea accesului la ghișeu, prin telefon și prin asistență locală pentru serviciile esențiale. Cererile trebuie să poată fi urmărite indiferent de canalul folosit. Instituțiile vor fi evaluate după rezolvarea solicitărilor, nu doar după numărul de platforme lansate.",
+            "Propunem formulare cu limbaj clar, caractere lizibile, instrucțiuni scurte și posibilitatea corectării erorilor. Testarea cu utilizatori reali, inclusiv persoane cu dificultăți de vedere sau mobilitate, trebuie să facă parte din pregătirea unui serviciu."
+          ]
+        },
+        {
+          "title": "Învățare practică și echipamente utile",
+          "paragraphs": [
+            "Programele de alfabetizare digitală vor porni de la activități concrete: comunicarea cu familia, programări, verificarea unei informații și folosirea în siguranță a serviciilor. Instruirea trebuie repetată, adaptată ritmului participanților și însoțită de un punct de ajutor după încheierea cursului.",
+            "Susținem sprijin pentru dispozitive și conectivitate acolo unde lipsa lor împiedică accesul. Finanțarea va urmări utilizarea efectivă și asistența oferită; distribuirea echipamentelor trebuie legată de nevoi, instruire și posibilitatea întreținerii lor."
+          ]
+        },
+        {
+          "title": "Date personale și decizii explicabile",
+          "paragraphs": [
+            "Serviciile publice și organizațiile politice trebuie să colecteze numai datele necesare și să explice scopul utilizării lor. Susținem intervenția unui operator uman când o decizie automată afectează accesul la servicii și verificarea informațiilor prezentate drept oficiale. Asistența digitală trebuie să păstreze controlul persoanei asupra propriilor alegeri."
+          ]
+        }
+      ],
+      "monitoring": "Solicitări rezolvate prin fiecare canal, accesibilitatea platformelor și capacitatea participanților de a folosi practic serviciile după instruire."
+    },
+    {
+      "id": "comunitati",
+      "title": "Servicii apropiate, în sate și în orașe",
+      "intro": "Adresa de domiciliu nu trebuie să decidă calitatea sprijinului primit. Politicile naționale au nevoie de soluții locale, adaptate distanțelor, personalului disponibil și situației oamenilor.",
+      "sections": [
+        {
+          "title": "O imagine reală a nevoilor locale",
+          "paragraphs": [
+            "Propunem inventarierea serviciilor existente și consultarea persoanelor care nu ajung ușor la ele. Evaluarea va identifica barierele de transport, lipsa informației, costurile și programul nepotrivit. Datele publicate trebuie să descrie nevoile comunității fără a expune situația personală a beneficiarilor.",
+            "Organizațiile PCS vor aduce aceste probleme în consultări și în propunerile reprezentanților lor. Rolul partidului este să formuleze politici și să urmărească răspunsul instituțional; soluționarea cazurilor individuale trebuie orientată către serviciile competente."
+          ]
+        },
+        {
+          "title": "Cooperare între localități",
+          "paragraphs": [
+            "Susținem servicii comune între comune și orașe pentru asistență socială, îngrijire, transport și consiliere. Echipele mobile și punctele periodice de lucru pot completa serviciile permanente, cu un calendar anunțat și o persoană de contact ușor de găsit.",
+            "Finanțarea trebuie să țină seama de costul deservirii zonelor dispersate. Un proiect rural nu poate fi evaluat exclusiv după numărul de beneficiari pe kilometru pătrat, ignorând distanțele și lipsa alternativelor."
+          ]
+        },
+        {
+          "title": "Pregătire pentru situații dificile",
+          "paragraphs": [
+            "Vom susține planuri locale pentru perioadele de caniculă, ger, întreruperi de utilități și alte situații care afectează accesul la servicii. Acestea trebuie să precizeze instituțiile responsabile, canalele de informare și modul de sprijinire a persoanelor cu mobilitate redusă. Contactarea și asistența se vor organiza cu respect pentru viața privată."
+          ]
+        }
+      ],
+      "monitoring": "Localități acoperite, timpul de acces la servicii, continuitatea echipelor mobile și funcționarea planurilor locale de sprijin."
+    },
+    {
+      "id": "economie",
+      "title": "Economie, fiscalitate și muncă respectată",
+      "intro": "Protecția socială durabilă se sprijină pe o economie productivă și pe administrarea responsabilă a veniturilor publice. Munca declarată, contribuțiile corect colectate și investițiile utile susțin siguranța tuturor generațiilor.",
+      "sections": [
+        {
+          "title": "Protejarea veniturilor mici",
+          "paragraphs": [
+            "Păstrăm direcția programului PCS privind reducerea poverii fiscale asupra pensiilor mici și protejarea venitului disponibil. Pragurile și mecanismele propuse trebuie evaluate în raport cu legislația aplicabilă la momentul inițiativei, costul vieții și efectele asupra beneficiarilor. Orice schimbare va fi însoțită de exemple de calcul și de o estimare a impactului bugetar.",
+            "Vom susține simplificarea accesului la facilitățile existente și analiza costurilor medicale și de îngrijire suportate de gospodării. Politica fiscală trebuie să fie inteligibilă și previzibilă, astfel încât persoanele să poată estima ce venit le rămâne efectiv."
+          ]
+        },
+        {
+          "title": "Activitate profesională prin alegere",
+          "paragraphs": [
+            "Susținem posibilitatea continuării activității în condiții potrivite sănătății, competenței și opțiunii persoanei. Propunerile privind angajarea și mentoratul trebuie să combată discriminarea de vârstă și să ofere condiții clare. Venitul insuficient nu trebuie folosit pentru a prezenta munca forțată de nevoie drept libertate de alegere.",
+            "Vom încuraja transmiterea experienței profesionale, formarea continuă și inițiativele economice viabile. Sprijinul public va avea criterii transparente și evaluarea riscurilor, fără a încuraja îndatorarea nepotrivită sau promisiunile de câștig sigur."
+          ]
+        },
+        {
+          "title": "Servicii de calitate și folosirea corectă a banilor",
+          "paragraphs": [
+            "Dezvoltarea economiei îngrijirii poate susține locuri de muncă și servicii necesare comunității. Contractele finanțate public trebuie atribuite transparent și urmărite prin calitatea prestației, calificarea personalului și costul total. Plata trebuie legată de servicii reale, documentate și verificate, cu corectarea deficiențelor identificate."
+          ]
+        }
+      ],
+      "monitoring": "Impactul măsurilor asupra venitului disponibil, accesul la activitate profesională și calitatea serviciilor achiziționate din bani publici."
+    },
+    {
+      "id": "reprezentare",
+      "title": "Reprezentare democratică și integritate",
+      "intro": "Seniorii trebuie să participe la formularea și evaluarea politicilor care îi privesc. Reprezentarea presupune ascultare, competență și răspundere publică pe întreaga durată a unui mandat.",
+      "sections": [
+        {
+          "title": "Consultare cu efect asupra deciziei",
+          "paragraphs": [
+            "Vom organiza consultări cu seniori, aparținători, asociații, sindicate, profesioniști și comunități locale. Propunerile primite trebuie sintetizate, iar alegerea unei soluții explicată. Consultarea va fi accesibilă și în afara platformelor online, cu posibilitatea formulării de observații în scris și în întâlniri locale.",
+            "Susținem participarea seniorilor la candidaturi și la structurile de decizie, în condițiile statutului și ale legii. Selecția trebuie să urmărească integritatea, competența, legătura cu comunitatea și disponibilitatea de a răspunde public pentru activitatea desfășurată."
+          ]
+        },
+        {
+          "title": "Responsabilitate în interiorul partidului",
+          "paragraphs": [
+            "Conducerea națională și organizațiile teritoriale vor fi chemate să prezinte prioritățile, activitatea și folosirea resurselor potrivit atribuțiilor statutare. Propunerile din acest manifest vor fi urmărite prin responsabili desemnați în mod transparent, cu respectarea competențelor organelor partidului.",
+            "Ne asumăm prevenirea conflictelor de interese, administrarea corectă a resurselor și respectarea regulilor de finanțare politică. Datele membrilor și ale persoanelor care ne contactează trebuie protejate. Participarea la o consultare sau la un eveniment nu trebuie confundată cu înscrierea în partid."
+          ]
+        },
+        {
+          "title": "Informare publică verificabilă",
+          "paragraphs": [
+            "Vom distinge comunicarea oficială PCS de informațiile preluate din presă și vom indica sursele afirmațiilor factuale. Activitățile propuse, cele începute și rezultatele obținute trebuie prezentate separat. Erorile vor fi corectate vizibil, iar dezacordurile politice discutate fără umilirea persoanelor."
+          ]
+        }
+      ],
+      "monitoring": "Consultări documentate, răspunsuri la propuneri, rapoarte de activitate și transparența deciziilor și a finanțării."
+    },
+    {
+      "id": "europa",
+      "title": "România europeană și legătura cu diaspora",
+      "intro": "PCS susține apartenența României la Uniunea Europeană și la NATO, cooperarea democratică și valorificarea oportunităților de dezvoltare. Politicile sociale naționale trebuie construite cu profesionalism și cu respectarea angajamentelor europene.",
+      "sections": [
+        {
+          "title": "Proiecte europene care lasă servicii funcționale",
+          "paragraphs": [
+            "Vom susține folosirea programelor europene eligibile pentru infrastructură socială, formarea personalului, accesibilitate și incluziune. Fiecare proiect trebuie să prevadă cine finanțează funcționarea după încheierea grantului. O investiție este utilă atunci când serviciul continuă să ajute comunitatea.",
+            "Cooperarea cu alte administrații și organizații poate aduce metode de lucru mai bune. Soluțiile trebuie adaptate resurselor și nevoilor locale, cu evaluarea rezultatelor și publicarea condițiilor în care pot fi extinse."
+          ]
+        },
+        {
+          "title": "Asistență pentru perioadele lucrate în străinătate",
+          "paragraphs": [
+            "Susținem informarea clară a persoanelor care au lucrat în mai multe state și asistența pentru pregătirea și urmărirea dosarelor. Instituțiile competente trebuie să explice regulile aplicabile situației concrete și să coopereze pentru verificarea documentelor. Cetățeanul are nevoie de o orientare corectă, accesibilă și actualizată.",
+            "Vom propune îmbunătățirea comunicării dintre instituțiile de pensii și serviciile consulare, cu canale telefonice și digitale. Sprijinul administrativ trebuie să respecte competențele fiecărei instituții și confidențialitatea datelor personale."
+          ]
+        },
+        {
+          "title": "Familii aflate la distanță",
+          "paragraphs": [
+            "Pentru seniorii reveniți în țară și pentru familiile cu membri plecați, propunem orientare către serviciile medicale, sociale și comunitare disponibile. Cu acordul persoanei, aparținătorii trebuie să poată primi informațiile necesare coordonării îngrijirii. Distanța nu trebuie să transforme accesul la sprijin într-un parcurs fără punct de contact."
+          ]
+        }
+      ],
+      "monitoring": "Continuitatea proiectelor după finanțare, accesul la informare și durata clarificării dosarelor care implică instituții din mai multe state."
+    },
+    {
+      "id": "aplicare",
+      "title": "Finanțare, calendar și răspundere pentru rezultate",
+      "intro": "Un angajament devine credibil printr-o propunere fundamentată și prin urmărirea aplicării sale. PCS va prezenta explicit competențele, etapele, resursele și limitele fiecărei măsuri pe care o susține.",
+      "sections": [
+        {
+          "title": "Fișa obligatorie a fiecărei măsuri",
+          "paragraphs": [
+            "Vom cere ca propunerile să precizeze beneficiarii, situația de pornire, rezultatul urmărit, costurile de investiție și funcționare, instituția competentă și riscurile de aplicare. Indicatorii trebuie să măsoare schimbarea pentru oameni, inclusiv diferențele dintre localități și categoriile cu acces dificil.",
+            "Sursele pot include bugete publice, reprioritizarea cheltuielilor și programe europene, în funcție de eligibilitate. Economiile posibile și finanțările încă neaprobate vor fi prezentate ca ipoteze, fără a fi contabilizate ca bani disponibili. Cheltuielile permanente necesită venituri și responsabilități de funcționare previzibile."
+          ]
+        },
+        {
+          "title": "Etape raportate la competența reală",
+          "paragraphs": [
+            "În primul ciclu de șase luni de la publicarea acestei ediții, PCS își propune consultări, un inventar al nevoilor semnalate și fișe pentru prioritățile naționale. Aceste activități țin de organizarea partidului. Adoptarea unor legi, programe bugetare sau investiții depinde de autoritățile competente și de mandatele obținute.",
+            "Pentru măsurile care primesc aprobare și finanțare vom cere un calendar de aplicare, verificarea capacității locale și evaluare înainte de extindere. Orizontul 2030 pentru centrele de zi și orizontul 2034 al programului rămân repere politice urmărite public, cu explicarea întârzierilor și a corecțiilor necesare."
+          ]
+        },
+        {
+          "title": "Raport public la fiecare șase luni",
+          "paragraphs": [
+            "Raportarea va prezenta pentru fiecare prioritate stadiul, dovezile, costurile cunoscute, responsabilul și pasul următor. Vom folosi stări clare: propus, în consultare, depus, aprobat, în aplicare, finalizat sau întârziat. O inițiativă depusă nu va fi prezentată drept serviciu deja disponibil.",
+            "Datele vor fi publicate agregat, cu surse și explicații. Reprezentanții PCS vor răspunde pentru activitatea lor, iar evaluarea independentă și observațiile cetățenilor vor fi folosite pentru corectarea propunerilor. Manifestul va fi revizuit transparent, cu data ediției și descrierea schimbărilor."
+          ]
+        }
+      ],
+      "monitoring": "Fișe de măsuri publicate, surse de finanțare confirmate, termene respectate și rapoarte semestriale cu dovezi verificabile."
+    }
+  ],
+  "commitments": [
+    "Vom susține pensii previzibile și protejarea puterii de cumpărare, cu explicații clare și corectarea erorilor administrative.",
+    "Vom susține accesul la tratamente și servicii medicale esențiale, cu atenție la costuri, timpi de așteptare și continuitate.",
+    "Vom promova îngrijirea de calitate la domiciliu și în comunitate, împreună cu sprijinul pentru aparținători.",
+    "Vom susține locuințe sigure, utilități suportabile și programe de adaptare și eficiență energetică accesibile.",
+    "Vom cere transport utilizabil, trasee pietonale sigure și legături pentru localitățile izolate.",
+    "Vom combate discriminarea, abuzul și exploatarea financiară prin prevenție și mecanisme de sprijin accesibile.",
+    "Vom susține centre de zi funcționale, acces la cultură, învățare și proiecte între generații.",
+    "Vom cere servicii digitale ușor de folosit, asistență umană și alternative pentru persoanele care nu folosesc internetul.",
+    "Vom consulta comunitățile și vom explica public deciziile, activitatea reprezentanților și folosirea resurselor.",
+    "Vom publica la fiecare șase luni stadiul angajamentelor, cu dovezi, responsabilități și pașii necesari pentru îndreptarea întârzierilor."
+  ],
+  "closing": "Ne asumăm să transformăm respectul pentru seniori într-un criteriu al deciziei publice. Vom asculta, vom propune, vom explica și vom răspunde pentru ceea ce facem. O Românie demnă se construiește prin grija față de oameni și prin instituții care își îndeplinesc obligațiile.",
+  "referencesIntro": "Ediția dezvoltă manifestul anterior și direcțiile programului PCS. Reperele externe de mai jos oferă context pentru politicile de îngrijire; ele nu reprezintă o aprobare a propunerilor partidului. Documentele au fost consultate la 7 septembrie 2026.",
+  "references": [
+    {
+      "title": "Programul politic și doctrina PCS, ediția 2026, orizont 2026–2034",
+      "url": "https://pcpens.online/documente/program-politic",
+      "note": "Sursa direcțiilor politice, a celor trei priorități, a reperului de 2.500 lei, a țintei de 200 de centre de zi până în 2030 și a raportării semestriale. Acestea sunt obiective programatice, nu rezultate deja realizate."
+    },
+    {
+      "title": "Statutul PCS, versiunea publicată pe site",
+      "url": "https://pcpens.online/documente/statut",
+      "note": "Reper pentru scopul partidului, organizare și atribuțiile structurilor de conducere. Manifestul nu modifică statutul și nu stabilește o dată de adoptare statutară."
+    },
+    {
+      "title": "HG nr. 1.492/2022 — Strategia națională privind îngrijirea de lungă durată și îmbătrânirea activă 2023–2030",
+      "url": "https://legislatie.just.ro/Public/DetaliiDocumentAfis/263098",
+      "note": "Reper național de politică publică pentru îngrijirea de lungă durată și îmbătrânirea activă."
+    },
+    {
+      "title": "Consiliul Uniunii Europene — recomandarea privind accesul la îngrijire de lungă durată accesibilă și de înaltă calitate, 8 decembrie 2022",
+      "url": "https://www.consilium.europa.eu/en/press/press-releases/2022/12/08/eu-ministers-adopt-recommendations-on-early-childhood-and-long-term-care/",
+      "note": "Reper european pentru accesibilitate, calitatea îngrijirii, reducerea diferențelor teritoriale și susținerea autonomiei persoanei."
+    }
+  ]
+}
