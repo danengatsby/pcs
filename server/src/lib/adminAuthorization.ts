@@ -1,41 +1,12 @@
 import type { Response } from "express";
-import type { UserRole } from "./authToken.js";
 import type { AuthenticatedUser } from "./authMiddleware.js";
 import { AppError } from "./errors.js";
 import { prisma } from "./prisma.js";
 
-export const adminCapabilities = [
-  "recruitment.read",
-  "recruitment.export",
-  "recruitment.manage",
-  "recruitment.delete",
-  "membership.read",
-  "membership.validate",
-  "membership.lifecycle",
-  "organization.read",
-  "organization.create",
-  "organization.update",
-  "organization.mandate",
-  "organization.objective",
-  "congress.read",
-  "congress.manage",
-  "congress.vote",
-  "arbitration.read",
-  "arbitration.manage",
-  "arbitration.adjudicate",
-  "executive.read",
-  "executive.targets",
-  "mobilization.read",
-  "mobilization.manage",
-  "communication.preview",
-  "communication.dispatch",
-  "content.read",
-  "content.write",
-  "audit.read",
-  "notifications.test",
-] as const;
-
-export type AdminCapability = (typeof adminCapabilities)[number];
+import { adminCapabilities, defaultAdminCapabilities, profileCapabilities, type AdminCapability, type AdminProfile } from "./adminAccessProfiles.js";
+import { isAdminRole } from "./adminMfa.js";
+export { adminCapabilities };
+export type { AdminCapability };
 
 export type AdminTerritoryScope = {
   national: boolean;
@@ -54,66 +25,12 @@ export type AdminAccessContext = {
   actor: AuthenticatedUser;
   capability: AdminCapability;
   capabilities: AdminCapability[];
+  profile?: AdminProfile | null;
   scope: AdminTerritoryScope;
 };
 
 type AdminLocals = {
   adminAccess?: AdminAccessContext;
-};
-
-const roleCapabilities: Record<Extract<UserRole, "CONSILIER" | "SECRETAR" | "VICEPRESEDINTE" | "PRESEDINTE">, readonly AdminCapability[]> = {
-  CONSILIER: [
-    "recruitment.read",
-    "membership.read",
-    "organization.read",
-    "congress.read",
-    "arbitration.read",
-    "mobilization.read",
-  ],
-  SECRETAR: [
-    "recruitment.read",
-    "recruitment.export",
-    "recruitment.manage",
-    "membership.read",
-    "membership.validate",
-    "organization.read",
-    "organization.objective",
-    "congress.read",
-    "congress.manage",
-    "congress.vote",
-    "arbitration.read",
-    "arbitration.manage",
-    "arbitration.adjudicate",
-    "mobilization.read",
-    "mobilization.manage",
-    "communication.preview",
-    "content.read",
-  ],
-  VICEPRESEDINTE: [
-    "recruitment.read",
-    "recruitment.export",
-    "recruitment.manage",
-    "recruitment.delete",
-    "membership.read",
-    "membership.validate",
-    "membership.lifecycle",
-    "organization.read",
-    "organization.update",
-    "organization.objective",
-    "congress.read",
-    "congress.manage",
-    "congress.vote",
-    "arbitration.read",
-    "arbitration.manage",
-    "arbitration.adjudicate",
-    "executive.read",
-    "mobilization.read",
-    "mobilization.manage",
-    "communication.preview",
-    "content.read",
-    "content.write",
-  ],
-  PRESEDINTE: adminCapabilities,
 };
 
 const nationalCapabilities = new Set<AdminCapability>([
@@ -125,13 +42,11 @@ const nationalCapabilities = new Set<AdminCapability>([
   "organization.create",
   "organization.mandate",
   "communication.dispatch",
+  "finance.read",
+  "finance.manage",
+  "parliamentary.read",
+  "parliamentary.manage",
 ]);
-
-function isAdministrativeRole(
-  role: UserRole
-): role is keyof typeof roleCapabilities {
-  return role in roleCapabilities;
-}
 
 function normalizeTerritoryText(value: string): string {
   return value.trim().toLocaleLowerCase("ro-RO");
@@ -262,50 +177,29 @@ export async function resolveAdminTerritoryScope(
   };
 }
 
-function effectiveCapabilities(
-  role: UserRole,
-  scope: AdminTerritoryScope
-): AdminCapability[] {
-  if (!isAdministrativeRole(role)) {
-    return [];
-  }
-  return roleCapabilities[role].filter((capability) => (
-    scope.national || !nationalCapabilities.has(capability)
-  ));
-}
-
 export async function buildAdminAccessContext(
   actor: AuthenticatedUser,
   capability: AdminCapability
 ): Promise<AdminAccessContext> {
-  if (!isAdministrativeRole(actor.role) || !roleCapabilities[actor.role].includes(capability)) {
-    throw new AppError(
-      403,
-      "ADMIN_PERMISSION_REQUIRED",
-      "Funcția ta nu permite această operație administrativă."
-    );
+  if (!isAdminRole(actor.role)) {
+    throw new AppError(403, "ADMIN_PERMISSION_REQUIRED", "Contul tău nu are acces administrativ.");
   }
-
+  const assigned = await prisma.adminAccessProfile.findUnique({ where: { userId: BigInt(actor.id) } });
+  const profile = assigned?.profile as AdminProfile | undefined;
+  const available = profile ? (profileCapabilities[profile] ?? []) : defaultAdminCapabilities(actor.role);
+  if (!available.includes(capability)) {
+    throw new AppError(403, "ADMIN_PERMISSION_REQUIRED", "Atribuțiile contului nu permit această operație administrativă.");
+  }
   const scope = await resolveAdminTerritoryScope(actor);
   if (!scope.national && scope.mandateOrganizationIds.length === 0) {
-    throw new AppError(
-      403,
-      "ADMIN_TERRITORY_REQUIRED",
-      "Nu ai un mandat teritorial activ asociat contului."
-    );
+    throw new AppError(403, "ADMIN_TERRITORY_REQUIRED", "Nu ai un mandat teritorial activ asociat contului.");
   }
   if (!scope.national && nationalCapabilities.has(capability)) {
-    throw new AppError(
-      403,
-      "ADMIN_NATIONAL_SCOPE_REQUIRED",
-      "Operația necesită un mandat cu acoperire națională."
-    );
+    throw new AppError(403, "ADMIN_NATIONAL_SCOPE_REQUIRED", "Operația necesită un mandat cu acoperire națională.");
   }
-
   return {
-    actor,
-    capability,
-    capabilities: effectiveCapabilities(actor.role, scope),
+    actor, capability, profile: profile ?? null,
+    capabilities: available.filter((item) => scope.national || !nationalCapabilities.has(item)),
     scope,
   };
 }

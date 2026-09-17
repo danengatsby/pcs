@@ -1,4 +1,4 @@
-import type { AuthSessionResponse } from '@features/auth/types'
+import type { AuthSessionResponse, AuthUser } from '@features/auth/types'
 
 export type StoredAuthSession = {
   csrfToken: string | null
@@ -6,6 +6,20 @@ export type StoredAuthSession = {
 
 const STORAGE_KEY = 'pcs.auth.session'
 let inMemoryAccessToken: string | null = null
+let generation = 0
+const listeners = new Set<(user: AuthUser | null) => void>()
+
+function notifySession(user: AuthUser | null): void {
+  for (const listener of listeners) listener(user)
+}
+
+function storeResponse(session: AuthSessionResponse): StoredAuthSession {
+  inMemoryAccessToken = session.token
+  const storedSession = toStoredAuthSession(session)
+  writeStoredAuthSession(storedSession)
+  notifySession(session.user)
+  return storedSession
+}
 
 function safeParse<T>(raw: string | null): T | null {
   if (!raw) return null
@@ -35,19 +49,15 @@ function normalizeStoredAuthSession(value: unknown): StoredAuthSession | null {
 }
 
 function readRawStoredAuthSession(): string | null {
-  const sessionValue = sessionStorage.getItem(STORAGE_KEY)
-  if (sessionValue) {
-    return sessionValue
-  }
-
-  const legacyLocalValue = localStorage.getItem(STORAGE_KEY)
-  if (legacyLocalValue) {
-    sessionStorage.setItem(STORAGE_KEY, legacyLocalValue)
-    localStorage.removeItem(STORAGE_KEY)
-    return legacyLocalValue
-  }
-
-  return null
+  // The refresh cookie belongs to the browser, so its CSRF companion must be
+  // shared by tabs as well. Never persist the access token or a personal link.
+  const raw = localStorage.getItem(STORAGE_KEY) ?? sessionStorage.getItem(STORAGE_KEY)
+  const session = normalizeStoredAuthSession(safeParse<unknown>(raw))
+  if (!session?.csrfToken) return null
+  const sanitized = JSON.stringify(session)
+  if (localStorage.getItem(STORAGE_KEY) !== sanitized) localStorage.setItem(STORAGE_KEY, sanitized)
+  sessionStorage.removeItem(STORAGE_KEY)
+  return sanitized
 }
 
 function writeStoredAuthSession(session: StoredAuthSession): void {
@@ -57,8 +67,8 @@ function writeStoredAuthSession(session: StoredAuthSession): void {
     return
   }
 
-  sessionStorage.setItem(STORAGE_KEY, JSON.stringify(session))
-  localStorage.removeItem(STORAGE_KEY)
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(session))
+  sessionStorage.removeItem(STORAGE_KEY)
 }
 
 function toStoredAuthSession(session: AuthSessionResponse): StoredAuthSession {
@@ -73,17 +83,30 @@ export const authStorage = {
   },
 
   set(session: StoredAuthSession) {
+    generation++
     writeStoredAuthSession(session)
   },
 
   setFromResponse(session: AuthSessionResponse): StoredAuthSession {
-    inMemoryAccessToken = session.token
-    const storedSession = toStoredAuthSession(session)
-    writeStoredAuthSession(storedSession)
-    return storedSession
+    generation++
+    return storeResponse(session)
+  },
+
+  updateFromRefresh(session: AuthSessionResponse, expectedGeneration: number): boolean {
+    if (generation !== expectedGeneration) return false
+    storeResponse(session)
+    return true
+  },
+
+  getGeneration(): number { return generation },
+
+  subscribe(listener: (user: AuthUser | null) => void): () => void {
+    listeners.add(listener)
+    return () => { listeners.delete(listener) }
   },
 
   setAccessToken(accessToken: string | null) {
+    generation++
     inMemoryAccessToken = accessToken
   },
 
@@ -96,8 +119,17 @@ export const authStorage = {
   },
 
   clear() {
+    generation++
     inMemoryAccessToken = null
     sessionStorage.removeItem(STORAGE_KEY)
     localStorage.removeItem(STORAGE_KEY)
+    notifySession(null)
   },
 }
+
+// Signing out in any tab also clears credentials held in other tabs' memory.
+window.addEventListener('storage', event => {
+  if (event.storageArea === localStorage && (event.key === STORAGE_KEY || event.key === null) && event.newValue === null) {
+    authStorage.clear()
+  }
+})

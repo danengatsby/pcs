@@ -20,4 +20,12 @@ export const signupSchema = z.object({
 export const signinSchema = z.object({
   email: signinIdentifierSchema,
   password: z.string().min(1).max(128),
+  mfaCode: z.string().regex(/^\d{6}$/, "Codul de autentificare trebuie să conțină 6 cifre.").optional(),
+}).strict();
+
+export const activationPreviewSchema = z.object({ token: z.string().regex(/^[A-Za-z0-9_-]{43}$/) }).strict();
+export const adminDirectLoginSchema = z.object({ token: z.string().regex(/^[A-Za-z0-9_-]{43}$/) }).strict();
+export const activationCompleteSchema = activationPreviewSchema.extend({
+  password: signupSchema.shape.password,
+  mfaCode: z.string().regex(/^\d{6}$/, "Introdu codul de 6 cifre din aplicația de autentificare."),
 }).strict();

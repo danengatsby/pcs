@@ -1,3 +1,4 @@
+import { signinTestInput } from "../helpers/adminAuth.js";
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { test } from "node:test";
@@ -21,7 +22,7 @@ async function createOfficer(input: {
   await query("UPDATE users SET role = $2 WHERE LOWER(email) = LOWER($1)", [input.email, input.role]);
   const response = await request(app)
     .post("/api/auth/signin")
-    .send({ email: input.email, password })
+    .send(await signinTestInput({ email: input.email, password }))
     .expect(200);
   return {
     id: response.body?.data?.user?.id as string,

@@ -7,6 +7,12 @@ function hashRateLimitEmail(email: string): string {
   return createHash("sha256").update(email).digest("hex");
 }
 
+export const adminActivationRateLimiter = createRateLimiter({
+  scope: "auth-admin-activation", windowMs: 15 * 60 * 1000, max: 30,
+  errorCode: "AUTH_RATE_LIMITED", errorMessage: "Prea multe încercări de activare. Încearcă din nou peste 15 minute.",
+  keyGenerator: (req) => readClientIp(req),
+});
+
 export const signupRateLimiter = createRateLimiter({
   scope: "auth-signup",
   windowMs: env.authRateLimitWindowMs,

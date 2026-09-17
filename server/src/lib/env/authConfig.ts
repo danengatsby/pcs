@@ -1,14 +1,18 @@
 import { randomBytes } from "node:crypto";
-import { isLikelyEmail, isRelaxedEnvironment, readBooleanFlag, readPositiveInt } from "./shared.js";
+import { isRelaxedEnvironment, readBooleanFlag, readPositiveInt } from "./shared.js";
 
 export type AuthRefreshStore = "sql" | "redis";
 
-export function readAuthPublicAdminEmail(): string {
-  const email = process.env.AUTH_PUBLIC_ADMIN_EMAIL?.trim().toLowerCase() ?? "";
-  if (email && (email.length > 180 || !isLikelyEmail(email))) {
-    throw new Error("AUTH_PUBLIC_ADMIN_EMAIL trebuie sa fie o adresa de email completa.");
+export function readAuthMfaEncryptionKey(nodeEnv: string): string {
+  const key = process.env.AUTH_MFA_ENCRYPTION_KEY?.trim() ?? "";
+  if (key && !/^[a-f0-9]{64}$/i.test(key)) {
+    throw new Error("AUTH_MFA_ENCRYPTION_KEY trebuie să conțină exact 64 de caractere hexazecimale.");
   }
-  return email;
+  if (!key && nodeEnv === "production") {
+    throw new Error("AUTH_MFA_ENCRYPTION_KEY este obligatorie în producție.");
+  }
+  // A deterministic test key is isolated by NODE_ENV and the test DB guard.
+  return key || (nodeEnv === "test" ? "a1".repeat(32) : "");
 }
 
 export function readAuthTokenSecret(nodeEnv: string): string {

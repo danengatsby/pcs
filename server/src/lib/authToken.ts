@@ -21,6 +21,7 @@ export type AuthTokenPayload = {
   iss: string;
   aud: string;
   jti: string;
+  adminSessionId?: string;
 };
 
 const authTokenKey = new TextEncoder().encode(env.authTokenSecret);
@@ -80,6 +81,8 @@ function parseTokenPayload(payload: JWTPayload): AuthTokenPayload | null {
     iss: payload.iss,
     aud: audience,
     jti: payload.jti,
+    ...(typeof payload.adminSessionId === "string" && /^[a-f0-9-]{36}$/i.test(payload.adminSessionId)
+      ? { adminSessionId: payload.adminSessionId } : {}),
   };
 }
 
@@ -88,11 +91,14 @@ export async function createAuthToken(payload: {
   role: UserRole;
   fullName: string;
   email: string;
+  adminSessionId?: string;
+  expiresInSeconds?: number;
 }): Promise<string> {
   return new SignJWT({
     role: payload.role,
     fullName: payload.fullName,
     email: payload.email,
+    ...(payload.adminSessionId ? { adminSessionId: payload.adminSessionId } : {}),
   })
     .setProtectedHeader({ alg: "HS256", typ: "JWT" })
     .setSubject(payload.id)
@@ -100,7 +106,7 @@ export async function createAuthToken(payload: {
     .setAudience(env.authTokenAudience)
     .setJti(randomUUID())
     .setIssuedAt()
-    .setExpirationTime(`${env.authTokenTtlSeconds}s`)
+    .setExpirationTime(`${payload.expiresInSeconds ?? env.authTokenTtlSeconds}s`)
     .sign(authTokenKey);
 }
 

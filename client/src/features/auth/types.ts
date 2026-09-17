@@ -19,6 +19,7 @@ export type AuthUser = {
 export type SigninInput = {
   email: string
   password: string
+  mfaCode?: string
 }
 
 export type AuthSessionResponse = {

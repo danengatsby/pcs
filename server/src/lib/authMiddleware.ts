@@ -8,6 +8,8 @@ import {
 import { isTokenRevoked } from "./authTokenRevocation.js";
 import { AppError } from "./errors.js";
 import { prisma } from "./prisma.js";
+import { isAdminRole, isAdminSessionValid } from "./adminMfa.js";
+import { isPublicAdminUser } from "./adminPublicAccess.js";
 import {
   buildAdminAccessContext,
   setAdminAccess,
@@ -120,6 +122,11 @@ export const requireAuth: RequestHandler = async (req, res, next) => {
 
     if (!user) {
       next(new AppError(401, "AUTH_UNAUTHORIZED", "Utilizatorul nu exista."));
+      return;
+    }
+
+    if (isAdminRole(user.role) && !isPublicAdminUser(user) && !await isAdminSessionValid(user.id, tokenPayload.adminSessionId)) {
+      next(new AppError(401, "AUTH_MFA_SESSION_REQUIRED", "Autentifică-te din nou cu parola și codul din aplicația de autentificare."));
       return;
     }
 

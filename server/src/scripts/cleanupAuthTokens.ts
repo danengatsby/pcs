@@ -1,6 +1,6 @@
 import { cleanupExpiredRefreshTokenSessions } from "../lib/authRefreshToken.js";
 import { cleanupExpiredRevokedTokens } from "../lib/authTokenRevocation.js";
-import { closePool } from "../lib/db.js";
+import { closePool, query } from "../lib/db.js";
 
 type BatchCleanupResult = {
   deletedRows: number;
@@ -49,9 +49,27 @@ async function main(): Promise<void> {
   const batchLimit = readPositiveIntEnv("AUTH_TOKEN_CLEANUP_BATCH_LIMIT", 5000);
   const maxBatches = readPositiveIntEnv("AUTH_TOKEN_CLEANUP_MAX_BATCHES", 20);
 
-  const [refreshCleanup, revokedCleanup] = await Promise.all([
+  const [refreshCleanup, revokedCleanup, adminCleanup, activationCleanup, directLoginCleanup] = await Promise.all([
     runBatchedCleanup(cleanupExpiredRefreshTokenSessions, batchLimit, maxBatches),
     runBatchedCleanup(cleanupExpiredRevokedTokens, batchLimit, maxBatches),
+    runBatchedCleanup(async (limit) => {
+      const result = await query(`DELETE FROM admin_auth_sessions WHERE id IN (
+        SELECT id FROM admin_auth_sessions WHERE expires_at <= NOW() ORDER BY expires_at LIMIT $1
+      )`, [limit]);
+      return result.rowCount ?? 0;
+    }, batchLimit, maxBatches),
+    runBatchedCleanup(async (limit) => {
+      const result = await query(`DELETE FROM admin_activation_invitations WHERE id IN (
+        SELECT id FROM admin_activation_invitations WHERE expires_at <= NOW() ORDER BY expires_at LIMIT $1
+      )`, [limit]);
+      return result.rowCount ?? 0;
+    }, batchLimit, maxBatches),
+    runBatchedCleanup(async (limit) => {
+      const result = await query(`DELETE FROM admin_direct_login_links WHERE id IN (
+        SELECT id FROM admin_direct_login_links WHERE expires_at <= NOW() ORDER BY expires_at LIMIT $1
+      )`, [limit]);
+      return result.rowCount ?? 0;
+    }, batchLimit, maxBatches),
   ]);
 
   console.log("Cleanup token-uri auth finalizat.", {
@@ -61,6 +79,9 @@ async function main(): Promise<void> {
     refreshBatches: refreshCleanup.batches,
     revokedTokensDeleted: revokedCleanup.deletedRows,
     revokedBatches: revokedCleanup.batches,
+    adminSessionsDeleted: adminCleanup.deletedRows,
+    activationInvitationsDeleted: activationCleanup.deletedRows,
+    directLoginLinksDeleted: directLoginCleanup.deletedRows,
   });
 }
 
