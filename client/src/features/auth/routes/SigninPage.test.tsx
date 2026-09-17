@@ -66,7 +66,7 @@ describe('SigninPage', () => {
     expect(screen.getByText('Administrare PCS')).toBeInTheDocument()
   })
 
-  it('redirects non-admin users to the user profile page', () => {
+  it('keeps direct public entry available for a signed-in non-admin user', () => {
     renderSigninPage({
       user: {
         id: '1',
@@ -76,7 +76,7 @@ describe('SigninPage', () => {
       },
     })
 
-    expect(screen.getByText('Profil utilizator')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Intră direct ca administrator' })).toBeInTheDocument()
   })
 
   it('renders the login form when no user is authenticated', () => {
@@ -90,7 +90,7 @@ describe('SigninPage', () => {
     expect(screen.getByRole('button', { name: 'Autentificare ca admin' })).toBeInTheDocument()
   })
 
-  it('opens the configured admin account regardless of credentials in the form', async () => {
+  it('authenticates an administrator only with the entered personal credentials', async () => {
     const user = userEvent.setup()
     const signin = vi.fn(async () => signinSuccess('PRESEDINTE'))
     renderSigninPage({ signin })
@@ -100,8 +100,8 @@ describe('SigninPage', () => {
     await user.click(screen.getByRole('button', { name: 'Autentificare ca admin' }))
 
     expect(signin).toHaveBeenCalledWith({
-      email: 'admin',
-      password: 'admin',
+      email: 'alt-utilizator',
+      password: 'ParolaSigura#2026',
     })
     expect(signin).toHaveBeenCalledOnce()
     expect(await screen.findByText('Administrare PCS')).toBeInTheDocument()
@@ -125,18 +125,27 @@ describe('SigninPage', () => {
     expect(screen.getByRole('button', { name: 'Autentificare ca admin' })).toBeEnabled()
   })
 
-  it('shows direct signin errors and allows another attempt', async () => {
+  it('requires a second factor before opening the administrative workspace', async () => {
     const user = userEvent.setup()
     const signin = vi.fn()
-      .mockResolvedValueOnce({ ok: false, error: { code: 'AUTH_FORBIDDEN', message: 'Contul admin nu este disponibil.' } })
+      .mockResolvedValueOnce({ ok: false, error: { code: 'AUTH_MFA_REQUIRED', message: 'Introdu codul din aplicație.' } })
+      .mockResolvedValueOnce({ ok: false, error: { code: 'AUTH_MFA_INVALID', message: 'Cod invalid sau deja folosit.' } })
       .mockResolvedValueOnce(signinSuccess('PRESEDINTE'))
     renderSigninPage({ signin })
-
+    await user.type(screen.getByLabelText('Utilizator'), 'personal@example.test')
+    await user.type(screen.getByLabelText('Parolă'), 'ParolaSigura#2026')
     await user.click(screen.getByRole('button', { name: 'Autentificare ca admin' }))
-    expect(await screen.findByRole('alert')).toHaveTextContent('Contul admin nu este disponibil.')
+    expect(screen.queryByText('Administrare PCS')).not.toBeInTheDocument()
+    const code = await screen.findByLabelText('Cod din aplicația de autentificare')
+    expect(code).toHaveAttribute('autocomplete', 'one-time-code')
+    await user.type(code, '123456')
     await user.click(screen.getByRole('button', { name: 'Autentificare ca admin' }))
+    expect(signin).toHaveBeenLastCalledWith({ email: 'personal@example.test', password: 'ParolaSigura#2026', mfaCode: '123456' })
+    expect(code).toHaveValue('')
+    await user.type(code, '654321')
+    await user.keyboard('{Enter}')
     expect(await screen.findByText('Administrare PCS')).toBeInTheDocument()
-    expect(signin).toHaveBeenCalledTimes(2)
+    expect(signin).toHaveBeenCalledTimes(3)
   })
 
   it('rejects admin mode for a non-administrative account and clears the session', async () => {
@@ -152,17 +161,12 @@ describe('SigninPage', () => {
     expect(signout).toHaveBeenCalledOnce()
   })
 
-  it('authenticates directly as admin when clicking admin button without filling credentials', async () => {
+  it('does not submit a shared account when admin is clicked without credentials', async () => {
     const user = userEvent.setup()
-    const signin = vi.fn(async () => signinSuccess('PRESEDINTE'))
+    const signin = vi.fn()
     renderSigninPage({ signin })
-
     await user.click(screen.getByRole('button', { name: 'Autentificare ca admin' }))
-
-    expect(signin).toHaveBeenCalledWith({
-      email: 'admin',
-      password: 'admin',
-    })
-    expect(await screen.findByText('Administrare PCS')).toBeInTheDocument()
+    expect(signin).not.toHaveBeenCalled()
+    expect(await screen.findByRole('alert')).toHaveTextContent('Completează utilizatorul și parola contului personal.')
   })
 })
