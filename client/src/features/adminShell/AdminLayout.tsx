@@ -56,7 +56,7 @@ export function AdminLayout() {
     <div className="admin-workspace">
       <aside className="admin-workspace__sidebar">
         <NavLink className="admin-workspace__brand" to="/admin" end>Administrare PCS</NavLink>
-        <div className="admin-workspace__identity"><strong>{user?.fullName}</strong><p className="muted">Arie autorizată: {access.data.scope.label}</p></div>
+        <div className="admin-workspace__identity"><strong>{user?.fullName}</strong>{access.data.profileLabel && <p className="muted">Atribuții: {access.data.profileLabel}</p>}<p className="muted">Arie autorizată: {access.data.scope.label}</p></div>
         <button className="btn admin-workspace__toggle" aria-expanded={menuOpen} aria-controls="admin-navigation" onClick={() => setMenuOpen(!menuOpen)}>Meniu administrativ</button>
         <nav id="admin-navigation" className={menuOpen ? 'is-open' : ''} aria-label="Meniu administrativ">
           <NavLink to="/admin" end onClick={() => setMenuOpen(false)}>Prezentare generală</NavLink>
@@ -83,6 +83,7 @@ export function AdminLayout() {
         </div>
       </aside>
       <div className="admin-workspace__content">
+        {access.data.demoDataEnabled && <div className="alert" role="note"><strong>Date demonstrative active.</strong> Înregistrările marcate „Demo” sunt fictive. Indicatorii administrativi le includ.</div>}
         {pathname !== '/admin' && <nav className="admin-workspace__breadcrumb" aria-label="Localizare în administrare"><Link to="/admin">Administrare</Link><span aria-hidden="true">/</span><span aria-current="page">{currentPage?.label ?? 'Pagină indisponibilă'}</span></nav>}
         <Outlet />
       </div>

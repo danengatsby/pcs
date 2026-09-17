@@ -53,6 +53,12 @@ describe('shared administrative shell', () => {
     expect(screen.queryByText('Pagina Tablou de comandă')).not.toBeInTheDocument()
   })
 
+  it('identifies the demo data included in administrative indicators when explicitly enabled', async () => {
+    vi.mocked(apiGet).mockImplementation(async (path) => ({ ok: true, data: path.endsWith('/access') ? { ...access, demoDataEnabled: true } : { counts: {}, total: 0 } }))
+    renderShell()
+    expect(await screen.findByRole('note')).toHaveTextContent('Înregistrările marcate „Demo” sunt fictive.')
+  })
+
   it('fails closed on an access error without requesting private counts', async () => {
     vi.mocked(apiGet).mockResolvedValue({ ok: false, error: { message: 'Mandat expirat', status: 403 } })
     renderShell('/admin/congresses')
@@ -87,13 +93,13 @@ describe('shared administrative shell', () => {
     await waitFor(() => expect(vi.mocked(apiGet).mock.calls.filter(([path]) => path.endsWith('/tasks')).length).toBeGreaterThan(before))
   })
 
-  it('groups all seven zones and includes a route back to the overview', async () => {
+  it('groups the authorized zones and includes a route back to the overview', async () => {
     vi.mocked(apiGet).mockResolvedValue({ ok: true, data: { ...access, capabilities: adminNavigation.map((item) => item.capability) } })
     renderShell('/admin/congresses')
     const nav = await screen.findByRole('navigation', { name: 'Meniu administrativ' })
-    expect(within(nav).getAllByRole('link')).toHaveLength(8)
+    expect(within(nav).getAllByRole('link')).toHaveLength(adminNavigation.length + 1)
     expect(within(nav).getByRole('link', { name: 'Prezentare generală' })).toHaveAttribute('href', '/admin')
-    expect(within(nav).getAllByRole('group').map((group) => group.getAttribute('aria-labelledby'))).toEqual(['admin-nav-overview', 'admin-nav-people', 'admin-nav-operations', 'admin-nav-governance'])
+    expect(within(nav).getAllByRole('group').map((group) => group.getAttribute('aria-labelledby'))).toEqual(['admin-nav-overview', 'admin-nav-specialized', 'admin-nav-people', 'admin-nav-operations', 'admin-nav-governance'])
   })
 
   it('shows pending work by volume, keeps empty registers accessible and omits unauthorized groups', async () => {
