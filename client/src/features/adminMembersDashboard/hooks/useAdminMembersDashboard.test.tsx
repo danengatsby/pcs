@@ -60,6 +60,22 @@ describe('membership dashboard hooks', () => {
     })
     expect(applyMembershipAction).toHaveBeenCalledWith('9', { action: 'activate', expectedVersion: 2 })
   })
+
+  it('never presents real members as placeholder data while loading the demo dataset', async () => {
+    let resolveDemo!: (value: Awaited<ReturnType<typeof getAdminMembersDashboard>>) => void
+    vi.mocked(getAdminMembersDashboard)
+      .mockResolvedValueOnce({ ok: true, data: { ...buildDashboard(), dataset: 'real' } })
+      .mockImplementationOnce(() => new Promise(resolve => { resolveDemo = resolve }))
+    const { result, rerender } = renderHook(({ dataset }: { dataset: 'real' | 'demo' }) => useAdminMembersDashboard({ dataset }), {
+      wrapper: createWrapper(), initialProps: { dataset: 'real' },
+    })
+    await waitFor(() => expect(result.current.dashboard?.rows[0].fullName).toBe('Ana Pop'))
+    rerender({ dataset: 'demo' })
+    await waitFor(() => expect(getAdminMembersDashboard).toHaveBeenLastCalledWith({ dataset: 'demo' }))
+    expect(result.current.dashboard).toBeNull()
+    await act(async () => resolveDemo({ ok: true, data: { ...buildDashboard(), dataset: 'demo', rows: [] } }))
+    await waitFor(() => expect(result.current.dashboard?.dataset).toBe('demo'))
+  })
 })
 
 function createWrapper() {

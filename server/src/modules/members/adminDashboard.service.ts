@@ -4,6 +4,7 @@ import {
   type AdminAccessContext,
 } from "../../lib/adminAuthorization.js";
 import { AppError } from "../../lib/errors.js";
+import { env } from "../../lib/env.js";
 import {
   applyMembershipActionFromRepository,
   listAdminMembershipsFromRepository,
@@ -78,6 +79,8 @@ export async function listAdminMembersDashboardService(
   filters: AdminMembersDashboardQuery,
   access: AdminAccessContext
 ): Promise<{
+  dataset: "real" | "demo";
+  demoAvailable: boolean;
   generatedAt: string;
   summary: {
     total: number;
@@ -106,13 +109,33 @@ export async function listAdminMembersDashboardService(
     organizationId: string | null;
   };
 }> {
-  const result = await listAdminMembershipsFromRepository(filters, access.scope);
+  const demo = filters.dataset === "demo";
+  if (demo && !env.adminDemoDatabaseUrl) {
+    throw new AppError(503, "MEMBERS_DEMO_UNAVAILABLE", "Lista membrilor fictivi nu este disponibilă momentan.");
+  }
+  // Synthetic organizations have their own identifiers and are visible to members.read holders.
+  const scope = demo
+    ? { national: true, mandateOrganizationIds: [], organizationIds: [], countyIds: [], countyNames: [], localities: [] }
+    : access.scope;
+  let result: Awaited<ReturnType<typeof listAdminMembershipsFromRepository>>;
+  try {
+    result = await listAdminMembershipsFromRepository(filters, scope);
+  } catch (error) {
+    if (demo) { throw new AppError(503, "MEMBERS_DEMO_UNAVAILABLE", "Lista membrilor fictivi nu este disponibilă momentan."); }
+    throw error;
+  }
   return {
+    dataset: filters.dataset,
+    demoAvailable: Boolean(env.adminDemoDatabaseUrl),
     generatedAt: new Date().toISOString(),
     summary: result.summary,
     rows: result.rows.map((row) => ({
       ...row,
-      availableActions: availableActionsForRow(row, access.actor.role),
+      // A demo identifier cannot be submitted to an action on a real member with the same numeric ID.
+      id: demo ? `demo:${row.id}` : row.id,
+      userId: demo ? null : row.userId,
+      volunteerId: demo ? null : row.volunteerId,
+      availableActions: demo ? [] : availableActionsForRow(row, access.actor.role),
     })),
     organizations: result.organizations,
     pagination: {

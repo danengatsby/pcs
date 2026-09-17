@@ -1,4 +1,5 @@
-import { useDeferredValue, useState, type FormEvent } from 'react'
+import { useCallback, useDeferredValue, useEffect, useState, type FormEvent } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Button, Input, Select } from '@components'
 import { useAdminMembersDashboard, useMembershipAction } from '../hooks/useAdminMembersDashboard'
 import type {
@@ -209,7 +210,9 @@ function MembershipRow({
       <div className="admin-members__record-main">
         <div className="admin-members__identity">
           <h2>{member.fullName}</h2>
-          <a className="text-link" href={`mailto:${member.email}`}>{member.email}</a>
+          {member.id.startsWith('demo:')
+            ? <span>{member.email}</span>
+            : <a className="text-link" href={`mailto:${member.email}`}>{member.email}</a>}
           <p className="muted">
             {[member.county, member.locality].filter(Boolean).join(' · ') || 'Localitate necompletată'}
           </p>
@@ -242,7 +245,7 @@ function MembershipRow({
             {actionLabels[action]}
           </Button>
         ))}
-        {member.availableActions.length === 0 ? <span className="muted">Fără operații disponibile pentru rolul tău.</span> : null}
+        {member.availableActions.length === 0 ? <span className="muted">{member.id.startsWith('demo:') ? 'Membru fictiv · doar consultare.' : 'Fără operații disponibile pentru rolul tău.'}</span> : null}
       </div>
 
       {activeAction ? (
@@ -288,6 +291,25 @@ function MembershipRow({
 }
 
 export function AdminMembersDashboardPage() {
+  const [params, setParams] = useSearchParams()
+  const selected = params.get('dataset')
+  const dataset = selected === 'demo' ? 'demo' : 'real'
+  const onDatasetChange = useCallback((value: 'real' | 'demo', automatic = false) => {
+    setParams(current => {
+      const next = new URLSearchParams(current)
+      next.set('dataset', value)
+      return next
+    }, { replace: automatic })
+  }, [setParams])
+  return <MembersRegistry key={dataset} dataset={dataset}
+    autoSelect={selected !== 'real' && selected !== 'demo'} onDatasetChange={onDatasetChange} />
+}
+
+function MembersRegistry({ dataset, autoSelect, onDatasetChange }: {
+  dataset: 'real' | 'demo'
+  autoSelect: boolean
+  onDatasetChange: (dataset: 'real' | 'demo', automatic?: boolean) => void
+}) {
   const [searchInput, setSearchInput] = useState('')
   const [status, setStatus] = useState('')
   const [organizationId, setOrganizationId] = useState('')
@@ -296,6 +318,7 @@ export function AdminMembersDashboardPage() {
   const [successMessage, setSuccessMessage] = useState('')
   const deferredSearch = useDeferredValue(searchInput)
   const { dashboard, loading, error, reload } = useAdminMembersDashboard({
+    dataset,
     search: deferredSearch,
     status: status ? status as MembershipStatus : undefined,
     organizationId: organizationId || undefined,
@@ -303,6 +326,13 @@ export function AdminMembersDashboardPage() {
     offset,
   })
   const membershipMutation = useMembershipAction()
+  // A plain navigation to Members should show the available examples when the
+  // entire real registry is empty, never because a search returned no matches.
+  const openDemo = autoSelect && dataset === 'real' && !loading && !error
+    && dashboard?.demoAvailable === true && dashboard.summary.total === 0
+  useEffect(() => {
+    if (openDemo) onDatasetChange('demo', true)
+  }, [openDemo, onDatasetChange])
   const paginationTotal = dashboard?.pagination.total ?? 0
   const paginationStart = paginationTotal === 0 ? 0 : offset + 1
   const paginationEnd = Math.min(offset + pageSize, paginationTotal)
@@ -311,7 +341,7 @@ export function AdminMembersDashboardPage() {
     member: AdminMembershipRow,
     input: { organizationId?: string; approvalOrganizationId?: string; reason?: string; effectiveAt?: string },
   ) {
-    if (!decision) return
+    if (!decision || dataset === 'demo') return
     membershipMutation.reset()
     setSuccessMessage('')
     try {
@@ -330,6 +360,18 @@ export function AdminMembersDashboardPage() {
     }
   }
 
+  if (openDemo) return <p role="status">Se încarcă membrii fictivi disponibili…</p>
+
+  const statistics = <section className="admin-members__stats" aria-label={dataset === 'demo' ? 'Situația membrilor fictivi' : 'Situația membrilor'}>
+    {summaryCards.map((card) => (
+      <article key={card.key} className="card admin-members__stat">
+        <div className="hero-kicker admin-members__stat-kicker">{card.label}</div>
+        <strong className="admin-members__stat-value">{dashboard?.summary[card.key] ?? (loading ? '…' : '—')}</strong>
+        <p>{card.helper}</p>
+      </article>
+    ))}
+  </section>
+
   return (
     <div className="admin-members">
       <section className="hero admin-members__hero">
@@ -347,23 +389,29 @@ export function AdminMembersDashboardPage() {
         </div>
       </section>
 
+      {dashboard?.demoAvailable || dataset === 'demo' ? (
+        <div className="admin-members__actions" role="group" aria-label="Alege registrul de membri">
+          <Button type="button" aria-pressed={dataset === 'real'} variant={dataset === 'real' ? 'primary' : 'default'} onClick={() => onDatasetChange('real')}>Membri reali</Button>
+          <Button type="button" aria-pressed={dataset === 'demo'} variant={dataset === 'demo' ? 'primary' : 'default'} onClick={() => onDatasetChange('demo')}>Membri fictivi</Button>
+        </div>
+      ) : null}
+      {dataset === 'demo' ? (
+        <div className="alert" role="status">
+          <strong>Membri fictivi — demonstrație.</strong> Poți căuta și consulta aceste exemple. Ele nu intră în statisticile membrilor reali și nu pot primi decizii sau comunicări.
+        </div>
+      ) : null}
       {error ? <div className="alert error">{error}</div> : null}
       {successMessage ? <div className="alert success">{successMessage}</div> : null}
 
-      <section className="admin-members__stats" aria-label="Situația membrilor">
-        {summaryCards.map((card) => (
-          <article key={card.key} className="card admin-members__stat">
-            <div className="hero-kicker admin-members__stat-kicker">{card.label}</div>
-            <strong className="admin-members__stat-value">{dashboard?.summary[card.key] ?? (loading ? '…' : '—')}</strong>
-            <p>{card.helper}</p>
-          </article>
-        ))}
-      </section>
+      {dataset === 'demo' ? <details className="admin-disclosure">
+        <summary>Statistici membri fictivi</summary>
+        {statistics}
+      </details> : statistics}
 
       <section className="panel admin-members__registry">
         <header className="panel__header admin-members__registry-header">
           <div>
-            <div className="panel__title">Evidența nominală</div>
+            <div className="panel__title">{dataset === 'demo' ? 'Evidența membrilor fictivi' : 'Evidența nominală'}</div>
             <p className="muted">
               {dashboard
                 ? `${dashboard.pagination.total} rezultate · pagina ${Math.floor(offset / pageSize) + 1}`
@@ -394,14 +442,19 @@ export function AdminMembersDashboardPage() {
         </div>
         <div className="panel__body admin-members__registry-body">
           {dashboard?.rows.length === 0 && !loading ? (
-            <div className="admin-members__empty">Nu există evidențe pentru filtrele selectate.</div>
+            <div className="admin-members__empty">
+              {dataset === 'real' && dashboard.summary.total === 0 && dashboard.demoAvailable ? <>
+                <p>Registrul membrilor reali este gol. Membrii fictivi sunt disponibili separat.</p>
+                <Button onClick={() => onDatasetChange('demo')}>Vezi membrii fictivi</Button>
+              </> : 'Nu există evidențe pentru filtrele selectate.'}
+            </div>
           ) : (
             dashboard?.rows.map((member) => (
               <MembershipRow
                 key={member.id}
-                member={member}
+                member={dataset === 'demo' ? { ...member, availableActions: [] } : member}
                 organizations={dashboard.organizations}
-                activeAction={decision?.memberId === member.id ? decision.action : null}
+                activeAction={dataset === 'real' && decision?.memberId === member.id ? decision.action : null}
                 saving={membershipMutation.saving}
                 mutationError={decision?.memberId === member.id ? membershipMutation.error : null}
                 onSelectAction={(action) => { membershipMutation.reset(); setDecision({ memberId: member.id, action }) }}

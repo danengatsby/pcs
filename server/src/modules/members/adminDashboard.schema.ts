@@ -21,6 +21,7 @@ export const membershipActions = [
 ] as const;
 
 export const adminMembersDashboardQuerySchema = z.object({
+  dataset: z.enum(["real", "demo"]).optional().default("real"),
   search: z.string().trim().max(120).optional().default(""),
   status: z.enum(membershipStatuses).optional(),
   organizationId: z.string().trim().max(80).optional(),

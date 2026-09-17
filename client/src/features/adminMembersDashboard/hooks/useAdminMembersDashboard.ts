@@ -1,4 +1,4 @@
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { readQueryError } from '@lib/queryClient'
 import {
   applyMembershipAction,
@@ -18,7 +18,8 @@ export function useAdminMembersDashboard(query: AdminMembersDashboardQuery) {
   const queryResult = useQuery({
     queryKey: adminMembersDashboardQueryKeys.detail(query),
     queryFn: () => fetchAdminMembersDashboard(query),
-    placeholderData: keepPreviousData,
+    // Never show records from another dataset while a new request is pending.
+    placeholderData: previous => (previous?.dataset ?? 'real') === (query.dataset ?? 'real') ? previous : undefined,
   })
 
   return {

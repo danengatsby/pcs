@@ -7,6 +7,7 @@ import type {
 } from '../types'
 
 export type AdminMembersDashboardQuery = {
+  dataset?: 'real' | 'demo'
   search?: string
   status?: MembershipStatus
   organizationId?: string
@@ -18,6 +19,7 @@ export function getAdminMembersDashboard(
   query: AdminMembersDashboardQuery = {},
 ): Promise<ApiResponse<AdminMembersDashboardResponse>> {
   const params = new URLSearchParams()
+  if (query.dataset) params.set('dataset', query.dataset)
   if (query.search?.trim()) params.set('search', query.search.trim())
   if (query.status) params.set('status', query.status)
   if (query.organizationId) params.set('organizationId', query.organizationId)

@@ -52,6 +52,8 @@ export type AdminMembershipRow = {
 }
 
 export type AdminMembersDashboardResponse = {
+  dataset?: 'real' | 'demo'
+  demoAvailable?: boolean
   generatedAt: string
   summary: {
     total: number

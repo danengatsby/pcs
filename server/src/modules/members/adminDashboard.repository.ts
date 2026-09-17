@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { recordAdminAudit } from "../../lib/adminAudit.js";
-import { prisma } from "../../lib/prisma.js";
+import { prisma, getAdminDemoPrisma } from "../../lib/prisma.js";
 import type { UserRole } from "../../lib/authToken.js";
 import type { AdminTerritoryScope } from "../../lib/adminAuthorization.js";
 import type {
@@ -325,14 +325,17 @@ export async function listAdminMembershipsFromRepository(
   };
   organizations: MembershipOrganizationOption[];
 }> {
-  const where = buildWhere(filters, scope);
-  const scopeWhere = buildMembershipScopeWhere(scope);
+  const demo = filters.dataset === "demo";
+  const client = demo ? getAdminDemoPrisma() : prisma;
+  const where = { AND: [buildWhere(filters, scope), ...(demo ? [{ isDemo: true }] : [])] };
+  const scopeWhere = { AND: [buildMembershipScopeWhere(scope), ...(demo ? [{ isDemo: true }] : [])] };
   const organizationWhere: Prisma.OrganizationWhereInput = {
     status: { in: ["forming", "active"] },
+    ...(demo ? { isDemo: true } : {}),
     ...(!scope.national ? { id: { in: scope.organizationIds } } : {}),
   };
-  const [rows, total, grouped, organizers, unassigned, organizations] = await prisma.$transaction([
-    prisma.membershipRecord.findMany({
+  const [rows, total, grouped, organizers, unassigned, organizations] = await client.$transaction([
+    client.membershipRecord.findMany({
       where,
       include: membershipInclude,
       orderBy: [
@@ -342,28 +345,28 @@ export async function listAdminMembershipsFromRepository(
       take: filters.limit,
       skip: filters.offset,
     }),
-    prisma.membershipRecord.count({ where }),
-    prisma.membershipRecord.groupBy({
+    client.membershipRecord.count({ where }),
+    client.membershipRecord.groupBy({
       by: ["status"],
       where: scopeWhere,
       orderBy: { status: "asc" },
       _count: { status: true },
     }),
-    prisma.membershipRecord.count({
+    client.membershipRecord.count({
       where: {
         AND: [scopeWhere],
         status: "active",
         user: { role: { in: organizerRoles } },
       },
     }),
-    prisma.membershipRecord.count({
+    client.membershipRecord.count({
       where: {
         AND: [scopeWhere],
         organizationId: null,
         status: { in: ["verified", "approved", "active", "suspended"] },
       },
     }),
-    prisma.organization.findMany({
+    client.organization.findMany({
       where: organizationWhere,
       orderBy: [
         { level: "asc" },

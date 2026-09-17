@@ -88,9 +88,89 @@ describe('AdminMembersDashboardPage', () => {
     expect(screen.getByText('Fără operații disponibile pentru rolul tău.')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Activează membrul' })).not.toBeInTheDocument()
   })
+
+  it('switches to clearly marked fictional members and clears a pending real decision and filters', async () => {
+    const user = userEvent.setup()
+    vi.mocked(useAdminMembersDashboard).mockImplementation(query => {
+      const dashboard = buildDashboard()
+      dashboard.demoAvailable = true
+      dashboard.dataset = query.dataset ?? 'real'
+      if (query.dataset === 'demo') {
+        dashboard.rows[0].id = 'demo:9'
+        dashboard.rows[0].fullName = 'Ana Pop (Demo)'
+      }
+      return { dashboard, loading: false, error: null, reload: vi.fn() }
+    })
+    renderPage('PRESEDINTE')
+    await user.type(screen.getByLabelText('Caută nume, email, județ sau organizație'), 'Ana')
+    await user.click(screen.getByRole('button', { name: 'Activează membrul' }))
+    await user.click(screen.getByRole('button', { name: 'Membri fictivi' }))
+    expect(screen.getByRole('status')).toHaveTextContent('Membri fictivi — demonstrație.')
+    expect(screen.getByText('Ana Pop (Demo)')).toBeVisible()
+    expect(screen.queryByRole('button', { name: 'Confirmă decizia' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Activează membrul' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'ana@example.test' })).not.toBeInTheDocument()
+    expect(screen.getByLabelText('Caută nume, email, județ sau organizație')).toHaveValue('')
+    expect(execute).not.toHaveBeenCalled()
+    await user.click(screen.getByRole('button', { name: 'Membri reali' }))
+    expect(screen.queryByText('Ana Pop (Demo)')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Confirmă decizia' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Activează membrul' })).toBeVisible()
+  })
+
+  it('opens available fictional members automatically when the entire real registry is empty and respects switching back', async () => {
+    mockAvailableDemo(0)
+    renderPage('PRESEDINTE')
+    expect(await screen.findByText('Ana Pop (Demo)')).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Membri fictivi' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByText('Statistici membri fictivi').closest('details')).not.toHaveAttribute('open')
+    await userEvent.click(screen.getByRole('button', { name: 'Membri reali' }))
+    expect(await screen.findByRole('button', { name: 'Vezi membrii fictivi' })).toBeVisible()
+    expect(screen.queryByText('Ana Pop (Demo)')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Membri reali' })).toHaveAttribute('aria-pressed', 'true')
+    await userEvent.click(screen.getByRole('button', { name: 'Vezi membrii fictivi' }))
+    expect(await screen.findByText('Ana Pop (Demo)')).toBeVisible()
+  })
+
+  it('keeps an explicitly requested empty real registry visible', () => {
+    mockAvailableDemo(0)
+    renderPage('PRESEDINTE', '/admin/members?dataset=real')
+    expect(screen.getByRole('button', { name: 'Vezi membrii fictivi' })).toBeVisible()
+    expect(screen.queryByText('Ana Pop (Demo)')).not.toBeInTheDocument()
+    expect(vi.mocked(useAdminMembersDashboard).mock.calls.every(([query]) => query.dataset === 'real')).toBe(true)
+  })
+
+  it('does not substitute fictitious members when real members exist but filters have no matches', async () => {
+    mockAvailableDemo(1)
+    renderPage('PRESEDINTE')
+    expect(screen.getByText('Ana Pop')).toBeVisible()
+    await userEvent.type(screen.getByLabelText('Caută nume, email, județ sau organizație'), 'no-match')
+    expect(await screen.findByText('Nu există evidențe pentru filtrele selectate.')).toBeVisible()
+    expect(screen.queryByText('Ana Pop (Demo)')).not.toBeInTheDocument()
+    expect(vi.mocked(useAdminMembersDashboard).mock.calls.every(([query]) => query.dataset === 'real')).toBe(true)
+  })
 })
 
-function renderPage(role: 'PRESEDINTE' | 'CONSILIER') {
+function mockAvailableDemo(realTotal: number) {
+  vi.mocked(useAdminMembersDashboard).mockImplementation(query => {
+    const dashboard = buildDashboard()
+    dashboard.demoAvailable = true
+    dashboard.dataset = query.dataset ?? 'real'
+    if (query.dataset === 'demo') {
+      dashboard.rows[0].id = 'demo:9'
+      dashboard.rows[0].fullName = 'Ana Pop (Demo)'
+    } else {
+      dashboard.summary.total = realTotal
+      if (realTotal === 0 || query.search) {
+        dashboard.rows = []
+        dashboard.pagination.total = 0
+      }
+    }
+    return { dashboard, loading: false, error: null, reload: vi.fn() }
+  })
+}
+
+function renderPage(role: 'PRESEDINTE' | 'CONSILIER', path = '/admin/members') {
   const auth: AuthContextValue = {
     user: { id: '1', fullName: 'Lider Test', email: 'lider@example.test', role },
     loading: false,
@@ -100,7 +180,7 @@ function renderPage(role: 'PRESEDINTE' | 'CONSILIER') {
   }
   return render(
     <AuthContext.Provider value={auth}>
-      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <MemoryRouter initialEntries={[path]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <AdminMembersDashboardPage />
       </MemoryRouter>
     </AuthContext.Provider>,
