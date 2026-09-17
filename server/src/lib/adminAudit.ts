@@ -154,10 +154,11 @@ export async function listAdminAudit(input: {
   targetType?: string | null;
   targetId?: string | null;
   cursor?: AdminAuditCursor | null;
+  excludedTargetTypes?: string[];
 }): Promise<ListAdminAuditResult> {
   const where: Prisma.AdminAuditLogWhereInput = {
     ...(input.action ? { action: input.action } : {}),
-    ...(input.targetType ? { targetType: input.targetType } : {}),
+    targetType: { ...(input.targetType ? { equals: input.targetType } : {}), ...(input.excludedTargetTypes?.length ? { notIn: input.excludedTargetTypes } : {}) },
     ...(input.targetId ? { targetId: input.targetId } : {}),
   };
 

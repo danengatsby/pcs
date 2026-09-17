@@ -11,6 +11,7 @@ import {
   getOrganizationDetailRepository,
   getOrganizationValidationRecord,
   listAdminOrganizationsRepository,
+  listOrganizationOptionsRepository,
   listOrganizationsRepository,
   updateOrganizationMandateRepository,
   updateOrganizationObjectiveRepository,
@@ -157,6 +158,13 @@ export async function listAdminOrganizationsService(
   scope: AdminTerritoryScope
 ) {
   return listAdminOrganizationsRepository(filters, scope);
+}
+
+export async function listOrganizationOptionsService(
+  filters: Pick<ListOrganizationsQuery, "limit" | "offset">,
+  scope: AdminTerritoryScope
+) {
+  return listOrganizationOptionsRepository(filters, scope);
 }
 
 export async function getOrganizationDetailService(id: string) {

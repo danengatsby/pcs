@@ -7,7 +7,7 @@ test("public homepage renders its headline and primary call to action", async ({
   const response = await page.goto("/");
 
   expect(response?.ok()).toBe(true);
-  await expect(page.getByRole("heading", { name: /Demnitate pentru seniori/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "PARTIDUL CONSERVATOR AL SENIORILOR" })).toBeVisible();
 
   const primaryCta = page.getByRole("link", { name: "Citește programul" });
   await expect(primaryCta).toBeVisible();

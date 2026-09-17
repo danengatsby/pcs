@@ -1,3 +1,4 @@
+import { signinTestInput } from "../helpers/adminAuth.js";
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { test } from "node:test";
@@ -61,7 +62,7 @@ async function setUserRole(email: string, role: string): Promise<void> {
 async function signin(email: string, password: string): Promise<string> {
   const response = await request(app)
     .post("/api/auth/signin")
-    .send({ email, password })
+    .send(await signinTestInput({ email, password }))
     .expect(200);
 
   const token = response.body?.data?.token as string | undefined;

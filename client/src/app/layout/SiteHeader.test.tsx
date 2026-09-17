@@ -41,7 +41,7 @@ describe('SiteHeader mobile menu', () => {
     expect(menuButton).toHaveAttribute('aria-expanded', 'true')
     expect(navigation).toHaveClass('is-mobile-open')
 
-    await user.click(screen.getByRole('link', { name: 'Program politic' }))
+    await user.click(screen.getByRole('link', { name: 'Manifest' }))
 
     expect(menuButton).toHaveAccessibleName('Meniu')
     expect(menuButton).toHaveAttribute('aria-expanded', 'false')

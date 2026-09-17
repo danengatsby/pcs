@@ -2,6 +2,8 @@ import { randomUUID } from "node:crypto";
 import path from "node:path";
 import dotenv from "dotenv";
 import { Pool, type QueryResult, type QueryResultRow } from "pg";
+import { Secret, TOTP } from "otpauth";
+import { createMfaEnrollment, decryptMfaSecret, encryptMfaSecret } from "../../../../server/src/lib/adminMfaCrypto";
 
 const envPath = path.resolve(process.cwd(), "server/.env");
 dotenv.config({ path: envPath });
@@ -127,6 +129,19 @@ export async function setUserRole(email: string, role: string): Promise<void> {
     `,
     [email, role],
   );
+}
+
+export async function prepareAdminMfa(email: string): Promise<string | null> {
+  const user = (await query<{ id: string; role: string }>("SELECT id::text, role FROM users WHERE email = $1", [email])).rows[0];
+  if (!user || !["PRESEDINTE", "VICEPRESEDINTE", "SECRETAR", "CONSILIER"].includes(user.role)) return null;
+  const key = process.env.AUTH_MFA_ENCRYPTION_KEY?.trim() || "a1".repeat(32);
+  const enrollment = createMfaEnrollment(email);
+  await query(`INSERT INTO admin_mfa_credentials (user_id, id, encrypted_secret) VALUES ($1, $2, $3) ON CONFLICT (user_id) DO NOTHING`, [user.id, randomUUID(), encryptMfaSecret(enrollment.secret, key, user.id)]);
+  const credential = (await query<{ encrypted_secret: string; last_step: string }>("SELECT encrypted_secret, last_step FROM admin_mfa_credentials WHERE user_id = $1", [user.id])).rows[0];
+  const secret = decryptMfaSecret(credential.encrypted_secret, key, user.id);
+  const step = Math.max(Math.floor(Date.now() / 30_000), Number(credential.last_step) + 1);
+  if (step > Math.floor(Date.now() / 30_000) + 1) throw new Error("Fixture MFA requires a new time step before another login.");
+  return new TOTP({ secret: Secret.fromBase32(secret) }).generate({ timestamp: step * 30_000 });
 }
 
 export async function insertVolunteerWithoutUser(input: {

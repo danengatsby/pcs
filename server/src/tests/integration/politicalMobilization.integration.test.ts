@@ -1,3 +1,4 @@
+import { signinTestInput } from "../helpers/adminAuth.js";
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import test from "node:test";
@@ -20,7 +21,7 @@ async function createAccount(input: { fullName: string; email: string; role: str
     password,
   }).expect(201);
   await query("UPDATE users SET role = $2 WHERE LOWER(email) = LOWER($1)", [input.email, input.role]);
-  const signin = await request(app).post("/api/auth/signin").send({ email: input.email, password }).expect(200);
+  const signin = await request(app).post("/api/auth/signin").send(await signinTestInput({ email: input.email, password })).expect(200);
   return {
     id: signin.body?.data?.user?.id as string,
     token: signin.body?.data?.token as string,
@@ -49,7 +50,7 @@ test("political mobilization connects operations, member reporting and consent-c
       website: "",
     }).expect(201);
     await query("UPDATE users SET role = 'MEMBRU' WHERE LOWER(email) = LOWER($1)", [memberEmail]);
-    const memberSignin = await request(app).post("/api/auth/signin").send({ email: memberEmail, password }).expect(200);
+    const memberSignin = await request(app).post("/api/auth/signin").send(await signinTestInput({ email: memberEmail, password })).expect(200);
     const memberId = memberSignin.body?.data?.user?.id as string;
     const memberToken = memberSignin.body?.data?.token as string;
 

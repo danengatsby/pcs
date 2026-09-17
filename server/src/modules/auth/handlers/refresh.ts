@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { createAuthToken } from "../../../lib/authToken.js";
-import { rotateRefreshTokenSession } from "../../../lib/authRefreshToken.js";
+import { revokeRefreshToken, rotateRefreshTokenSession } from "../../../lib/authRefreshToken.js";
+import { adminAccessTokenLifetimeSeconds, isAdminRole, rotateAdminSession } from "../../../lib/adminMfa.js";
 import { AppError } from "../../../lib/errors.js";
 import { env } from "../../../lib/env.js";
 import { sendSuccess } from "../../../lib/http.js";
@@ -14,6 +15,9 @@ import {
 import { buildAuthTokenPolicy, readExpiryIso } from "../policy.js";
 import { readClientIp, readUserAgent } from "../requestContext.js";
 import { sanitizeUser } from "../user.js";
+import { prisma } from "../../../lib/prisma.js";
+import type { UserRole } from "../../../lib/authToken.js";
+import { isPublicAdminUser } from "../../../lib/adminPublicAccess.js";
 
 export async function refreshHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
   if (!env.authRefreshEnabled) {
@@ -40,6 +44,7 @@ export async function refreshHandler(req: Request, res: Response, next: NextFunc
   }
 
   try {
+    res.setHeader("Cache-Control", "private, no-store");
     const rotated = await rotateRefreshTokenSession(refreshToken, csrfHeader, {
       userAgent: readUserAgent(req),
       ipAddress: readClientIp(req),
@@ -51,11 +56,34 @@ export async function refreshHandler(req: Request, res: Response, next: NextFunc
       return;
     }
 
+    let adminSessionId: string | undefined;
+    // Redis stores a user snapshot. Re-read identity and role before minting a
+    // new token, including after a promotion, demotion or deleted account.
+    const currentUser = await prisma.user.findUnique({ where: { id: BigInt(rotated.user.id) }, select: { id: true, email: true, fullName: true, role: true } });
+    if (!currentUser) {
+      await revokeRefreshToken(rotated.session.token);
+      clearRefreshCookies(res);
+      next(new AppError(401, "AUTH_UNAUTHORIZED", "Contul nu mai este disponibil."));
+      return;
+    }
+    rotated.user = { id: currentUser.id.toString(), fullName: currentUser.fullName, email: currentUser.email, role: currentUser.role as UserRole };
+    if (isAdminRole(rotated.user.role) && !isPublicAdminUser(rotated.user)) {
+      adminSessionId = await rotateAdminSession(rotated.user.id, refreshToken, rotated.session.token) ?? undefined;
+      if (!adminSessionId) {
+        await revokeRefreshToken(rotated.session.token);
+        clearRefreshCookies(res);
+        next(new AppError(401, "AUTH_MFA_SESSION_REQUIRED", "Autentifică-te din nou cu parola și codul din aplicația de autentificare."));
+        return;
+      }
+    }
+    const expiresInSeconds = isAdminRole(rotated.user.role) ? Math.min(env.authTokenTtlSeconds, adminAccessTokenLifetimeSeconds) : env.authTokenTtlSeconds;
     const token = await createAuthToken({
       id: rotated.user.id,
       fullName: rotated.user.fullName,
       email: rotated.user.email,
       role: rotated.user.role,
+      adminSessionId,
+      expiresInSeconds,
     });
 
     setRefreshCookies(res, rotated.session);
@@ -63,8 +91,8 @@ export async function refreshHandler(req: Request, res: Response, next: NextFunc
       message: "Token reimprospatat cu succes.",
       token,
       tokenType: "Bearer",
-      expiresInSeconds: env.authTokenTtlSeconds,
-      accessTokenExpiresAt: readExpiryIso(env.authTokenTtlSeconds),
+      expiresInSeconds,
+      accessTokenExpiresAt: readExpiryIso(expiresInSeconds),
       csrfToken: rotated.session.csrfToken,
       refreshExpiresInSeconds: rotated.session.expiresInSeconds,
       refreshTokenExpiresAt: readExpiryIso(rotated.session.expiresInSeconds),

@@ -5,7 +5,7 @@ import request from "supertest";
 import { createApp } from "../../app.js";
 import { createFastifyServer } from "../../fastifyServer.js";
 import { query } from "../../lib/db.js";
-import { createAuthToken } from "../../lib/authToken.js";
+import { createTestAuthToken } from "../helpers/adminAuth.js";
 import { adminCapabilities, type AdminAccessContext } from "../../lib/adminAuthorization.js";
 import { readExecutiveInterventions } from "../../modules/executiveDashboard/interventions.repository.js";
 
@@ -19,7 +19,7 @@ test("executive interventions cover six live queues, exact time boundaries, scop
   try {
     const actorId = (await query<{ id: string }>("INSERT INTO users (full_name, email, password_hash, role) VALUES ('Președinte intervenții', $1, 'unused', 'PRESEDINTE') RETURNING id", [email])).rows[0].id.toString();
     const actor = { id: actorId, email, fullName: "Președinte intervenții", role: "PRESEDINTE" as const };
-    const token = await createAuthToken(actor);
+    const token = await createTestAuthToken(actor);
     const baselineMissing = Number((await query<{ total: string }>("SELECT COUNT(*) AS total FROM member_documents WHERE status = 'published' AND expires_on IS NULL")).rows[0].total);
     for (const org of orgs) { await query("INSERT INTO organizations (id, code, name, level, status) VALUES ($1, $1, $1, 'county', 'active')", [org]); }
     await query("INSERT INTO organization_leadership_mandates (organization_id, user_id, full_name, position_title, started_at, ended_at, status) VALUES ($1, $2, 'Responsabil curent', 'Președinte', '2026-01-01', '2026-12-31', 'active'), ($3, NULL, 'Responsabil expirat', 'Secretar', '2025-01-01', '2026-10-09', 'active'), ($3, NULL, 'Responsabil viitor', 'Secretar', '2026-10-11', NULL, 'active')", [orgs[0], actorId, orgs[2]]);

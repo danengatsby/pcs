@@ -30,6 +30,8 @@ export const listAdminOrganizationsQuerySchema = listOrganizationsQuerySchema.ex
   status: z.enum(organizationStatuses).optional(),
 });
 
+export const organizationOptionsQuerySchema = listOrganizationsQuerySchema.pick({ limit: true, offset: true });
+
 export const organizationTerritorySchema = z.object({
   type: z.enum(territoryTypes),
   countyId: z.coerce.number().int().positive().nullable().optional(),

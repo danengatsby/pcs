@@ -1,4 +1,5 @@
 import { authStorage } from '@react/shared/auth/authStorage'
+import { authenticatedFetch } from '@lib/authenticatedFetch'
 import type { ListAdminVolunteersQuery } from './listVolunteers'
 import { buildVolunteersAdminSearchParams } from '../queryState'
 
@@ -57,7 +58,7 @@ export async function exportAdminVolunteersCsv(query: ListAdminVolunteersQuery):
     ? `/api/admin/volunteers/export.csv?${params.toString()}`
     : '/api/admin/volunteers/export.csv'
 
-  const response = await fetch(path, {
+  const response = await authenticatedFetch(path, {
     method: 'GET',
     headers,
     credentials: 'include',

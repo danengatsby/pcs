@@ -17,7 +17,7 @@ try {
     throw new Error(`Pagina publică a răspuns cu HTTP ${response?.status() ?? "necunoscut"}.`);
   }
 
-  await page.getByRole("heading", { name: /Demnitate pentru seniori/i }).waitFor({
+  await page.getByRole("heading", { name: "PARTIDUL CONSERVATOR AL SENIORILOR" }).waitFor({
     state: "visible",
     timeout: 10_000,
   });

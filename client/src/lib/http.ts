@@ -1,4 +1,5 @@
 import { authStorage } from '@react/shared/auth/authStorage'
+import { authenticatedFetch } from './authenticatedFetch'
 
 export type ApiResult<T> = {
   ok: true
@@ -165,7 +166,7 @@ async function fetchApi(
     }
   }
 
-  const res = await fetch(path, {
+  const res = await authenticatedFetch(path, {
     method: opts.method,
     headers,
     body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,

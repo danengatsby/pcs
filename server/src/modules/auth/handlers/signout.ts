@@ -4,6 +4,7 @@ import { revokeToken } from "../../../lib/authTokenRevocation.js";
 import { revokeRefreshToken } from "../../../lib/authRefreshToken.js";
 import { AppError } from "../../../lib/errors.js";
 import { sendSuccess } from "../../../lib/http.js";
+import { revokeAdminSession } from "../../../lib/adminMfa.js";
 import {
   clearRefreshCookies,
   readRefreshCookie,
@@ -35,6 +36,7 @@ export async function handleSignout(req: Request, res: Response, next: NextFunct
       }
 
       await revokeRefreshToken(refreshToken);
+      await revokeAdminSession({ refreshToken });
     }
 
     const bearerToken = readBearerToken(req.header("authorization"));
@@ -42,6 +44,9 @@ export async function handleSignout(req: Request, res: Response, next: NextFunct
       const tokenPayload = await verifyAuthToken(bearerToken);
       if (tokenPayload) {
         await revokeToken({ jti: tokenPayload.jti, exp: tokenPayload.exp });
+        if (tokenPayload.adminSessionId) {
+          await revokeAdminSession({ sessionId: tokenPayload.adminSessionId });
+        }
       }
     }
 

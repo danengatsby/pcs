@@ -15,6 +15,7 @@ import {
   createOrganizationSchema,
   listAdminOrganizationsQuerySchema,
   listOrganizationsQuerySchema,
+  organizationOptionsQuerySchema,
   organizationChildIdParamSchema,
   organizationIdParamSchema,
   updateOrganizationMandateSchema,
@@ -27,6 +28,7 @@ import {
   createOrganizationService,
   getOrganizationDetailService,
   listAdminOrganizationsService,
+  listOrganizationOptionsService,
   listOrganizationsService,
   updateOrganizationMandateService,
   updateOrganizationObjectiveService,
@@ -104,6 +106,17 @@ export const listAdminOrganizationsController: RequestHandler = async (req, res,
         national: access.scope.national,
       },
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const listOrganizationOptionsController: RequestHandler = async (req, res, next) => {
+  try {
+    const filters = parseOrThrow(organizationOptionsQuerySchema, req.query);
+    const access = requireAdminAccess(res);
+    res.setHeader("Cache-Control", "private, no-store");
+    sendSuccess(res, await listOrganizationOptionsService(filters, access.scope));
   } catch (error) {
     next(error);
   }

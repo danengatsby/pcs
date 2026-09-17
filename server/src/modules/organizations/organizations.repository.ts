@@ -274,6 +274,27 @@ export async function listOrganizationsRepository(filters: ListOrganizationsQuer
   };
 }
 
+export async function listOrganizationOptionsRepository(
+  filters: Pick<ListOrganizationsQuery, "limit" | "offset">,
+  scope: AdminTerritoryScope
+) {
+  const where: Prisma.OrganizationWhereInput = {
+    status: { in: ["forming", "active"] },
+    ...(scope.national ? {} : { id: { in: scope.organizationIds } }),
+  };
+  const [rows, total] = await prisma.$transaction([
+    prisma.organization.findMany({
+      where,
+      select: { id: true, name: true },
+      orderBy: [{ name: "asc" }, { id: "asc" }],
+      skip: filters.offset,
+      take: filters.limit,
+    }),
+    prisma.organization.count({ where }),
+  ]);
+  return { rows, total };
+}
+
 export async function listAdminOrganizationsRepository(
   filters: ListAdminOrganizationsQuery,
   scope: AdminTerritoryScope
@@ -370,6 +391,7 @@ export async function getOrganizationValidationRecord(id: string) {
     where: { id },
     select: {
       id: true,
+      isDemo: true,
       code: true,
       level: true,
       status: true,
@@ -424,6 +446,7 @@ export async function createOrganizationRepository(input: CreateOrganizationInpu
   primaryCounty: string;
 }) {
   const id = randomUUID();
+  const isDemo = input.parentId ? (await getOrganizationValidationRecord(input.parentId))?.isDemo ?? false : false;
   await prisma.organization.create({
     data: {
       id,
@@ -440,9 +463,9 @@ export async function createOrganizationRepository(input: CreateOrganizationInpu
       foundedAt: toDate(input.foundedAt),
       createdBy: input.actorId,
       updatedBy: input.actorId,
-      isDemo: false,
-      publicApprovedAt: input.status === "active" ? new Date() : null,
-      publicApprovedBy: input.status === "active" ? input.actorId : null,
+      isDemo,
+      publicApprovedAt: !isDemo && input.status === "active" ? new Date() : null,
+      publicApprovedBy: !isDemo && input.status === "active" ? input.actorId : null,
       territories: { create: buildTerritoryWrites(input.territories) },
     },
   });
@@ -453,6 +476,8 @@ export async function updateOrganizationRepository(id: string, input: UpdateOrga
   actorId: bigint;
   primaryCounty?: string;
 }) {
+  const existing = await getOrganizationValidationRecord(id);
+  const isDemo = existing?.isDemo ?? false;
   await prisma.organization.update({
     where: { id },
     data: {
@@ -475,9 +500,9 @@ export async function updateOrganizationRepository(id: string, input: UpdateOrga
           },
         }
         : {}),
-      isDemo: false,
-      publicApprovedAt: input.status === "active" ? new Date() : null,
-      publicApprovedBy: input.status === "active" ? input.actorId : null,
+      isDemo,
+      publicApprovedAt: !isDemo && input.status === "active" ? new Date() : null,
+      publicApprovedBy: !isDemo && input.status === "active" ? input.actorId : null,
       updatedBy: input.actorId,
       updatedAt: new Date(),
     },
@@ -494,6 +519,7 @@ export async function createOrganizationMandateRepository(
   input: CreateOrganizationMandateInput & { actorId: bigint }
 ) {
   const row = await prisma.$transaction(async (tx) => {
+    const organization = await tx.organization.findUniqueOrThrow({ where: { id: organizationId }, select: { isDemo: true } });
     const decision = await tx.organizationMandateDecision.create({
       data: {
         organizationId,
@@ -514,9 +540,9 @@ export async function createOrganizationMandateRepository(
         startedAt: toDate(input.startedAt) as Date,
         endedAt: toDate(input.endedAt),
         status: input.status,
-        isDemo: false,
-        publicApprovedAt: input.status === "active" ? new Date() : null,
-        publicApprovedBy: input.status === "active" ? input.actorId : null,
+        isDemo: organization.isDemo,
+        publicApprovedAt: !organization.isDemo && input.status === "active" ? new Date() : null,
+        publicApprovedBy: !organization.isDemo && input.status === "active" ? input.actorId : null,
         decisionId: decision.id,
       },
       select: { id: true },
@@ -532,7 +558,7 @@ export async function updateOrganizationMandateRepository(
 ) {
   const existing = await prisma.organizationLeadershipMandate.findFirst({
     where: { id: BigInt(mandateId), organizationId },
-    select: { id: true, decisionId: true },
+    select: { id: true, decisionId: true, isDemo: true },
   });
   if (!existing) {
     return null;
@@ -573,9 +599,9 @@ export async function updateOrganizationMandateRepository(
             },
           },
       } : {}),
-      isDemo: false,
-      publicApprovedAt: input.status === "active" ? new Date() : null,
-      publicApprovedBy: input.status === "active" ? input.actorId : null,
+      isDemo: existing.isDemo,
+      publicApprovedAt: !existing.isDemo && input.status === "active" ? new Date() : null,
+      publicApprovedBy: !existing.isDemo && input.status === "active" ? input.actorId : null,
       updatedAt: new Date(),
     },
   });
@@ -586,9 +612,11 @@ export async function createOrganizationObjectiveRepository(
   organizationId: string,
   input: CreateOrganizationObjectiveInput
 ) {
+  const organization = await getOrganizationValidationRecord(organizationId);
   const row = await prisma.organizationObjective.create({
     data: {
       organizationId,
+      isDemo: organization?.isDemo ?? false,
       title: input.title,
       description: input.description,
       metricName: input.metricName,

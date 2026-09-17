@@ -3,6 +3,10 @@ import type { ApiRouteDefinition } from "../apiRouteTypes.js";
 import { requireAdminCapability, requireAuth } from "../../lib/authMiddleware.js";
 import { requireAdminAccess, territoryScopeLabel } from "../../lib/adminAuthorization.js";
 import { sendSuccess } from "../../lib/http.js";
+import { env } from "../../lib/env.js";
+import { adminProfileLabels } from "../../lib/adminAccessProfiles.js";
+import { createTreasuryHandler, listTreasuryHandler, postTreasuryHandler, treasuryHistoryHandler, updateTreasuryHandler, voidTreasuryHandler } from "../../modules/treasury/treasury.controller.js";
+import { createParliamentaryHandler, listParliamentaryHandler, parliamentaryAssigneesHandler, parliamentaryHistoryHandler, transitionParliamentaryHandler, updateParliamentaryHandler } from "../../modules/parliamentary/parliamentary.controller.js";
 import { getAdminTasksHandler } from "../../modules/admin/handlers/getAdminTasks.js";
 import { listInterventionsController, listExpirationsController, updateExpirationController } from "../../modules/executiveDashboard/interventions.controller.js";
 import { listAdminAuditHandler } from "../../modules/admin/handlers/listAdminAudit.js";
@@ -23,6 +27,7 @@ import {
   createAdminOrganizationObjectiveController,
   getAdminOrganizationController,
   listAdminOrganizationsController,
+  listOrganizationOptionsController,
   updateAdminOrganizationController,
   updateAdminOrganizationMandateController,
   updateAdminOrganizationObjectiveController,
@@ -59,6 +64,11 @@ import {
   listArbitrationCasesController,
 } from "../../modules/arbitration/arbitration.controller.js";
 
+const workspaceReadGuard = requireAdminCapability("workspace.read");
+const treasuryReadGuard = requireAdminCapability("finance.read");
+const treasuryManageGuard = requireAdminCapability("finance.manage");
+const parliamentaryReadGuard = requireAdminCapability("parliamentary.read");
+const parliamentaryManageGuard = requireAdminCapability("parliamentary.manage");
 const recruitmentReadGuard = requireAdminCapability("recruitment.read");
 const recruitmentExportGuard = requireAdminCapability("recruitment.export");
 const recruitmentManageGuard = requireAdminCapability("recruitment.manage");
@@ -87,7 +97,10 @@ const adminAccessHandler: RequestHandler = (_req, res, next) => {
     const access = requireAdminAccess(res);
     res.setHeader("Cache-Control", "private, no-store");
     sendSuccess(res, {
+      demoDataEnabled: env.adminDemoDataAllowed,
       role: access.actor.role,
+      profile: access.profile,
+      profileLabel: access.profile ? adminProfileLabels[access.profile] : (access.actor.role === "SECRETAR" ? "Secretariat" : "Conducere și organizare"),
       capabilities: access.capabilities,
       scope: {
         national: access.scope.national,
@@ -107,8 +120,21 @@ const adminAccessHandler: RequestHandler = (_req, res, next) => {
 };
 
 export const adminRoutes: ApiRouteDefinition[] = [
-  { method: "GET", url: "/api/admin/access", handlers: [requireAuth, recruitmentReadGuard, adminAccessHandler] },
-  { method: "GET", url: "/api/admin/tasks", handlers: [requireAuth, recruitmentReadGuard, getAdminTasksHandler] },
+  { method: "GET", url: "/api/admin/treasury/entries", handlers: [requireAuth, treasuryReadGuard, listTreasuryHandler] },
+  { method: "POST", url: "/api/admin/treasury/entries", handlers: [requireAuth, treasuryManageGuard, createTreasuryHandler] },
+  { method: "PATCH", url: "/api/admin/treasury/entries/:id", handlers: [requireAuth, treasuryManageGuard, updateTreasuryHandler] },
+  { method: "POST", url: "/api/admin/treasury/entries/:id/post", handlers: [requireAuth, treasuryManageGuard, postTreasuryHandler] },
+  { method: "POST", url: "/api/admin/treasury/entries/:id/void", handlers: [requireAuth, treasuryManageGuard, voidTreasuryHandler] },
+  { method: "GET", url: "/api/admin/treasury/entries/:id/history", handlers: [requireAuth, treasuryReadGuard, treasuryHistoryHandler] },
+  { method: "GET", url: "/api/admin/parliamentary/items", handlers: [requireAuth, parliamentaryReadGuard, listParliamentaryHandler] },
+  { method: "POST", url: "/api/admin/parliamentary/items", handlers: [requireAuth, parliamentaryManageGuard, createParliamentaryHandler] },
+  { method: "GET", url: "/api/admin/parliamentary/assignees", handlers: [requireAuth, parliamentaryReadGuard, parliamentaryAssigneesHandler] },
+  { method: "PATCH", url: "/api/admin/parliamentary/items/:id", handlers: [requireAuth, parliamentaryManageGuard, updateParliamentaryHandler] },
+  { method: "POST", url: "/api/admin/parliamentary/items/:id/status", handlers: [requireAuth, parliamentaryManageGuard, transitionParliamentaryHandler] },
+  { method: "GET", url: "/api/admin/parliamentary/items/:id/history", handlers: [requireAuth, parliamentaryReadGuard, parliamentaryHistoryHandler] },
+  { method: "GET", url: "/api/admin/access", handlers: [requireAuth, workspaceReadGuard, adminAccessHandler] },
+  { method: "GET", url: "/api/admin/tasks", handlers: [requireAuth, workspaceReadGuard, getAdminTasksHandler] },
+  { method: "GET", url: "/api/admin/organization-options", handlers: [requireAuth, workspaceReadGuard, listOrganizationOptionsController] },
   { method: "GET", url: "/api/admin/volunteers", handlers: [requireAuth, recruitmentReadGuard, listAdminVolunteersHandler] },
   { method: "GET", url: "/api/admin/volunteers/owners", handlers: [requireAuth, recruitmentReadGuard, listAdminVolunteerOwnersHandler] },
   { method: "GET", url: "/api/admin/volunteers/export.csv", handlers: [requireAuth, recruitmentExportGuard, exportAdminVolunteersCsvHandler] },

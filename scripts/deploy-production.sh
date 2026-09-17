@@ -163,20 +163,52 @@ validate_client_release
 log "Aplic migrațiile DB."
 NODE_ENV=production node server/dist/scripts/migrateDb.js
 
-log "Elimin datele marcate explicit ca demonstrative."
-PURGE_DEMO_DATA_CONFIRM=DELETE_SYNTHETIC_DATA \
-NODE_ENV=production node server/dist/scripts/purgeDemoData.js
-
 log "Verific fail-closed integritatea datelor de producție."
 NODE_ENV=production node server/dist/scripts/assertProductionDataIntegrity.js
 
 log "Reporneasc obligatoriu API-ul și workerii pe noul release."
+# PM2 retains pm_cwd/pm_exec_path when restarting an existing name from a
+# different source release. Recreate only PCS processes whose paths changed.
+mapfile -t moved_processes < <(node <<'JS'
+const { execFileSync } = require('node:child_process');
+const path = require('node:path');
+const config = require(path.join(process.cwd(), 'ecosystem.config.cjs'));
+const processes = JSON.parse(execFileSync('pm2', ['jlist'], { encoding: 'utf8' }));
+for (const app of config.apps) {
+  const existing = processes.find((item) => item.name === app.name);
+  if (existing && (existing.pm2_env.pm_cwd !== app.cwd || existing.pm2_env.pm_exec_path !== path.resolve(app.cwd, app.script))) {
+    console.log(app.name);
+  }
+}
+JS
+)
+for process_name in "${moved_processes[@]}"; do
+  log "Mut procesul $process_name pe noul director de release."
+  pm2 delete "$process_name" >/dev/null
+done
+
 NEWS_MEDIA_CLAMAV_ENABLED=1 \
 NEWS_MEDIA_CLAMAV_MODE=clamd \
 NEWS_MEDIA_CLAMD_HOST=127.0.0.1 \
 NEWS_MEDIA_CLAMD_PORT=3310 \
 CLIENT_DIST_PATH="$client_release_dir" \
 NODE_ENV=production pm2 startOrRestart ecosystem.config.cjs --update-env
+
+CLIENT_DIST_PATH="$client_release_dir" node <<'JS'
+const { execFileSync } = require('node:child_process');
+const path = require('node:path');
+const config = require(path.join(process.cwd(), 'ecosystem.config.cjs'));
+const processes = JSON.parse(execFileSync('pm2', ['jlist'], { encoding: 'utf8' }));
+for (const app of config.apps) {
+  const deployed = processes.find((item) => item.name === app.name);
+  if (!deployed || deployed.pm2_env.pm_cwd !== app.cwd
+    || deployed.pm2_env.pm_exec_path !== path.resolve(app.cwd, app.script)
+    || deployed.pm2_env.CLIENT_DIST_PATH !== process.env.CLIENT_DIST_PATH) {
+    throw new Error(`Procesul ${app.name} nu rulează artefactele release-ului cerut.`);
+  }
+}
+console.log('Căile API-ului și workerilor corespund release-ului cerut.');
+JS
 
 log "Rulez smoke checks."
 wait_for_api

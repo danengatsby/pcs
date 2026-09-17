@@ -1,3 +1,4 @@
+import { signinTestInput } from "../helpers/adminAuth.js";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import request from "supertest";
@@ -39,10 +40,10 @@ test("admin should create and read news through API", async () => {
 
     const signinResponse = await request(app)
       .post("/api/auth/signin")
-      .send({
+      .send(await signinTestInput({
         email,
         password,
-      })
+      }))
       .expect(200);
 
     const token = signinResponse.body?.data?.token as string | undefined;

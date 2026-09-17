@@ -5,11 +5,14 @@ import { prisma } from "../../../lib/prisma.js";
 import { countRecruitmentTasks } from "../../volunteers/repositoryAdmin.js";
 import { buildMembershipScopeWhere } from "../../members/adminDashboard.repository.js";
 import { countMobilizationTasks } from "../../politicalOperations/politicalOperations.repository.js";
+import { pendingParliamentaryWhere } from "../../parliamentary/parliamentary.service.js";
 
 export async function readAdminTasks(access: AdminAccessContext) {
   const organizationWhere = access.scope.national ? {} : { organizationId: { in: access.scope.organizationIds } };
   // Only aggregate authorized queues; never load personal records to build menu badges.
   const queues: Array<[string, AdminCapability, () => Promise<number>]> = [
+    ["treasury", "finance.read", () => prisma.treasuryEntry.count({ where: { status: "draft" } })],
+    ["parliamentary", "parliamentary.read", () => prisma.parliamentaryItem.count({ where: pendingParliamentaryWhere() })],
     ["volunteers", "recruitment.read", () => countRecruitmentTasks(access.scope)],
     ["members", "membership.read", () => prisma.membershipRecord.count({
       where: { AND: [buildMembershipScopeWhere(access.scope), { status: "application" }] },

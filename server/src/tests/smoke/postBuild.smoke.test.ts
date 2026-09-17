@@ -1,3 +1,4 @@
+import { signinTestInput } from "../helpers/adminAuth.js";
 import assert from "node:assert/strict";
 import { after, before, test } from "node:test";
 import request from "supertest";
@@ -55,10 +56,10 @@ test("post-build smoke should cover auth basic, members, and volunteers admin fl
     const signinResponse = await request(runtimeServer!.target)
       .post("/api/auth/signin")
       .set("Accept-Encoding", "identity")
-      .send({
+      .send(await signinTestInput({
         email: authEmail,
         password,
-      })
+      }))
       .expect(200);
 
     const authToken = signinResponse.body?.data?.token as string | undefined;
@@ -95,10 +96,10 @@ test("post-build smoke should cover auth basic, members, and volunteers admin fl
     const adminSigninResponse = await request(runtimeServer!.target)
       .post("/api/auth/signin")
       .set("Accept-Encoding", "identity")
-      .send({
+      .send(await signinTestInput({
         email: adminEmail,
         password,
-      })
+      }))
       .expect(200);
 
     const adminToken = adminSigninResponse.body?.data?.token as string | undefined;

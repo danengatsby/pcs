@@ -1,3 +1,4 @@
+import { signinTestInput } from "../helpers/adminAuth.js";
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { test } from "node:test";
@@ -12,7 +13,7 @@ const password = "ParolaFoarteBuna#2026";
 async function createUser(email: string, fullName: string, role: string): Promise<string> {
   await request(app).post("/api/auth/signup").send({ fullName, email, password }).expect(201);
   await query("UPDATE users SET role = $2 WHERE LOWER(email) = LOWER($1)", [email, role]);
-  const signin = await request(app).post("/api/auth/signin").send({ email, password }).expect(200);
+  const signin = await request(app).post("/api/auth/signin").send(await signinTestInput({ email, password })).expect(200);
   const token = signin.body?.data?.token as string | undefined;
   assert.ok(token);
   return token;
@@ -248,7 +249,7 @@ test("membership registry should paginate and execute the complete governed life
 
     const memberSignin = await request(app)
       .post("/api/auth/signin")
-      .send({ email: memberEmail, password })
+      .send(await signinTestInput({ email: memberEmail, password }))
       .expect(200);
     await request(app)
       .get("/api/admin/members/dashboard")

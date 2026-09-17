@@ -152,9 +152,6 @@ export function SiteHeader({ administrative = false }: { administrative?: boolea
           aria-label="Meniu principal"
         >
           {administrative ? <Link className="nav-link" to="/" onClick={handleNavigation}>Vezi site-ul</Link> : <>
-          <Link className="nav-link" to="/documente/program-politic" onClick={handleNavigation}>
-            Program politic
-          </Link>
           <Link className="nav-link" to="/manifest" onClick={handleNavigation}>
             Manifest
           </Link>

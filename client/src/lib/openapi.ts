@@ -2,6 +2,7 @@ import createClient from 'openapi-fetch'
 import { authStorage } from '@react/shared/auth/authStorage'
 import type { components, paths } from '../generated/openapi/schema'
 import type { ApiEnvelopeResponse, ApiResponse } from './http'
+import { authenticatedFetch } from './authenticatedFetch'
 
 type OpenApiMeta = components['schemas']['ApiMeta']
 type OpenApiEnvelope<T, M = OpenApiMeta> = {
@@ -29,7 +30,7 @@ const apiBaseUrl = typeof window === 'undefined'
 const client = createClient<paths>({
   baseUrl: apiBaseUrl,
   credentials: 'include',
-  fetch: (request) => globalThis.fetch(request),
+  fetch: (request) => authenticatedFetch(request),
   headers: {
     Accept: 'application/json',
   },

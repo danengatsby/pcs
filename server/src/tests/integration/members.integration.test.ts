@@ -1,3 +1,4 @@
+import { signinTestInput } from "../helpers/adminAuth.js";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import request from "supertest";
@@ -49,7 +50,7 @@ test("members route should list enrolled members with status and role", async ()
 
     const signinResponse = await request(app)
       .post("/api/auth/signin")
-      .send({ email: adminEmail, password })
+      .send(await signinTestInput({ email: adminEmail, password }))
       .expect(200);
 
     const adminToken = signinResponse.body?.data?.token as string | undefined;

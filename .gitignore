@@ -12,6 +12,7 @@ server/uploads
 coverage
 playwright-report
 test-results
+artifacts
 xx
 monitoring/prometheus/secrets/pcs_metrics_bearer_token
 monitoring/grafana/secrets/grafana_admin_password

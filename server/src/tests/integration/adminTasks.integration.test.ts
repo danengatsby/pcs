@@ -5,7 +5,7 @@ import request from "supertest";
 import { createApp } from "../../app.js";
 import { createFastifyServer } from "../../fastifyServer.js";
 import { query } from "../../lib/db.js";
-import { createAuthToken } from "../../lib/authToken.js";
+import { createTestAuthToken } from "../helpers/adminAuth.js";
 import { buildAdminAccessContext } from "../../lib/adminAuthorization.js";
 import { readAdminTasks } from "../../modules/admin/handlers/getAdminTasks.js";
 
@@ -20,7 +20,7 @@ test("administrative tasks enforce capabilities, territory, complete counts and 
   try {
     userId = (await query<{ id: string }>("INSERT INTO users (full_name, email, password_hash, role) VALUES ('Secretar sarcini', $1, 'unused', 'SECRETAR') RETURNING id", [email])).rows[0].id.toString();
     const actor = { id: userId, fullName: "Secretar sarcini", email, role: "SECRETAR" as const };
-    const token = await createAuthToken(actor);
+    const token = await createTestAuthToken(actor);
     for (const server of [app, fastify.server]) {
       await request(server).get("/api/admin/tasks").expect(401);
       await request(server).get("/api/admin/tasks").set("Authorization", `Bearer ${token}`).expect(403);
@@ -43,11 +43,11 @@ test("administrative tasks enforce capabilities, territory, complete counts and 
     }
     await query("INSERT INTO arbitration_cases (case_number, case_type, subject, facts, filed_by) VALUES ($1, 'other', 'Dosar național', 'Nu este vizibil în mandatul local.', $2)", [`national-${suffix}`, userId]);
     const scopedAccess = await buildAdminAccessContext(actor, "recruitment.read");
-    const expected = { volunteers: 1, members: 1, organizations: 1, mobilization: 1, congresses: 55, arbitration: 1 };
+    const expected = { volunteers: 1, members: 1, organizations: 1, mobilization: 1, congresses: 55 };
     for (const server of [app, fastify.server]) {
       const response = await request(server).get("/api/admin/tasks").set("Authorization", `Bearer ${token}`).expect(200);
       assert.deepEqual(response.body.data.counts, expected);
-      assert.equal(response.body.data.total, 60);
+      assert.equal(response.body.data.total, 59);
       assert.equal(response.headers["cache-control"], "private, no-store");
       assert.doesNotMatch(response.text, /Dosar privat|Sesizare privată|example\.test|0712345678/);
     }
@@ -61,7 +61,7 @@ test("administrative tasks enforce capabilities, territory, complete counts and 
     await query("UPDATE arbitration_cases SET status = 'decided' WHERE organization_id = $1", [organizations[0]]);
     const updated = await request(app).get("/api/admin/tasks").set("Authorization", `Bearer ${token}`).expect(200);
     assert.equal(updated.body.data.counts.congresses, 0);
-    assert.equal(updated.body.data.counts.arbitration, 0);
+    assert.equal(updated.body.data.counts.arbitration, undefined);
     // Revoking the mandate blocks both capabilities and counts, even with the existing token.
     await query("UPDATE organization_leadership_mandates SET status = 'suspended' WHERE user_id = $1", [userId]);
     for (const server of [app, fastify.server]) {

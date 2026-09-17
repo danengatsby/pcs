@@ -1,6 +1,10 @@
 // Initialize telemetry early
+import { captureAdminActivationToken } from './lib/adminActivationToken'
+import { captureAdminDirectLoginToken } from './lib/adminDirectLogin'
+captureAdminActivationToken()
+captureAdminDirectLoginToken()
 import { initClientTelemetry } from './lib/telemetry'
-initClientTelemetry()
+if (!['/auth/activate', '/auth/direct', '/auth/signin'].includes(window.location.pathname)) initClientTelemetry()
 
 import React from 'react'
 import ReactDOM from 'react-dom/client'

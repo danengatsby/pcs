@@ -14,6 +14,10 @@ import {
 import { packageVersion } from "./buildInfo.js";
 import { env } from "./env.js";
 import { governanceAdminPaths } from "./openapi-admin-governance.js";
+import { administrativeRecordsPaths, administrativeRecordsSchemas } from "./openapi-admin-records.js";
+import { adminActivationPaths, adminActivationSchemas } from "./openapi-admin-activation.js";
+import { adminDirectLoginPaths, adminDirectLoginSchemas } from "./openapi-admin-direct-login.js";
+import { adminPublicLoginPaths } from "./openapi-admin-public-login.js";
 import { executiveInterventionPaths, executiveInterventionSchemas } from "./openapi-executive-interventions.js";
 
 function createSuccessResponseSchema(dataSchema: Record<string, unknown>): Record<string, unknown> {
@@ -1618,6 +1622,10 @@ export const openApiSpec = {
       },
     },
     ...governanceAdminPaths,
+    ...administrativeRecordsPaths,
+    ...adminActivationPaths,
+    ...adminDirectLoginPaths,
+    ...adminPublicLoginPaths,
     ...executiveInterventionPaths,
     "/admin/tasks": {
       get: {
@@ -2271,6 +2279,32 @@ export const openApiSpec = {
         },
       },
     },
+    "/admin/organization-options": {
+      get: {
+        tags: ["Territorial Organizations"],
+        summary: "List organization IDs and names in the current administrative scope",
+        operationId: "listOrganizationOptions",
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          { name: "limit", in: "query", schema: { type: "integer", minimum: 1, maximum: 200, default: 50 } },
+          { name: "offset", in: "query", schema: { type: "integer", minimum: 0, maximum: 10000, default: 0 } },
+        ],
+        responses: {
+          "200": { description: "Scoped organization names without contacts or leadership records", content: { "application/json": { schema: {
+            allOf: [
+              { $ref: "#/components/schemas/ApiSuccessResponse" },
+              { type: "object", properties: { data: { type: "object", required: ["rows", "total"], properties: {
+                rows: { type: "array", items: { type: "object", additionalProperties: false, required: ["id", "name"], properties: { id: { type: "string" }, name: { type: "string" } } } },
+                total: { type: "integer", minimum: 0 },
+              } } } },
+            ],
+          } } } },
+          "400": { description: "Invalid pagination" },
+          "401": { description: "Unauthorized" },
+          "403": { description: "Active administrative mandate required" },
+        },
+      },
+    },
     "/admin/organizations": {
       get: {
         tags: ["Territorial Organizations"],
@@ -2573,6 +2607,12 @@ export const openApiSpec = {
           },
         ],
         parameters: [
+          {
+            name: "dataset",
+            in: "query",
+            description: "The optional demo dataset is read-only and uses a separate database.",
+            schema: { type: "string", enum: ["real", "demo"], default: "real" },
+          },
           {
             name: "search",
             in: "query",
@@ -3235,6 +3275,7 @@ export const openApiSpec = {
             maxLength: 180,
             example: "admin",
           },
+          mfaCode: { type: "string", pattern: "^[0-9]{6}$", description: "Cod TOTP obligatoriu pentru conturile administrative, după înrolare nominală." },
           password: {
             type: "string",
             format: "password",
@@ -4333,6 +4374,9 @@ export const openApiSpec = {
         additionalProperties: false,
       },
       ...executiveInterventionSchemas,
+      ...administrativeRecordsSchemas,
+      ...adminActivationSchemas,
+      ...adminDirectLoginSchemas,
       ExecutiveDashboardSummary: {
         type: "object",
         required: [
@@ -4610,8 +4654,10 @@ export const openApiSpec = {
       },
       AdminMembersDashboardData: {
         type: "object",
-        required: ["generatedAt", "summary", "rows", "organizations", "pagination", "filters"],
+        required: ["dataset", "demoAvailable", "generatedAt", "summary", "rows", "organizations", "pagination", "filters"],
         properties: {
+          dataset: { type: "string", enum: ["real", "demo"] },
+          demoAvailable: { type: "boolean" },
           generatedAt: { type: "string", format: "date-time" },
           summary: { $ref: "#/components/schemas/AdminMembersDashboardSummary" },
           rows: { type: "array", items: { $ref: "#/components/schemas/AdminMembershipRow" } },

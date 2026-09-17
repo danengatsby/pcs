@@ -2,13 +2,17 @@
 
 Punctul unic de intrare este `/admin`, inclusiv pentru butonul „Autentificare ca admin”. Rutele anterioare rămân valide, dar sunt acum copii ai aceluiași shell, cu navigare adaptată pe mobil.
 
-Butonul „Autentificare ca admin” folosește contul comun indicat prin `AUTH_PUBLIC_ADMIN_EMAIL` în `server/.env`, indiferent de datele completate în formular. Această opțiune permite oricărui vizitator al site-ului acces fără parolă cu drepturile acelui cont. Valoarea implicită este goală (dezactivat); activarea cere adresa completă a unui cont existent cu rol administrativ. Nu se creează conturi și nu se schimbă roluri automat.
+Butonul „Autentificare ca admin” verifică utilizatorul și parola completate în formular, apoi cere codul TOTP al titularului. Accesul comun prin `AUTH_PUBLIC_ADMIN_EMAIL` a fost eliminat. Sesiunile administrative vechi, fără MFA, sunt refuzate inclusiv la refresh.
 
-Clientul trimite acțiunea publică prin `POST /api/auth/signin` cu `{ "email": "admin", "password": "admin" }`; perechea identifică acțiunea și nu reprezintă parola contului. Autentificarea obișnuită verifică în continuare parola introdusă. Ambele fluxuri păstrează limitarea cererilor și sesiunile cu refresh/revocare. Sesiunile admin deja deschise intră direct în `/admin` la vizitarea paginii de autentificare.
-
-Pentru oprirea accesului public, goliți `AUTH_PUBLIC_ADMIN_EMAIL` și reporniți API-ul. Aceasta oprește intrările noi; sesiunile deja emise trebuie revocate separat dacă se dorește închiderea lor imediată.
+Conturile, înrolarea/recuperarea MFA, atribuțiile și pregătirea release-ului sunt descrise în [Acces administrativ nominal](admin-security.md).
 
 ## Organizarea informațiilor
+
+### Set demonstrativ administrativ
+
+`ADMIN_DEMO_DATA_ALLOWED=true` este acceptat numai într-o instanță separată, cu `NODE_ENV=development`, bază dedicată `*_demo` și notificări email dezactivate. Producția refuză opțiunea și orice inventar de date demo. Testele folosesc exclusiv o bază explicită de test.
+
+În instanța separată, `NODE_ENV=development npm run db:seed-admin-demo --workspace server` încarcă 60 de membri, 24 de voluntari, 7 organizații și 7 organizatori fictivi, marcați „Demo”. Rerularea nu resetează dosarele modificate. Datele demonstrative nu sunt aprobate public și nu generează notificări. Vezi [procedura de separare](admin-security.md#demonstrații-separate).
 
 Meniul și pagina de intrare folosesc aceleași patru domenii: **Sinteză**, **Oameni**, **Organizare** și **Guvernanță**. Domeniile fără registre autorizate nu sunt afișate. „Prezentare generală” revine la `/admin`, iar paginile interioare indică poziția curentă în administrare.
 
@@ -22,6 +26,7 @@ Meniul și protecția accesului direct folosesc capabilitățile efective din `G
 
 | Rută | Capabilitate | Sarcini numărate |
 | --- | --- | --- |
+| `/admin/communications` | `communication.preview` | Comunicare autorizată, fără contor |
 | `/admin/dashboard` | `executive.read` | Sinteză, fără un contor duplicat |
 | `/admin/volunteers` | `recruitment.read` | Dosare noi sau cu revenire/memento depășit, exceptând dosarele active |
 | `/admin/members` | `membership.read` | Cereri cu status `application` |

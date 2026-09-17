@@ -1,3 +1,4 @@
+import { signinTestInput } from "../helpers/adminAuth.js";
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { test } from "node:test";
@@ -21,7 +22,7 @@ async function signupWithRole(input: {
   await query("UPDATE users SET role = $2 WHERE LOWER(email) = LOWER($1)", [input.email, input.role]);
   const response = await request(app)
     .post("/api/auth/signin")
-    .send({ email: input.email, password: input.password })
+    .send(await signinTestInput({ email: input.email, password: input.password }))
     .expect(200);
   const token = response.body?.data?.token as string | undefined;
   const userId = response.body?.data?.user?.id as string | undefined;

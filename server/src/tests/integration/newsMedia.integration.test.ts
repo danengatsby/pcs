@@ -1,3 +1,4 @@
+import { signinTestInput } from "../helpers/adminAuth.js";
 import assert from "node:assert/strict";
 import { constants as fsConstants } from "node:fs";
 import { access, rm, writeFile } from "node:fs/promises";
@@ -63,10 +64,10 @@ async function readAdminToken(email: string, password: string): Promise<string> 
 
   const signinResponse = await request(app)
     .post("/api/auth/signin")
-    .send({
+    .send(await signinTestInput({
       email,
       password,
-    })
+    }))
     .expect(200);
 
   const token = (signinResponse.body as SigninResponse).data?.token ?? "";

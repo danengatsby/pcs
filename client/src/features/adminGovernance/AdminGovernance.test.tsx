@@ -15,7 +15,7 @@ const caseRow = { id: '8', caseNumber: 'ARB-8', subject: 'Sesizare teritorială'
 function renderPage(page: 'congress' | 'arbitration', manage = true) {
   const auth: AuthContextValue = { user: { id: '1', email: 'a@example.test', fullName: 'Secretar', role: 'SECRETAR' }, loading: false, signin: vi.fn(), signout: vi.fn(), reload: vi.fn() }
   return render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><AuthContext.Provider value={auth}>
-    <AdminContext.Provider value={{ access: { role: 'SECRETAR', capabilities: ['organization.read', ...(manage ? ['congress.manage', 'arbitration.manage'] : [])], scope: { national: false, label: 'Cluj', organizationIds: ['cluj'] } } }}>
+    <AdminContext.Provider value={{ access: { role: 'SECRETAR', capabilities: ['workspace.read', ...(manage ? ['congress.manage', 'arbitration.manage'] : [])], scope: { national: false, label: 'Cluj', organizationIds: ['cluj'] } } }}>
       {page === 'congress' ? <CongressPage /> : <ArbitrationPage />}
     </AdminContext.Provider>
   </AuthContext.Provider></QueryClientProvider>)
@@ -24,7 +24,7 @@ function renderPage(page: 'congress' | 'arbitration', manage = true) {
 describe('administrative governance routes', () => {
   beforeEach(() => {
     vi.resetAllMocks()
-    vi.mocked(apiGet).mockImplementation(async (path) => ({ ok: true, data: path.includes('/organizations') ? { rows: [{ id: 'cluj', name: 'Filiala Cluj' }], total: 1 } : path.includes('/congresses') ? [congress] : [caseRow] }))
+    vi.mocked(apiGet).mockImplementation(async (path) => ({ ok: true, data: path.includes('/organization-options') ? { rows: [{ id: 'cluj', name: 'Filiala Cluj' }], total: 1 } : path.includes('/congresses') ? [congress] : [caseRow] }))
     vi.mocked(apiPost).mockResolvedValue({ ok: true, data: { id: '9' } })
   })
 

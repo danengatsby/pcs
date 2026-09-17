@@ -6,6 +6,7 @@ import RequireAuth from './components/RequireAuth'
 import RequireAdmin from './components/RequireAdmin'
 import { AdminLayout } from '@features/adminShell/AdminLayout'
 import { AdminHomePage, RequireCapability } from '@features/adminShell/AdminPages'
+import { CommunicationsPage } from '@features/adminShell/CommunicationsPage'
 import {
   loadAdminMembersDashboardPage,
   loadAuthPolicyPage,
@@ -62,6 +63,8 @@ const NewsListPage = lazyNamed(loadNewsListPage, 'NewsListPage')
 const NewsDetailPage = lazyNamed(loadNewsDetailPage, 'NewsDetailPage')
 const AuthPolicyPage = lazyNamed(loadAuthPolicyPage, 'AuthPolicyPage')
 const SigninPage = lazyNamed(loadSigninPage, 'SigninPage')
+const AdminActivationPage = lazyNamed(() => import('@features/auth/routes/AdminActivationPage'), 'AdminActivationPage')
+const AdminDirectLoginPage = lazyNamed(() => import('@features/auth/routes/AdminDirectLoginPage'), 'AdminDirectLoginPage')
 const UserProfilePage = lazyNamed(loadUserProfilePage, 'UserProfilePage')
 const ContactPage = lazyNamed(loadContactPage, 'ContactPage')
 const ExecutiveDashboardPage = lazyNamed(loadExecutiveDashboardPage, 'ExecutiveDashboardPage')
@@ -74,6 +77,8 @@ const MobilizationPage = lazyNamed(loadMobilizationPage, 'MobilizationPage')
 const PoliticalOperationsPage = lazyNamed(loadPoliticalOperationsPage, 'PoliticalOperationsPage')
 const CongressPage = lazyNamed(loadCongressPage, 'CongressPage')
 const ArbitrationPage = lazyNamed(loadArbitrationPage, 'ArbitrationPage')
+const TreasuryPage = lazyNamed(() => import('@features/adminRecords/TreasuryPage'), 'TreasuryPage')
+const ParliamentaryPage = lazyNamed(() => import('@features/adminRecords/ParliamentaryPage'), 'ParliamentaryPage')
 
 export const router = createBrowserRouter([
   {
@@ -95,6 +100,8 @@ export const router = createBrowserRouter([
       { path: '/documente/:documentSlug', element: renderRoute(<DocumentPage />) },
       { path: '/auth/policy', element: renderRoute(<AuthPolicyPage />) },
       { path: '/auth/signin', element: renderRoute(<SigninPage />) },
+      { path: '/auth/activate', element: renderRoute(<AdminActivationPage />) },
+      { path: '/auth/direct', element: renderRoute(<AdminDirectLoginPage />) },
       {
         path: '/profil',
         element: renderRoute(
@@ -108,8 +115,11 @@ export const router = createBrowserRouter([
         element: <RequireAdmin><AdminLayout /></RequireAdmin>,
         children: [
           { index: true, element: <AdminHomePage /> },
+          { path: 'treasury', element: <RequireCapability capability="finance.read">{renderRoute(<TreasuryPage />)}</RequireCapability> },
+          { path: 'parliamentary', element: <RequireCapability capability="parliamentary.read">{renderRoute(<ParliamentaryPage />)}</RequireCapability> },
           { path: 'dashboard', element: <RequireCapability capability="executive.read">{renderRoute(<ExecutiveDashboardPage />)}</RequireCapability> },
           { path: 'mobilization', element: <RequireCapability capability="mobilization.read">{renderRoute(<PoliticalOperationsPage />)}</RequireCapability> },
+          { path: 'communications', element: <RequireCapability capability="communication.preview"><CommunicationsPage /></RequireCapability> },
           { path: 'organizations', element: <RequireCapability capability="organization.read">{renderRoute(<TerritorialOrganizationsPage />)}</RequireCapability> },
           { path: 'members', element: <RequireCapability capability="membership.read">{renderRoute(<AdminMembersDashboardPage />)}</RequireCapability> },
           { path: 'volunteers', element: <RequireCapability capability="recruitment.read">{renderRoute(<VolunteersAdminPage />)}</RequireCapability> },

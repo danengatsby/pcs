@@ -76,8 +76,7 @@ export function HomePage() {
           <div className="hero-copy">
             <div className="hero-kicker">Ce apărăm · Ce facem · Cum te implici</div>
             <h1 className="home-hero__headline">
-              Demnitate pentru seniori.
-              <span>Răspundere pentru România.</span>
+              PARTIDUL CONSERVATOR AL SENIORILOR
             </h1>
             <p className="lead home-hero__lead">
               PCS apără pensia demnă, sănătatea accesibilă și dreptul seniorilor de a decide. Am publicat

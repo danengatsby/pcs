@@ -3,9 +3,17 @@ import { listAdminAudit, parseAdminAuditCursor } from "../../../lib/adminAudit.j
 import { AppError } from "../../../lib/errors.js";
 import { sendSuccess } from "../../../lib/http.js";
 import { parsePositiveInt } from "../admin.shared.js";
+import { requireAdminAccess } from "../../../lib/adminAuthorization.js";
 
 export const listAdminAuditHandler: RequestHandler = async (req, res, next) => {
   try {
+    const access = requireAdminAccess(res);
+    // The general audit must not provide a second route into confidential registers.
+    const excludedTargetTypes = [
+      ...(!access.capabilities.includes("finance.read") ? ["treasury_entry"] : []),
+      ...(!access.capabilities.includes("parliamentary.read") ? ["parliamentary_item"] : []),
+      ...(!access.capabilities.includes("arbitration.read") ? ["arbitration_case", "arbitration_party", "arbitration_evidence", "arbitration_conflict", "arbitration_decision", "arbitration_appeal"] : []),
+    ];
     const limit = parsePositiveInt(req.query.limit, 80, 1, 300);
     const rawCursor = typeof req.query.cursor === "string" ? req.query.cursor.trim() : "";
     const cursor = parseAdminAuditCursor(rawCursor);
@@ -27,6 +35,7 @@ export const listAdminAuditHandler: RequestHandler = async (req, res, next) => {
       targetType: targetTypeValue,
       targetId: targetIdValue,
       cursor,
+      excludedTargetTypes,
     });
 
     sendSuccess(res, result.rows, {

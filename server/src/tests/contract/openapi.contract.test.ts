@@ -6,7 +6,7 @@ import { packageVersion } from "../../lib/buildInfo.js";
 import { openApiSpec } from "../../lib/openapi-spec.js";
 import { emailTestSchema } from "../../modules/admin/admin.shared.js";
 import { refreshCsrfHeaderName } from "../../modules/auth/types.js";
-import { signinSchema, signupSchema } from "../../modules/auth/validation.js";
+import { signinSchema, signupSchema, activationCompleteSchema, activationPreviewSchema } from "../../modules/auth/validation.js";
 import { memberWorkflowStatuses } from "../../modules/members/members.schema.js";
 import {
   membershipActionSchema,
@@ -198,6 +198,8 @@ test("openapi contract: spec version should match package version metadata", () 
 test("openapi contract: auth request schemas should match live zod schemas", () => {
   assertComponentMatchesZodObject("AuthSignupInput", signupSchema);
   assertComponentMatchesZodObject("AuthSigninInput", signinSchema);
+  assertComponentMatchesZodObject("AdminActivationPreviewInput", activationPreviewSchema);
+  assertComponentMatchesZodObject("AdminActivationCompleteInput", activationCompleteSchema);
 });
 
 test("openapi contract: volunteer and admin write schemas should match live zod schemas", () => {
@@ -312,9 +314,10 @@ test("openapi contract: members and admin endpoints should expose implemented pa
   assertParameterNames("/members", "get", ["search", "status", "limit", "offset"]);
   assertParameterNames("/admin/executive-dashboard", "get", []);
   assertParameterNames("/admin/executive-dashboard/targets/{key}", "patch", ["key"]);
-  assertParameterNames("/admin/members/dashboard", "get", ["search", "status", "organizationId", "limit", "offset"]);
+  assertParameterNames("/admin/members/dashboard", "get", ["dataset", "search", "status", "organizationId", "limit", "offset"]);
   assertPositiveIntegerPathParameter("/admin/members/{id}/actions", "post");
   assertParameterNames("/admin/organizations", "get", ["search", "level", "status", "limit", "offset"]);
+  assertParameterNames("/admin/organization-options", "get", ["limit", "offset"]);
   assertParameterNames("/admin/organizations", "post", []);
   assertParameterNames("/admin/organizations/{id}", "get", ["id"]);
   assertParameterNames("/admin/organizations/{id}", "patch", ["id"]);

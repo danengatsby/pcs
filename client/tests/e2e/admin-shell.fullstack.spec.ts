@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { expect, test } from "@playwright/test";
-import { signupUser } from "./helpers/auth";
+import { signupUser, signInThroughUi, signOutThroughUi } from "./helpers/auth";
 import { buildTestEmail, deleteUserByEmail, query, setUserRole } from "./helpers/testDb";
 
 test.use({ actionTimeout: 10_000 });
@@ -21,15 +21,12 @@ test("territorial shell supports direct routes, live task badges, congress and a
     await query("INSERT INTO organization_territories (organization_id, territory_type, county_id, locality) SELECT $1, 'county', id, '' FROM counties WHERE name = 'Cluj'", [organizationId]);
     await query("INSERT INTO organization_leadership_mandates (organization_id, user_id, full_name, position_title, started_at, status) VALUES ($1, $2, 'Secretar interfață', 'Secretar', CURRENT_DATE, 'active')", [organizationId, actorId]);
 
-    await page.goto("/auth/signin");
-    await page.getByLabel("Utilizator").fill(email);
-    await page.getByLabel("Parolă", { exact: true }).fill(password);
-    await page.getByRole("button", { name: "Autentificare", exact: true }).click();
+    await signInThroughUi(page, { email, password });
     await expect(page).toHaveURL(/\/profil$/);
     await page.goto("/admin");
     await expect(page).toHaveURL(/\/admin$/);
     const nav = page.getByRole("navigation", { name: "Meniu administrativ" });
-    await expect(nav.getByRole("link")).toHaveCount(7);
+    await expect(nav.getByRole("link")).toHaveCount(6);
     await expect(nav.getByRole("link", { name: /Tablou de comandă/ })).toHaveCount(0);
 
     await nav.getByRole("link", { name: /Congres/ }).click();
@@ -46,6 +43,13 @@ test("territorial shell supports direct routes, live task badges, congress and a
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.screenshot({ path: testInfo.outputPath("admin-desktop.png"), fullPage: true });
 
+    await expect(nav.getByRole("link", { name: /Arbitraj/ })).toHaveCount(0);
+    await signOutThroughUi(page);
+    await query("INSERT INTO admin_access_profiles (user_id, profile, assigned_by, reason) VALUES ($1, 'arbitration', 'test-operator@example.test', 'Desemnare explicită pentru testul arbitrajului')", [actorId]);
+    await signInThroughUi(page, { email, password });
+    await expect(page).toHaveURL(/\/profil$/);
+    await page.goto('/admin');
+    await expect(nav.getByRole('link', { name: /Congres/ })).toHaveCount(0);
     await page.setViewportSize({ width: 390, height: 844 });
     await page.getByRole("button", { name: "Meniu administrativ" }).click();
     await nav.getByRole("link", { name: /Arbitraj/ }).click();

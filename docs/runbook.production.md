@@ -40,6 +40,7 @@ Reguli active in proiect:
 - buildurile locale folosesc `client/dist`; deploy-ul de productie nu scrie in directorul servit
 - fiecare deploy construieste frontend-ul intr-un director nou `.releases/client/<release-id>` si porneste API-ul cu `CLIENT_DIST_PATH` setat la acel director imutabil
 - procesul PM2 este repornit obligatoriu dupa build, cu `--update-env`
+- când se schimbă directorul sursă al release-ului, scriptul recreează numai procesele PCS afectate; PM2 poate păstra calea veche la un simplu restart. După pornire sunt verificate `pm_cwd`, `pm_exec_path` și `CLIENT_DIST_PATH` pentru API și ambii workeri
 - frontend nu publica source maps (`sourcemap: false`)
 - backend curata `server/dist` inainte de compilare (`rm -rf dist && tsc`)
 
@@ -58,9 +59,10 @@ npm run deploy:production
 
 Ordine importanta:
 - migrarea ruleaza dupa build si inainte de restart
-- dupa migrare, deploy-ul sterge tranzactional numai randurile marcate `is_demo=true`, apoi cere inventar zero; o dependenta ambigua anuleaza curatarea
+- dupa migrare, deploy-ul cere inventar zero de date demo; curățarea este o operație explicită separată, fără ștergeri automate în deploy
 - scriptul de migrari este forward-only si executa smoke checks DB dupa aplicare
 - `npm run db:seed` functioneaza numai cu `NODE_ENV=test`, `DEMO_DATA_ALLOWED=1` si un `TEST_DATABASE_URL` al carui nume contine `test`/`testing`
+- Acces nominal: configurează `AUTH_MFA_ENCRYPTION_KEY`, aplică migrarea 039 și înrolează administratorii înainte de restart. Datele demo sunt interzise în producție. Vezi `docs/admin-security.md`.
 - `pcs-server`, `pcs-email-outbox-worker` si `pcs-admin-audit-outbox-worker` sunt procese PM2 separate; workerii nu ruleaza in procesul API
 - `npm run predeploy` verifică secretele obligatorii, alinierea PM2/Docker/aplicație și răspunsul `PONG` al `clamd`
 - build-ul frontend nu citeste secretele din `server/.env` si nu necesita chei de verificare externe

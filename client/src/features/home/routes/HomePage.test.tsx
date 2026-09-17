@@ -11,7 +11,7 @@ describe('HomePage', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getByRole('heading', { name: /Demnitate pentru seniori/ })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'PARTIDUL CONSERVATOR AL SENIORILOR' })).toBeInTheDocument()
     expect(screen.getByText(/PCS apără pensia demnă, sănătatea accesibilă/)).toBeInTheDocument()
     expect(screen.getByText(/Am publicat Programul 2026—2034/)).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Primele trei angajamente ale PCS' })).toBeInTheDocument()

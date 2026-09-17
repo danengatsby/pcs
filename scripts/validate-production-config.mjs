@@ -8,6 +8,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const envPath = process.argv[2] ?? path.join(root, "server", ".env");
 const required = [
   "AUTH_TOKEN_SECRET",
+  "AUTH_MFA_ENCRYPTION_KEY",
   "CORS_ORIGIN",
   "POSTGRES_HOST",
   "POSTGRES_DB",
@@ -60,6 +61,8 @@ function checkClamd(host, port) {
 const values = { ...parse(await fs.readFile(envPath, "utf8")), ...process.env };
 for (const name of required) assertRealValue(values, name);
 if (values.NODE_ENV !== "production") fail("NODE_ENV trebuie să fie production.");
+if (!/^[a-f0-9]{64}$/i.test(values.AUTH_MFA_ENCRYPTION_KEY.trim())) fail("AUTH_MFA_ENCRYPTION_KEY trebuie să aibă 64 caractere hexazecimale.");
+if (/^(1|true|yes|on)$/i.test(values.ADMIN_DEMO_DATA_ALLOWED?.trim() ?? "")) fail("Datele demo sunt interzise în producție.");
 if (/(^|[_-])(test|testing|demo|seed)([_-]|$)/i.test(values.POSTGRES_DB.trim())) {
   fail("POSTGRES_DB de producție nu poate avea nume de bază test/demo/seed.");
 }

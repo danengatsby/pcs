@@ -16,7 +16,7 @@ import {
   readVolunteerRateLimitWindowMs,
 } from "./env/appConfig.js";
 import {
-  readAuthPublicAdminEmail,
+  readAuthMfaEncryptionKey,
   readAuthRefreshEnabled,
   readAuthRefreshStore,
   readAuthRefreshTtlSeconds,
@@ -46,6 +46,7 @@ import {
   validateMetricsPolicy,
 } from "./env/metricsConfig.js";
 import {
+  readBooleanFlag,
   readNodeEnv,
   readPublicBaseUrl,
 } from "./env/shared.js";
@@ -64,6 +65,8 @@ import {
   readOtelExporterUrl,
 } from "./env/telemetryConfig.js";
 import { validateClamAvConfigForEnvironment } from "./clamav.js";
+import { assertAdminDemoEnvironment } from "./adminDemoPolicy.js";
+import { readAdminDemoDatabaseUrl } from "./env/adminDemoViewConfig.js";
 
 const currentFile = fileURLToPath(import.meta.url);
 const currentDir = path.dirname(currentFile);
@@ -100,6 +103,7 @@ const metricsEnabled = readMetricsEnabled(nodeEnv);
 const metricsBearerToken = readMetricsBearerToken();
 
 const emailNotificationsEnabled = readEmailNotificationsEnabled();
+const databaseUrl = readDatabaseUrl();
 const emailSmtpUser = readEmailSmtpUser();
 const emailSmtpPass = readEmailSmtpPass();
 
@@ -127,11 +131,13 @@ if (corsCredentials && corsOrigins.includes("*")) {
 
 export const env = {
   nodeEnv,
+  adminDemoDataAllowed: readBooleanFlag(process.env.ADMIN_DEMO_DATA_ALLOWED, false),
   port: readPort(),
   bindHost: readBindHost(nodeEnv),
   corsOrigins,
   corsCredentials,
-  databaseUrl: readDatabaseUrl(),
+  databaseUrl,
+  adminDemoDatabaseUrl: readAdminDemoDatabaseUrl(process.env.ADMIN_DEMO_DATABASE_URL, databaseUrl, nodeEnv),
   logLevel: readLogLevel(),
   volunteerRateLimitWindowMs: readVolunteerRateLimitWindowMs(),
   volunteerRateLimitMax: readVolunteerRateLimitMax(),
@@ -147,7 +153,8 @@ export const env = {
   authTokenTtlSeconds,
   authTokenIssuer: readAuthTokenIssuer(),
   authTokenAudience: readAuthTokenAudience(),
-  authPublicAdminEmail: readAuthPublicAdminEmail(),
+  authMfaEncryptionKey: readAuthMfaEncryptionKey(nodeEnv),
+  authPublicAdminEnabled: readBooleanFlag(process.env.AUTH_PUBLIC_ADMIN_ENABLED, false),
   authRefreshEnabled,
   authRefreshTtlSeconds,
   authRefreshStore,
@@ -173,3 +180,5 @@ export const env = {
 };
 
 export type AppEnv = typeof env;
+
+assertAdminDemoEnvironment({ nodeEnv, databaseUrl: env.databaseUrl, enabled: env.adminDemoDataAllowed, emailNotificationsEnabled });

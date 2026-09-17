@@ -167,6 +167,24 @@ describe('AppProviders', () => {
     expect(authStorage.getAccessToken()).toBeNull()
     expect(authStorage.getCsrfToken()).toBeNull()
   })
+
+  it('updates the visible user when automatic renewal invalidates the session', async () => {
+    renderWithProviders()
+    await waitFor(() => expect(screen.getByTestId('loading')).toHaveTextContent('false'))
+    act(() => { authStorage.setFromResponse(buildSessionResponse()) })
+    expect(screen.getByTestId('user')).toHaveTextContent('admin@example.test')
+    act(() => { authStorage.clear() })
+    expect(screen.getByTestId('user')).toHaveTextContent('none')
+  })
+
+  it('keeps the browser session available when startup refresh temporarily fails', async () => {
+    authStorage.set({ csrfToken: 'stored-csrf' })
+    vi.mocked(refreshSession).mockResolvedValue({ ok: false, error: { status: 503, message: 'Temporarily unavailable.' } })
+    renderWithProviders()
+    await waitFor(() => expect(screen.getByTestId('loading')).toHaveTextContent('false'))
+    expect(screen.getByTestId('user')).toHaveTextContent('none')
+    expect(authStorage.getCsrfToken()).toBe('stored-csrf')
+  })
 })
 
 function renderWithProviders() {

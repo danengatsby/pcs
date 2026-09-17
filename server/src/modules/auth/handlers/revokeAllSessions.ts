@@ -3,6 +3,7 @@ import { revokeAllRefreshTokenSessionsForUser } from "../../../lib/authRefreshTo
 import { sendSuccess } from "../../../lib/http.js";
 import { readAuthUser } from "../../../lib/authMiddleware.js";
 import { clearRefreshCookies } from "../cookies.js";
+import { revokeAdminSession } from "../../../lib/adminMfa.js";
 
 export async function revokeAllSessionsHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
@@ -14,6 +15,7 @@ export async function revokeAllSessionsHandler(req: Request, res: Response, next
       return;
     }
 
+    await revokeAdminSession({ userId: user.id });
     await revokeAllRefreshTokenSessionsForUser(user.id);
 
     clearRefreshCookies(res);

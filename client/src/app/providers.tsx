@@ -18,13 +18,14 @@ async function restoreStoredSession(): Promise<AuthUser | null> {
   if (csrfToken) {
     const refreshed = await refreshSession()
     if (refreshed.ok) {
-      authStorage.setFromResponse(refreshed.data)
+      if (authStorage.getAccessToken() !== refreshed.data.token) authStorage.setFromResponse(refreshed.data)
       return refreshed.data.user
     }
   }
 
   if (!authStorage.getAccessToken()) {
-    authStorage.clear()
+    // A temporary refresh failure must not erase a still valid browser session.
+    if (!authStorage.getCsrfToken()) authStorage.clear()
     return null
   }
 
@@ -41,6 +42,11 @@ export function AppProviders({ children }: AppProvidersProps) {
   const [queryClient] = useState(createAppQueryClient)
   const [user, setUser] = useState<AuthUser | null>(null)
   const [loading, setLoading] = useState(true)
+
+  useEffect(() => authStorage.subscribe(nextUser => {
+    setUser(nextUser)
+    if (!nextUser) queryClient.clear()
+  }), [queryClient])
 
   const reload = useCallback(async () => {
     setLoading(true)

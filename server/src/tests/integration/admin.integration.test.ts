@@ -1,3 +1,4 @@
+import { signinTestInput } from "../helpers/adminAuth.js";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import request from "supertest";
@@ -63,10 +64,10 @@ test("admin endpoints should update volunteer workflow, export csv and expose au
 
     const signinResponse = await request(app)
       .post("/api/auth/signin")
-      .send({
+      .send(await signinTestInput({
         email: adminEmail,
         password,
-      })
+      }))
       .expect(200);
 
     const token = signinResponse.body?.data?.token as string | undefined;
@@ -376,10 +377,10 @@ test("admin volunteers should include aderent users even without volunteer form 
 
     const signinResponse = await request(app)
       .post("/api/auth/signin")
-      .send({
+      .send(await signinTestInput({
         email: adminEmail,
         password,
-      })
+      }))
       .expect(200);
 
     const token = signinResponse.body?.data?.token as string | undefined;
@@ -460,10 +461,10 @@ test("admin should bulk update volunteer workflow for multiple records", async (
 
     const signinResponse = await request(app)
       .post("/api/auth/signin")
-      .send({
+      .send(await signinTestInput({
         email: adminEmail,
         password,
-      })
+      }))
       .expect(200);
 
     const token = signinResponse.body?.data?.token as string | undefined;
@@ -666,10 +667,10 @@ test("admin should bulk delete volunteer records for multiple selections", async
 
     const signinResponse = await request(app)
       .post("/api/auth/signin")
-      .send({
+      .send(await signinTestInput({
         email: adminEmail,
         password,
-      })
+      }))
       .expect(200);
 
     const token = signinResponse.body?.data?.token as string | undefined;

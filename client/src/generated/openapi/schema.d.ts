@@ -843,6 +843,274 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/treasury/entries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List treasury entries with posted totals across all matching pages
+         * @description Requires finance.read, an individual MFA session and an active national mandate. Records are internal; changes are audited.
+         */
+        get: operations["listTreasuryEntries"];
+        put?: never;
+        /**
+         * Create a draft; repeated identical requestId is idempotent
+         * @description Requires finance.manage, an individual MFA session and an active national mandate. Records are internal; changes are audited.
+         */
+        post: operations["createTreasuryEntry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/treasury/entries/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Edit a draft with optimistic concurrency
+         * @description Requires finance.manage, an individual MFA session and an active national mandate. Records are internal; changes are audited.
+         */
+        patch: operations["updateTreasuryEntry"];
+        trace?: never;
+    };
+    "/admin/treasury/entries/{id}/post": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Confirm a draft and include it in totals
+         * @description Requires finance.manage, an individual MFA session and an active national mandate. Records are internal; changes are audited.
+         */
+        post: operations["postTreasuryEntry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/treasury/entries/{id}/void": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Void an entry with a retained reason; never delete it
+         * @description Requires finance.manage, an individual MFA session and an active national mandate. Records are internal; changes are audited.
+         */
+        post: operations["voidTreasuryEntry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/treasury/entries/{id}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read the last 50 attributed treasury changes
+         * @description Requires finance.read, an individual MFA session and an active national mandate. Records are internal; changes are audited.
+         */
+        get: operations["treasuryEntryHistory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/parliamentary/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List parliamentary work, responsible people and deadlines
+         * @description Requires parliamentary.read, an individual MFA session and an active national mandate. Records are internal; changes are audited.
+         */
+        get: operations["listParliamentaryItems"];
+        put?: never;
+        /**
+         * Create an internal work item with an idempotent request ID
+         * @description Requires parliamentary.manage, an individual MFA session and an active national mandate. Records are internal; changes are audited.
+         */
+        post: operations["createParliamentaryItem"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/parliamentary/assignees": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List named people with active national parliamentary duties
+         * @description Requires parliamentary.read, an individual MFA session and an active national mandate. Records are internal; changes are audited.
+         */
+        get: operations["listParliamentaryAssignees"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/parliamentary/items/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Edit open parliamentary work with a version check
+         * @description Requires parliamentary.manage, an individual MFA session and an active national mandate. Records are internal; changes are audited.
+         */
+        patch: operations["updateParliamentaryItem"];
+        trace?: never;
+    };
+    "/admin/parliamentary/items/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Record a justified stage change without submitting documents externally
+         * @description Requires parliamentary.manage, an individual MFA session and an active national mandate. Records are internal; changes are audited.
+         */
+        post: operations["transitionParliamentaryItem"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/parliamentary/items/{id}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read the last 50 attributed parliamentary changes
+         * @description Requires parliamentary.read, an individual MFA session and an active national mandate. Records are internal; changes are audited.
+         */
+        get: operations["parliamentaryItemHistory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/admin-activation/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Prepare initial administrator activation
+         * @description Requires an unexpired operator-issued 256-bit invitation. Only initial activation is supported. Responses use Cache-Control: private, no-store. The capability is sent in the JSON body, never as a URL query parameter.
+         */
+        post: operations["previewAdminActivation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/admin-activation/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Choose a password, confirm TOTP and start the personal session; consumes the invitation
+         * @description Requires an unexpired operator-issued 256-bit invitation. Only initial activation is supported. Responses use Cache-Control: private, no-store. The capability is sent in the JSON body, never as a URL query parameter.
+         */
+        post: operations["completeAdminActivation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/admin-direct-login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Consume a personal operator-issued link and enter administration directly
+         * @description Requires a one-use, 256-bit capability issued by a server operator for an already activated account. Expires after 30 minutes. This is an audited alternative to password plus TOTP, not a TOTP verification. Responses use Cache-Control: private, no-store. Send the capability only in the JSON body.
+         */
+        post: operations["redeemAdminDirectLogin"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/admin/executive-dashboard/interventions": {
         parameters: {
             query?: never;
@@ -1232,6 +1500,23 @@ export interface paths {
          * @description Retrieve active party organizations from the territorial registry
          */
         get: operations["listOrganizations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/organization-options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List organization IDs and names in the current administrative scope */
+        get: operations["listOrganizationOptions"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1705,6 +1990,8 @@ export interface components {
              * @example admin
              */
             email: string;
+            /** @description Cod TOTP obligatoriu pentru conturile administrative, după înrolare nominală. */
+            mfaCode?: string;
             /** Format: password */
             password: string;
         };
@@ -2266,6 +2553,101 @@ export interface components {
             /** Format: date */
             expectedExpiresOn: string | null;
         };
+        TreasuryCreateInput: {
+            organizationId: string | null;
+            /** @enum {string} */
+            kind: "income" | "expense";
+            /** @enum {string} */
+            category: "membership_fee" | "donation" | "subsidy" | "operations" | "event" | "other";
+            /** @description Positive RON decimal; at most two decimal places. Stored as integer bani. */
+            amount: string;
+            /** Format: date */
+            occurredOn: string;
+            description: string;
+            reference: string;
+            /** Format: uuid */
+            requestId: string;
+        };
+        TreasuryUpdateInput: {
+            organizationId: string | null;
+            /** @enum {string} */
+            kind: "income" | "expense";
+            /** @enum {string} */
+            category: "membership_fee" | "donation" | "subsidy" | "operations" | "event" | "other";
+            /** @description Positive RON decimal; at most two decimal places. Stored as integer bani. */
+            amount: string;
+            /** Format: date */
+            occurredOn: string;
+            description: string;
+            reference: string;
+            version: number;
+        };
+        TreasuryPostInput: {
+            version: number;
+            /** @enum {boolean} */
+            confirmed: true;
+        };
+        TreasuryVoidInput: {
+            version: number;
+            reason: string;
+        };
+        ParliamentaryCreateInput: {
+            title: string;
+            /** @enum {string} */
+            kind: "bill" | "amendment" | "question" | "committee_work";
+            /** @enum {string} */
+            chamber: "deputies" | "senate" | "joint";
+            reference: string;
+            /** @description Empty or HTTPS URL without credentials. */
+            sourceUrl: string;
+            description: string;
+            assignedTo: string | null;
+            /** Format: date */
+            dueOn: string | null;
+            /** Format: uuid */
+            requestId: string;
+        };
+        ParliamentaryUpdateInput: {
+            title: string;
+            /** @enum {string} */
+            kind: "bill" | "amendment" | "question" | "committee_work";
+            /** @enum {string} */
+            chamber: "deputies" | "senate" | "joint";
+            reference: string;
+            /** @description Empty or HTTPS URL without credentials. */
+            sourceUrl: string;
+            description: string;
+            assignedTo: string | null;
+            /** Format: date */
+            dueOn: string | null;
+            version: number;
+        };
+        ParliamentaryTransitionInput: {
+            version: number;
+            /** @enum {string} */
+            status: "draft" | "submitted" | "committee" | "scheduled" | "adopted" | "rejected" | "withdrawn";
+            reason: string;
+        };
+        AdminActivationPreviewInput: {
+            token: string;
+        };
+        AdminActivationCompleteInput: {
+            token: string;
+            password: string;
+            mfaCode: string;
+        };
+        AdminActivationPreviewData: {
+            fullName: string;
+            /** Format: email */
+            email: string;
+            secret: string;
+            qrDataUrl: string;
+            /** Format: date-time */
+            expiresAt: string;
+        };
+        AdminDirectLoginInput: {
+            token: string;
+        };
         ExecutiveDashboardSummary: {
             applicationsTotal: number;
             applicationsLast30Days: number;
@@ -2437,6 +2819,9 @@ export interface components {
             hasNext: boolean;
         };
         AdminMembersDashboardData: {
+            /** @enum {string} */
+            dataset: "real" | "demo";
+            demoAvailable: boolean;
             /** Format: date-time */
             generatedAt: string;
             summary: components["schemas"]["AdminMembersDashboardSummary"];
@@ -4978,6 +5363,869 @@ export interface operations {
             };
         };
     };
+    listTreasuryEntries: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                search?: string;
+                kind?: "income" | "expense";
+                status?: "draft" | "posted" | "voided";
+                year?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid input or assignee */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication and MFA required */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Duty profile or national mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Record not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Stale version, conflicting request ID or invalid transition */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    createTreasuryEntry: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TreasuryCreateInput"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid input or assignee */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication and MFA required */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Duty profile or national mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Record not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Stale version, conflicting request ID or invalid transition */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateTreasuryEntry: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TreasuryUpdateInput"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid input or assignee */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication and MFA required */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Duty profile or national mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Record not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Stale version, conflicting request ID or invalid transition */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    postTreasuryEntry: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TreasuryPostInput"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid input or assignee */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication and MFA required */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Duty profile or national mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Record not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Stale version, conflicting request ID or invalid transition */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    voidTreasuryEntry: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TreasuryVoidInput"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid input or assignee */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication and MFA required */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Duty profile or national mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Record not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Stale version, conflicting request ID or invalid transition */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    treasuryEntryHistory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid input or assignee */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication and MFA required */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Duty profile or national mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Record not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Stale version, conflicting request ID or invalid transition */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listParliamentaryItems: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                search?: string;
+                status?: "draft" | "submitted" | "committee" | "scheduled" | "adopted" | "rejected" | "withdrawn";
+                chamber?: "deputies" | "senate" | "joint";
+                pending?: "true" | "false";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid input or assignee */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication and MFA required */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Duty profile or national mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Record not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Stale version, conflicting request ID or invalid transition */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    createParliamentaryItem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ParliamentaryCreateInput"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid input or assignee */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication and MFA required */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Duty profile or national mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Record not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Stale version, conflicting request ID or invalid transition */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    listParliamentaryAssignees: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid input or assignee */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication and MFA required */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Duty profile or national mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Record not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Stale version, conflicting request ID or invalid transition */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateParliamentaryItem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ParliamentaryUpdateInput"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid input or assignee */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication and MFA required */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Duty profile or national mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Record not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Stale version, conflicting request ID or invalid transition */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    transitionParliamentaryItem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ParliamentaryTransitionInput"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid input or assignee */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication and MFA required */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Duty profile or national mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Record not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Stale version, conflicting request ID or invalid transition */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    parliamentaryItemHistory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"];
+                };
+            };
+            /** @description Invalid input or assignee */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication and MFA required */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Duty profile or national mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Record not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Stale version, conflicting request ID or invalid transition */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    previewAdminActivation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminActivationPreviewInput"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AdminActivationPreviewData"];
+                        error: unknown;
+                        meta: components["schemas"]["ApiMeta"];
+                    };
+                };
+            };
+            /** @description Invalid input */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid, expired, used invitation or incorrect TOTP */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Too many attempts */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    completeAdminActivation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminActivationCompleteInput"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AuthSessionData"];
+                        error: unknown;
+                        meta: components["schemas"]["ApiMeta"];
+                    };
+                };
+            };
+            /** @description Invalid input */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid, expired, used invitation or incorrect TOTP */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Too many attempts */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    redeemAdminDirectLogin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminDirectLoginInput"];
+            };
+        };
+        responses: {
+            /** @description Personal administrative session */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AuthSessionData"];
+                        error: unknown;
+                        meta: components["schemas"]["ApiMeta"];
+                    };
+                };
+            };
+            /** @description Invalid input */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid, expired, consumed or revoked link */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Too many attempts */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     listExecutiveInterventions: {
         parameters: {
             query?: {
@@ -5955,6 +7203,58 @@ export interface operations {
             };
         };
     };
+    listOrganizationOptions: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Scoped organization names without contacts or leadership records */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiSuccessResponse"] & {
+                        data?: {
+                            rows: {
+                                id: string;
+                                name: string;
+                            }[];
+                            total: number;
+                        };
+                    };
+                };
+            };
+            /** @description Invalid pagination */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Active administrative mandate required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     listAdminOrganizations: {
         parameters: {
             query?: {
@@ -6490,6 +7790,8 @@ export interface operations {
     listAdminMembersDashboard: {
         parameters: {
             query?: {
+                /** @description The optional demo dataset is read-only and uses a separate database. */
+                dataset?: "real" | "demo";
                 search?: string;
                 status?: components["schemas"]["MembershipStatus"];
                 organizationId?: string;

@@ -7,6 +7,10 @@ const sensitiveLogPaths = [
   "req.headers.authorization",
   "req.headers.cookie",
   "res.headers['set-cookie']",
+  "req.body.password",
+  "req.body.mfaCode",
+  "req.body.secret",
+  "req.body.token",
 ] as const;
 
 export const appLogger = pino({

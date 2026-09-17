@@ -318,6 +318,8 @@
 }
 
 .signin-page__card {
+  box-sizing: border-box;
+  min-width: 0;
   width: min(100%, 480px);
 }
 
@@ -1278,12 +1280,12 @@
 }
 
 .mobilization-hero h1 {
-  max-width: 14ch;
+  max-width: 22ch;
   margin: 14px 0 0;
-  font-size: clamp(2.7rem, 6vw, 4.7rem);
+  font-size: clamp(2rem, 4vw, 3.25rem);
   font-weight: 760;
-  line-height: 0.98;
-  letter-spacing: -0.052em;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
 }
 
 .mobilization-hero .lead {
@@ -1804,7 +1806,7 @@
   }
 
   .mobilization-hero h1 {
-    font-size: clamp(2.35rem, 12vw, 3.5rem);
+    font-size: clamp(1.65rem, 7vw, 2.4rem);
   }
 
   .mobilization-hero__summary,
@@ -3712,18 +3714,12 @@ code {
 }
 
 .home-hero__headline {
-  max-width: 13ch;
+  max-width: 22ch;
   margin: 14px 0 0;
-  font-size: clamp(2.7rem, 6vw, 4.9rem);
+  font-size: clamp(2rem, 4vw, 3.25rem);
   font-weight: 760;
-  line-height: 0.99;
-  letter-spacing: -0.055em;
-}
-
-.home-hero__headline span {
-  display: block;
-  margin-top: 0.16em;
-  color: var(--home-gold);
+  line-height: 1.12;
+  letter-spacing: -0.025em;
 }
 
 .home-hero__lead {
@@ -4160,7 +4156,7 @@ code {
   }
 
   .home-hero__headline {
-    font-size: clamp(2.45rem, 13vw, 3.7rem);
+    font-size: clamp(1.65rem, 7vw, 2.4rem);
   }
 
   .home-hero__identity {
@@ -4263,12 +4259,12 @@ code {
 }
 
 .contact-hero h1 {
-  max-width: 13ch;
+  max-width: 22ch;
   margin: 14px 0 0;
-  font-size: clamp(2.65rem, 6vw, 4.65rem);
+  font-size: clamp(2rem, 4vw, 3.25rem);
   font-weight: 750;
-  line-height: 1;
-  letter-spacing: -0.052em;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
 }
 
 .contact-hero .lead {
@@ -4651,7 +4647,7 @@ code {
   }
 
   .contact-hero h1 {
-    font-size: clamp(2.4rem, 12vw, 3.6rem);
+    font-size: clamp(1.65rem, 7vw, 2.4rem);
   }
 
   .contact-details,
@@ -4721,12 +4717,12 @@ code {
 }
 
 .news-hub__hero h1 {
-  max-width: 14ch;
+  max-width: 22ch;
   margin: 14px 0 0;
-  font-size: clamp(2.65rem, 6vw, 4.65rem);
+  font-size: clamp(2rem, 4vw, 3.25rem);
   font-weight: 750;
-  line-height: 1;
-  letter-spacing: -0.052em;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
 }
 
 .news-hub__hero .lead {
@@ -5034,7 +5030,7 @@ code {
   }
 
   .news-hub__hero h1 {
-    font-size: clamp(2.35rem, 12vw, 3.5rem);
+    font-size: clamp(1.65rem, 7vw, 2.4rem);
   }
 
   .news-hub__summary,
